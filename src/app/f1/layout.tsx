@@ -5,6 +5,8 @@ import { IconBrandYoutube } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+import { F1SubNav } from "@/components/f1/F1SubNav";
+
 export default function F1Layout({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<any>(null);
   const [nextRace, setNextRace] = useState<any>(null);
@@ -104,6 +106,8 @@ export default function F1Layout({ children }: { children: React.ReactNode }) {
           <span className="text-xs font-semibold text-white tracking-wide">Subscribe</span>
         </Link>
       </div>
+      
+      <F1SubNav />
       
       {/* PAGE CONTENT */}
       <div className="flex-1 overflow-y-auto">
