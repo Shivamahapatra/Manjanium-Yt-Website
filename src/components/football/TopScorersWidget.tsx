@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Clock, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Player as BasePlayer } from './PlayerStatsModal';
 
@@ -50,7 +50,7 @@ export function TopScorersWidget({
       .slice(0, 10);
   }, [scorers]);
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: { 
       opacity: 1, 
@@ -60,7 +60,7 @@ export function TopScorersWidget({
     }
   };
 
-  const rowVariants = {
+  const rowVariants: Variants = {
     hidden: { opacity: 0, x: -10 },
     visible: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };
