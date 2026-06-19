@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 
 export default function FootballHubPage() {
   const [fixtures, setFixtures] = useState<any[]>([]);
+  const [standings, setStandings] = useState<any[]>([]);
+  const [debugStats, setDebugStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,9 +16,9 @@ export default function FootballHubPage() {
       try {
         const response = await fetch('/api/football/fixtures/live');
         const data = await response.json();
-        // API-Sports wraps data arrays inside a "response" key
         if (data.response) {
           setFixtures(data.response);
+          setDebugStats(data.debug);
         }
       } catch (error) {
         console.error("Error fetching Football data", error);
@@ -24,19 +26,34 @@ export default function FootballHubPage() {
         setLoading(false);
       }
     };
+    const fetchStandings = async () => {
+      try {
+        const res = await fetch('/api/football/standings');
+        const data = await res.json();
+        if (data.response && data.response[0]?.league?.standings) {
+          setStandings(data.response[0].league.standings);
+        }
+      } catch (error) {
+        console.error("Error fetching standings", error);
+      }
+    };
+
     fetchLiveMatches();
+    fetchStandings();
     const interval = setInterval(fetchLiveMatches, 30000); // 30s polling
     return () => clearInterval(interval);
   }, []);
 
-  const isLive = fixtures.length > 0;
+  const liveCount = debugStats?.liveCount || 0;
+  const isLive = liveCount > 0;
+  const isUpcoming = !isLive && fixtures.length > 0;
 
   return (
     <div className="min-h-screen p-8 bg-neutral-100 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8 border-b border-neutral-300 dark:border-neutral-800 pb-4">
           <h1 className="text-4xl font-bold text-blue-600 dark:text-blue-500">Live Match Center</h1>
-          {isLive && (
+          {isLive ? (
             <motion.div
               animate={{ opacity: [1, 0.5, 1] }}
               transition={{ repeat: Infinity, duration: 1.5 }}
@@ -45,7 +62,15 @@ export default function FootballHubPage() {
               <div className="w-2 h-2 bg-white rounded-full"></div>
               LIVE MATCHES
             </motion.div>
-          )}
+          ) : isUpcoming ? (
+            <motion.div
+              animate={{ opacity: [1, 0.7, 1] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="bg-amber-500 text-white px-3 py-1 rounded-md text-sm font-bold flex items-center gap-2"
+            >
+              UPCOMING MATCHES
+            </motion.div>
+          ) : null}
         </div>
 
         {loading ? (
@@ -53,64 +78,125 @@ export default function FootballHubPage() {
             <Spin size="large" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {fixtures.map((match: any) => {
-              const homeTeam = match.teams.home;
-              const awayTeam = match.teams.away;
-              const fixture = match.fixture;
-              const league = match.league;
-
-              return (
-                <Card 
-                  key={fixture.id}
-                  hoverable
-                  className="rounded-[20px] overflow-hidden border-neutral-200 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm"
-                  bodyStyle={{ padding: 0 }}
-                >
-                  <div className="bg-neutral-200 dark:bg-neutral-800 px-4 py-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 flex justify-between">
-                    <span className="flex items-center gap-2">
-                      {league.logo && <img src={league.logo} alt={league.name} className="w-4 h-4 object-contain" />}
-                      {league.season} • {league.name}
-                    </span>
-                    <span className="text-red-500">
-                      {fixture.status.elapsed ? `${fixture.status.elapsed}'` : fixture.status.short}
-                    </span>
-                  </div>
-                  
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex flex-col items-center gap-2 w-1/3">
-                        <img src={homeTeam?.logo || "/placeholder.png"} alt={homeTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
-                        <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{homeTeam?.name}</span>
+          <>
+            {/* World Cup Standings UI */}
+            {standings.length > 0 && (
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold mb-6 text-neutral-800 dark:text-neutral-200">FIFA World Cup 2026 — Group Standings</h2>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {standings.map((group: any[], index: number) => (
+                    <div key={index} className="bg-white dark:bg-neutral-900 rounded-[20px] overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-sm">
+                      <div className="bg-neutral-100 dark:bg-neutral-800 px-4 py-2 font-bold text-neutral-800 dark:text-neutral-200 border-b border-neutral-200 dark:border-neutral-800">
+                        {group[0]?.group || `Group ${String.fromCharCode(65 + index)}`}
                       </div>
-                      
-                      <div className="flex flex-col items-center justify-center w-1/3">
-                        <div className="text-3xl font-black font-mono dark:text-white">
-                          {match.goals.home ?? 0} - {match.goals.away ?? 0}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-center gap-2 w-1/3">
-                        <img src={awayTeam?.logo || "/placeholder.png"} alt={awayTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
-                        <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{awayTeam?.name}</span>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                          <thead className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-900/50">
+                            <tr>
+                              <th className="px-4 py-2 w-8 text-center">Pos</th>
+                              <th className="px-4 py-2">Team</th>
+                              <th className="px-2 py-2 text-center">P</th>
+                              <th className="px-2 py-2 text-center">W</th>
+                              <th className="px-2 py-2 text-center">D</th>
+                              <th className="px-2 py-2 text-center">L</th>
+                              <th className="px-2 py-2 text-center">GD</th>
+                              <th className="px-4 py-2 text-center font-bold">Pts</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {group.map((teamData: any) => {
+                              const isTopTwo = teamData.rank <= 2;
+                              return (
+                                <tr key={teamData.team.id} className="border-b border-neutral-100 dark:border-neutral-800/50 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
+                                  <td className="px-4 py-2 text-center font-semibold text-neutral-500 dark:text-neutral-400">{teamData.rank}</td>
+                                  <td className={`px-4 py-2 font-semibold flex items-center gap-2 ${isTopTwo ? 'text-green-600 dark:text-green-500' : 'text-neutral-600 dark:text-neutral-400'}`}>
+                                    <img src={teamData.team.logo} alt={teamData.team.name} className="w-5 h-5 object-contain" />
+                                    {teamData.team.name}
+                                  </td>
+                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.all.played}</td>
+                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.all.win}</td>
+                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.all.draw}</td>
+                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.all.lose}</td>
+                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.goalsDiff}</td>
+                                  <td className="px-4 py-2 text-center font-bold text-neutral-900 dark:text-white">{teamData.points}</td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="bg-neutral-50 dark:bg-black px-4 py-3 border-t border-neutral-200 dark:border-neutral-800 text-sm flex justify-between">
-                    <span className="text-neutral-500">{fixture.venue?.name || "TBD"}</span>
-                    <span className="text-neutral-400 text-xs">{new Date(fixture.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                  </div>
-                </Card>
-              );
-            })}
-            
-            {!fixtures.length && (
-              <div className="col-span-full text-center py-20 text-neutral-500">
-                No live matches found right now. Check back later!
+                  ))}
+                </div>
               </div>
             )}
-          </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {fixtures.map((match: any) => {
+                const homeTeam = match.teams.home;
+                const awayTeam = match.teams.away;
+                const fixture = match.fixture;
+                const league = match.league;
+                const isMatchUpcoming = ['NS', 'TBD'].includes(fixture.status.short);
+
+                return (
+                  <Card 
+                    key={fixture.id}
+                    hoverable
+                    className="rounded-[20px] overflow-hidden border-neutral-200 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm"
+                    bodyStyle={{ padding: 0 }}
+                  >
+                    <div className="bg-neutral-200 dark:bg-neutral-800 px-4 py-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 flex justify-between">
+                      <span className="flex items-center gap-2">
+                        {league.logo && <img src={league.logo} alt={league.name} className="w-4 h-4 object-contain" />}
+                        {league.season} • {league.name}
+                      </span>
+                      <span className={isMatchUpcoming ? "text-amber-500" : "text-red-500"}>
+                        {fixture.status.elapsed ? `${fixture.status.elapsed}'` : fixture.status.short}
+                      </span>
+                    </div>
+                    
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col items-center gap-2 w-1/3">
+                          <img src={homeTeam?.logo || "/placeholder.png"} alt={homeTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
+                          <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{homeTeam?.name}</span>
+                        </div>
+                        
+                        <div className="flex flex-col items-center justify-center w-1/3">
+                          {isMatchUpcoming ? (
+                            <div className="text-xl font-bold text-neutral-600 dark:text-neutral-400 text-center whitespace-nowrap">
+                              {new Date(fixture.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          ) : (
+                            <div className="text-3xl font-black font-mono dark:text-white">
+                              {match.goals.home ?? 0} - {match.goals.away ?? 0}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex flex-col items-center gap-2 w-1/3">
+                          <img src={awayTeam?.logo || "/placeholder.png"} alt={awayTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
+                          <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{awayTeam?.name}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-neutral-50 dark:bg-black px-4 py-3 border-t border-neutral-200 dark:border-neutral-800 text-sm flex justify-between">
+                      <span className="text-neutral-500">{fixture.venue?.name || "TBD"}</span>
+                      <span className="text-neutral-400 text-xs">{new Date(fixture.date).toLocaleDateString()}</span>
+                    </div>
+                  </Card>
+                );
+              })}
+              
+              {!fixtures.length && (
+                <div className="col-span-full text-center py-20">
+                  <p className="text-neutral-500 dark:text-neutral-400 text-lg">No matches scheduled today.</p>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
 
