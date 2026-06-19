@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Clock, MapPin, Activity, AlertCircle, Shield, Goal, Flag, RefreshCw } from 'lucide-react';
 import { LiveTimeline, MatchEvent } from '@/components/football/LiveTimeline';
 import { TeamLineup } from '@/components/football/TeamLineup';
+import { MatchStatistics } from '@/components/football/MatchStatistics';
 
 export default function MatchDetailsPage() {
   const params = useParams();
@@ -200,60 +201,15 @@ export default function MatchDetailsPage() {
       );
     }
 
-    const StatBar = ({ label, homeVal, awayVal, invertColors = false }: any) => {
-      const total = (homeVal || 0) + (awayVal || 0);
-      const homePct = total === 0 ? 50 : ((homeVal || 0) / total) * 100;
-      const awayPct = total === 0 ? 50 : ((awayVal || 0) / total) * 100;
-
-      return (
-        <div className="mb-5">
-          <div className="flex justify-between text-xs font-bold mb-1">
-            <span className="text-blue-600 dark:text-blue-400">{homeVal}</span>
-            <span className="text-neutral-500 uppercase tracking-wider">{label}</span>
-            <span className="text-red-600 dark:text-red-400">{awayVal}</span>
-          </div>
-          <div className="flex h-2 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800 gap-1">
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: `${homePct}%` }}
-              className={`h-full ${invertColors ? 'bg-red-500' : 'bg-blue-500'}`}
-            />
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: `${awayPct}%` }}
-              className={`h-full ${invertColors ? 'bg-blue-500' : 'bg-red-500'}`}
-            />
-          </div>
-        </div>
-      );
-    };
-
     return (
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-sm border border-neutral-200 dark:border-neutral-800">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-bold text-lg flex items-center gap-2">
-            Team Statistics
-          </h3>
-        </div>
-
-        <div className="flex justify-between items-center mb-6 px-2">
-          {match.homeTeam?.logo && <img src={match.homeTeam.logo} className="w-8 h-8 object-contain" alt="home" />}
-          <span className="text-xs text-neutral-400 font-bold uppercase">vs</span>
-          {match.awayTeam?.logo && <img src={match.awayTeam.logo} className="w-8 h-8 object-contain" alt="away" />}
-        </div>
-
-        <StatBar label="Possession %" homeVal={s.homeTeam.possession} awayVal={s.awayTeam.possession} />
-        <StatBar label="Shots" homeVal={s.homeTeam.shots} awayVal={s.awayTeam.shots} />
-        <StatBar label="Shots on Target" homeVal={s.homeTeam.shotsOnTarget} awayVal={s.awayTeam.shotsOnTarget} />
-        <StatBar label="Passes" homeVal={s.homeTeam.passes} awayVal={s.awayTeam.passes} />
-        <StatBar label="Pass Completion %" homeVal={s.homeTeam.passCompletion} awayVal={s.awayTeam.passCompletion} />
-        <StatBar label="Tackles" homeVal={s.homeTeam.tackles} awayVal={s.awayTeam.tackles} />
-        <StatBar label="Interceptions" homeVal={s.homeTeam.interceptions} awayVal={s.awayTeam.interceptions} />
-        <StatBar label="Corners" homeVal={s.homeTeam.corners} awayVal={s.awayTeam.corners} />
-        <StatBar label="Fouls" homeVal={s.homeTeam.fouls} awayVal={s.awayTeam.fouls} invertColors />
-        <StatBar label="Yellow Cards" homeVal={s.homeTeam.yellowCards} awayVal={s.awayTeam.yellowCards} invertColors />
-        <StatBar label="Red Cards" homeVal={s.homeTeam.redCards} awayVal={s.awayTeam.redCards} invertColors />
-      </div>
+      <MatchStatistics 
+        homeTeamStats={s.homeTeam}
+        awayTeamStats={s.awayTeam}
+        homeTeamName={match.homeTeam?.name || 'Home'}
+        awayTeamName={match.awayTeam?.name || 'Away'}
+        homeTeamLogo={match.homeTeam?.logo}
+        awayTeamLogo={match.awayTeam?.logo}
+      />
     );
   };
 
