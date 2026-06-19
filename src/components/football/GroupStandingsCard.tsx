@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export interface Team {
@@ -41,7 +41,7 @@ export function GroupStandingsCard({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   // Animation variants
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { height: 0, opacity: 0 },
     visible: {
       height: 'auto',
@@ -60,7 +60,7 @@ export function GroupStandingsCard({
     },
   };
 
-  const rowVariants = {
+  const rowVariants: Variants = {
     hidden: { opacity: 0, y: 10 },
     visible: { opacity: 1, y: 0 },
   };
