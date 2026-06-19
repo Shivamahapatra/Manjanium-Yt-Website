@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Youtube } from "lucide-react";
+import { IconBrandYoutube } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
