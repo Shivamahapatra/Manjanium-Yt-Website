@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Manjanium Sports Hub",
+  title: "Manjanium On Softs",
   description: "Live F1 Telemetry & Football Match Center",
 };
 
