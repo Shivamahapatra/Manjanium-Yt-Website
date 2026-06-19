@@ -33,11 +33,11 @@ export function Sidebar() {
       </button>
 
       {/* Sidebar Container */}
-      <motion.aside
-        initial={{ x: -300 }}
-        animate={{ x: isOpen ? 0 : -300 }}
-        className="fixed md:static inset-y-0 left-0 z-40 w-64 bg-zinc-950 border-r border-zinc-800 flex flex-col md:translate-x-0 transition-transform duration-300 ease-in-out"
-        style={{ transform: isOpen ? 'translateX(0)' : '' }}
+      <aside
+        className={cn(
+          "fixed md:static inset-y-0 left-0 z-40 w-64 bg-zinc-950 border-r border-zinc-800 flex flex-col transition-transform duration-300 ease-in-out",
+          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        )}
       >
         <div className="p-6 flex items-center gap-3 border-b border-zinc-800/50">
           <div className="w-8 h-8 rounded bg-[#E10600] flex items-center justify-center font-bold text-white tracking-tighter">
@@ -81,7 +81,7 @@ export function Sidebar() {
             <span className="text-zinc-300">v2.0.0</span>
           </div>
         </div>
-      </motion.aside>
+      </aside>
 
       {/* Mobile Overlay */}
       {isOpen && (
