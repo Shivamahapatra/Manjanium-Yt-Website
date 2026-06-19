@@ -1,70 +1,144 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Table, Slider, Timeline, Badge, Tag } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Table, Tag, Tabs as AntTabs } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, Clock, Flag, Radio, Settings2, BarChart2 } from 'lucide-react';
+import { Activity, Clock, Trophy, BarChart2, Radio } from 'lucide-react';
 import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
 
+// Team Colors Map for Driver Tags
+const TeamColors: Record<string, string> = {
+  "1": "#3671C6", // Red Bull
+  "11": "#3671C6",
+  "16": "#E8002D", // Ferrari
+  "55": "#E8002D",
+  "44": "#27F4D2", // Mercedes
+  "63": "#27F4D2",
+  "4": "#FF8000", // McLaren
+  "81": "#FF8000",
+  "14": "#229971", // Aston Martin
+  "18": "#229971",
+  "10": "#0093CC", // Alpine
+  "31": "#0093CC",
+  "23": "#52E252", // Williams
+  "2": "#52E252",
+  "22": "#6692FF", // RB
+  "3": "#6692FF",
+  "77": "#00E701", // Kick Sauber
+  "24": "#00E701",
+  "20": "#B6BABD", // Haas
+  "27": "#B6BABD",
+};
+
+// Map acronyms for demonstration (OpenF1 requires driver endpoint for acronyms, but we'll fallback to number if not provided)
+const DriverAcronyms: Record<string, string> = {
+  "1": "VER", "11": "PER", "16": "LEC", "55": "SAI", "44": "HAM", "63": "RUS", "4": "NOR", "81": "PIA", "14": "ALO", "18": "STR", "10": "GAS", "31": "OCO", "23": "ALB", "2": "SAR", "22": "TSU", "3": "RIC", "77": "BOT", "24": "ZHO", "20": "MAG", "27": "HUL"
+};
+
 export default function F1Hub() {
-  const [delayOffset, setDelayOffset] = useState(0); // in seconds
+  const [session, setSession] = useState<any>(null);
   const [positions, setPositions] = useState<any[]>([]);
   const [telemetry, setTelemetry] = useState<any[]>([]);
-  const [raceControl, setRaceControl] = useState<any[]>([]);
-  const [lastFetchTime, setLastFetchTime] = useState<Date | null>(null);
+  const [standings, setStandings] = useState<any[]>([]);
+  const [topDrivers, setTopDrivers] = useState<number[]>([1, 16]); // Fallback P1 and P2
+  const [activeTab, setActiveTab] = useState('live');
 
-  // Poll OpenF1 endpoints via Next.js Proxy Rewrites
+  // Master Sync
   useEffect(() => {
     const fetchF1Data = async () => {
       try {
-        const timeNow = new Date();
-        setLastFetchTime(timeNow);
-
-        // Fetching latest race control messages
-        const rcRes = await fetch('/api/openf1/race_control?session_key=latest');
-        const rcJson = await rcRes.json();
-        if (Array.isArray(rcJson)) {
-          // Take last 10 messages, reverse for timeline
-          setRaceControl(rcJson.slice(-10).reverse());
+        // 1. Session Type
+        const sessRes = await fetch('/api/openf1/sessions');
+        const sessJson = await sessRes.json();
+        let currentSession = null;
+        if (Array.isArray(sessJson) && sessJson.length > 0) {
+          // OpenF1 latest session is the last array item usually
+          currentSession = sessJson[sessJson.length - 1];
+          setSession(currentSession);
         }
 
-        // Fetching latest telemetry for Max Verstappen (Driver 1)
-        const telRes = await fetch('/api/openf1/car_data?driver_number=1&session_key=latest');
-        const telJson = await telRes.json();
-        if (Array.isArray(telJson)) {
-          // Keep last 40 data frames for smooth sliding window chart
-          setTelemetry(telJson.slice(-40));
-        }
+        // 2. Standings (Fallback)
+        const standingsRes = await fetch('/api/f1/standings');
+        const standingsJson = await standingsRes.json();
+        setStandings(standingsJson?.sportsStandingsResults?.[0]?.sportsStandingsSubResults?.[0]?.teamStandings || []);
 
-        // Fetching positions for Timing Tower
-        const posRes = await fetch('/api/openf1/position?session_key=latest');
+        // 3. Timing Tower (Merged Position & Intervals)
+        const posRes = await fetch('/api/openf1/position');
         const posJson = await posRes.json();
         
-        if (Array.isArray(posJson)) {
-          // Group by driver_number to find their latest absolute position
+        const intRes = await fetch('/api/openf1/intervals');
+        const intJson = await intRes.json();
+        
+        if (Array.isArray(posJson) && Array.isArray(intJson)) {
+          // Get latest absolute position per driver
           const latestPositions = new Map();
           posJson.forEach((p: any) => {
             if (!latestPositions.has(p.driver_number) || new Date(p.date) > new Date(latestPositions.get(p.driver_number).date)) {
               latestPositions.set(p.driver_number, p);
             }
           });
+
+          // Get latest absolute interval per driver
+          const latestIntervals = new Map();
+          intJson.forEach((i: any) => {
+            if (!latestIntervals.has(i.driver_number) || new Date(i.date) > new Date(latestIntervals.get(i.driver_number).date)) {
+              latestIntervals.set(i.driver_number, i);
+            }
+          });
           
-          const sortedPositions = Array.from(latestPositions.values()).sort((a, b) => a.position - b.position);
-          setPositions(sortedPositions);
+          const merged = Array.from(latestPositions.values()).map(pos => {
+            const intv = latestIntervals.get(pos.driver_number);
+            return {
+              ...pos,
+              gap_to_leader: intv?.gap_to_leader || '+0.000',
+              interval: intv?.interval || '+0.000',
+            };
+          }).sort((a, b) => a.position - b.position);
+
+          setPositions(merged);
+
+          // Extract Top 2 drivers for Telemetry
+          if (merged.length >= 2) {
+            setTopDrivers([merged[0].driver_number, merged[1].driver_number]);
+          }
         }
+
+        // 4. Head-to-Head Telemetry
+        if (topDrivers.length === 2) {
+          const telRes = await fetch(`/api/openf1/car_data?driver_number=${topDrivers[0]}&driver_number=${topDrivers[1]}`);
+          const telJson = await telRes.json();
+          if (Array.isArray(telJson)) {
+            // Group and align data frames
+            const p1Data = telJson.filter((d: any) => d.driver_number === topDrivers[0]).slice(-30);
+            const p2Data = telJson.filter((d: any) => d.driver_number === topDrivers[1]).slice(-30);
+            
+            // Merge into unified timeframe array for Recharts
+            const mergedTelemetry = p1Data.map((d1: any, index: number) => {
+              const d2 = p2Data[index] || {};
+              return {
+                date: d1.date,
+                p1Speed: d1.speed,
+                p1Gear: d1.n_gear,
+                p2Speed: d2.speed,
+                p2Gear: d2.n_gear,
+              };
+            });
+            setTelemetry(mergedTelemetry);
+          }
+        }
+
       } catch (error) {
         console.error("OpenF1 Data Sync Error:", error);
       }
     };
 
     fetchF1Data();
-    // Re-fetch every 3.5 seconds
-    const interval = setInterval(fetchF1Data, 3500); 
+    const interval = setInterval(fetchF1Data, 5000); 
     return () => clearInterval(interval);
-  }, []);
+  }, [topDrivers]);
 
-  // Framer Motion custom Table Row wrapper to glide overtakes
+  // Framer Motion custom Table Row
   const MotionRow = (props: any) => {
     return (
       <motion.tr
@@ -79,138 +153,146 @@ export default function F1Hub() {
   };
 
   const timingColumns = [
-    { title: 'Pos', dataIndex: 'position', key: 'position', render: (text: number) => <span className="font-bold text-neutral-500 dark:text-zinc-400">P{text}</span> },
-    { title: 'Driver', dataIndex: 'driver_number', key: 'driver', render: (text: number) => <Tag color="blue" className="font-bold font-mono border-none bg-blue-500/20 text-blue-400">{text}</Tag> },
-    { title: 'Latest Time', dataIndex: 'date', key: 'date', render: (text: string) => <span className="text-xs text-neutral-400 font-mono">{new Date(text).toLocaleTimeString()}</span> },
+    { title: 'POS', dataIndex: 'position', key: 'position', render: (text: number) => <span className="font-bold text-neutral-500 dark:text-zinc-400">{text}</span> },
+    { title: 'DRIVER', dataIndex: 'driver_number', key: 'driver', render: (text: number) => (
+      <div className="flex items-center gap-2">
+        <div className="w-1.5 h-4 rounded-sm" style={{ backgroundColor: TeamColors[text.toString()] || '#fff' }} />
+        <span className="font-bold font-mono text-neutral-900 dark:text-white">{DriverAcronyms[text.toString()] || text}</span>
+      </div>
+    )},
+    { title: 'GAP', dataIndex: 'gap_to_leader', key: 'gap', render: (text: number) => <span className="font-mono text-xs font-semibold text-neutral-600 dark:text-neutral-300">{text}</span> },
+    { title: 'INT', dataIndex: 'interval', key: 'int', render: (text: number) => <span className="font-mono text-xs text-neutral-400 dark:text-neutral-500">{text}</span> },
   ];
+
+  const standingColumns = [
+    { title: 'POS', dataIndex: 'positionInDivision', key: 'pos', render: (text: number) => <span className="font-bold text-neutral-500 dark:text-zinc-400">P{text}</span> },
+    { title: 'TEAM', dataIndex: 'team', key: 'team', render: (text: string) => <span className="text-neutral-900 dark:text-white font-medium">{text}</span> },
+    { title: 'WINS', dataIndex: 'wins', key: 'wins' },
+    { title: 'POINTS', dataIndex: 'points', key: 'points', render: (text: number) => <Tag color="blue" className="font-bold bg-blue-500/20 text-blue-400 border-none">{text} pts</Tag> },
+  ];
+
+  // Dynamic Header State Mapping
+  const isQuali = session?.session_type === 'Qualifying';
+  const isRace = session?.session_type === 'Race';
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white p-4 md:p-8 relative overflow-hidden transition-colors duration-300">
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-600/10 dark:bg-red-600/20 rounded-full blur-[120px] pointer-events-none transition-colors duration-300" />
       
       <div className="max-w-7xl mx-auto z-10 relative">
-        <header className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
-              <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-neutral-800 via-neutral-500 to-neutral-400 dark:from-white dark:via-zinc-200 dark:to-zinc-500">
-                COSMOS HUB
-              </h1>
-            </div>
-            <p className="text-neutral-500 dark:text-zinc-400 text-sm flex items-center gap-2">
-              <Activity size={14} /> OpenF1 High-Performance Telemetry Stream
-            </p>
+        <header className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
+            <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-neutral-800 via-neutral-500 to-neutral-400 dark:from-white dark:via-zinc-200 dark:to-zinc-500">
+              MANJANIUM F1 HUB
+            </h1>
           </div>
-
-          <div className="bg-white/80 dark:bg-zinc-900/80 p-4 rounded-xl border border-neutral-200 dark:border-zinc-800 backdrop-blur-md min-w-[300px]">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-bold text-neutral-500 flex items-center gap-2"><Settings2 size={12}/> SYNC DELAY</span>
-              <span className="text-xs font-mono font-bold text-red-500">-{delayOffset}s</span>
-            </div>
-            <Slider 
-              min={0} 
-              max={60} 
-              defaultValue={0} 
-              onChange={setDelayOffset} 
-              className="m-0"
-              tooltip={{ formatter: (val) => `-${val}s` }}
-            />
-          </div>
+          
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={session?.session_type || 'default'}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="flex flex-col gap-2"
+            >
+              <div className="flex items-center gap-2 text-xl font-medium tracking-wide text-neutral-600 dark:text-zinc-300">
+                <Radio className="text-red-500" size={18} />
+                {session ? `${session.session_name} - ${session.country_name}` : 'Awaiting Active Session...'}
+              </div>
+              
+              <div className="flex gap-4">
+                {isQuali && <Tag color="purple" className="border-none font-bold">SECTOR TIMES PRIORITIZED</Tag>}
+                {isRace && <Tag color="green" className="border-none font-bold">INTERVAL GAPS PRIORITIZED</Tag>}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </header>
 
-        <BentoGrid className="max-w-full">
-          {/* TIMING TOWER */}
-          <BentoGridItem
-            title="Live Timing Tower"
-            description="Dynamic position tracking."
-            icon={<Clock className="h-4 w-4 text-neutral-500" />}
-            className="md:col-span-1 md:row-span-2 overflow-hidden"
-            header={
-              <div className="h-full overflow-hidden flex flex-col w-full relative">
-                <div className="overflow-y-auto h-full absolute inset-0 custom-scrollbar pr-2">
+        <AntTabs 
+          activeKey={activeTab} 
+          onChange={setActiveTab}
+          className="dark:[&_.ant-tabs-tab-btn]:text-zinc-400 dark:[&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:text-white mb-6"
+          items={[
+            {
+              key: 'live',
+              label: <span className="flex items-center gap-2 font-bold"><Activity size={16}/> LIVE DASHBOARD</span>,
+              children: (
+                <BentoGrid className="max-w-full">
+                  {/* TIMING TOWER */}
+                  <BentoGridItem
+                    title="Live Timing Tower"
+                    description={isQuali ? "Q1 / Q2 / Q3 Knockouts" : "Live Interval Gaps"}
+                    icon={<Clock className="h-4 w-4 text-neutral-500" />}
+                    className="md:col-span-1 md:row-span-2 overflow-hidden bg-white/50 dark:bg-zinc-900/40"
+                    header={
+                      <div className="h-full overflow-hidden flex flex-col w-full relative">
+                        <div className="overflow-y-auto h-full absolute inset-0 custom-scrollbar pr-2">
+                          <Table 
+                            dataSource={positions} 
+                            columns={timingColumns} 
+                            pagination={false}
+                            rowKey="driver_number"
+                            className="manjanium-table w-full dark:[&_.ant-table]:!bg-transparent dark:[&_.ant-table-thead_th]:!bg-zinc-800/50"
+                            components={{ body: { row: MotionRow } }}
+                            size="small"
+                          />
+                        </div>
+                      </div>
+                    }
+                  />
+
+                  {/* TELEMETRY VECTORS */}
+                  <BentoGridItem
+                    title={`Head-to-Head Telemetry (P1 vs P2)`}
+                    description={`Speed & Gear Vectors: ${DriverAcronyms[topDrivers[0]]} vs ${DriverAcronyms[topDrivers[1]]}`}
+                    icon={<BarChart2 className="h-4 w-4 text-neutral-500" />}
+                    className="md:col-span-2 md:row-span-2 min-h-[400px] bg-white/50 dark:bg-zinc-900/40"
+                    header={
+                      <div className="w-full h-full flex-grow pt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={telemetry} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                            <XAxis dataKey="date" tickFormatter={() => ''} stroke="#666" axisLine={false} tickLine={false} />
+                            <YAxis yAxisId="left" stroke="#888" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                            <RechartsTooltip 
+                              contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', color: '#fff' }}
+                              labelFormatter={() => ''}
+                            />
+                            <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
+                            
+                            {/* P1 Lines */}
+                            <Line yAxisId="left" type="monotone" dataKey="p1Speed" name={`${DriverAcronyms[topDrivers[0]]} Speed`} stroke={TeamColors[topDrivers[0]] || '#3b82f6'} strokeWidth={2} dot={false} isAnimationActive={false} />
+                            
+                            {/* P2 Lines */}
+                            <Line yAxisId="left" type="monotone" dataKey="p2Speed" name={`${DriverAcronyms[topDrivers[1]]} Speed`} stroke={TeamColors[topDrivers[1]] || '#ef4444'} strokeDasharray="5 5" strokeWidth={2} dot={false} isAnimationActive={false} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    }
+                  />
+                </BentoGrid>
+              )
+            },
+            {
+              key: 'standings',
+              label: <span className="flex items-center gap-2 font-bold"><Trophy size={16}/> CHAMPIONSHIP</span>,
+              children: (
+                <div className="w-full overflow-hidden relative rounded-2xl bg-white dark:bg-zinc-900/60 border border-neutral-200 dark:border-zinc-800 shadow-xl backdrop-blur-md p-6">
+                  <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><Trophy className="text-yellow-500"/> Constructors Championship</h2>
                   <Table 
-                    dataSource={positions} 
-                    columns={timingColumns} 
+                    dataSource={standings} 
+                    columns={standingColumns} 
                     pagination={false}
-                    rowKey="driver_number"
-                    className="manjanium-table w-full"
-                    components={{
-                      body: {
-                        row: MotionRow,
-                      },
-                    }}
-                    size="small"
+                    rowKey={(record) => record.team?.id || record.team}
+                    className="manjanium-table dark:[&_.ant-table]:!bg-transparent dark:[&_.ant-table-thead_th]:!bg-zinc-800/50"
+                    scroll={{ x: 'max-content' }}
                   />
                 </div>
-              </div>
+              )
             }
-          />
-
-          {/* TELEMETRY VECTORS */}
-          <BentoGridItem
-            title="Max Verstappen (1) - Live Telemetry"
-            description="Real-time speed and RPM vectors."
-            icon={<BarChart2 className="h-4 w-4 text-neutral-500" />}
-            className="md:col-span-2 md:row-span-1 min-h-[300px]"
-            header={
-              <div className="w-full h-[200px] flex-grow">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={telemetry} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                    <XAxis dataKey="date" tickFormatter={() => ''} stroke="#666" axisLine={false} tickLine={false} />
-                    <YAxis yAxisId="left" stroke="#3b82f6" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <YAxis yAxisId="right" orientation="right" stroke="#ef4444" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <RechartsTooltip 
-                      contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px' }}
-                      labelFormatter={(val) => new Date(val).toLocaleTimeString()}
-                    />
-                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
-                    <Line yAxisId="left" type="monotone" dataKey="speed" name="Speed (km/h)" stroke="#3b82f6" strokeWidth={2} dot={false} isAnimationActive={false} />
-                    <Line yAxisId="right" type="monotone" dataKey="rpm" name="RPM" stroke="#ef4444" strokeWidth={2} dot={false} isAnimationActive={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            }
-          />
-
-          {/* RACE CONTROL */}
-          <BentoGridItem
-            title="FIA Race Control"
-            description="Live marshaling and incident reports."
-            icon={<Radio className="h-4 w-4 text-neutral-500" />}
-            className="md:col-span-2 md:row-span-1 overflow-hidden"
-            header={
-              <div className="h-full overflow-hidden w-full relative pt-2">
-                <div className="overflow-y-auto h-full absolute inset-0 custom-scrollbar pr-4">
-                  <Timeline
-                    className="dark:text-white"
-                    items={raceControl.map((rc, i) => {
-                      let color = "blue";
-                      if (rc.category === "Flag" && rc.message.includes("YELLOW")) color = "orange";
-                      if (rc.category === "Flag" && rc.message.includes("RED")) color = "red";
-                      if (rc.category === "Flag" && rc.message.includes("GREEN")) color = "green";
-                      
-                      return {
-                        color,
-                        children: (
-                          <div className="text-sm">
-                            <span className="font-mono text-xs text-neutral-500 mr-2">{new Date(rc.date).toLocaleTimeString()}</span>
-                            <span className="font-semibold text-neutral-800 dark:text-neutral-200">{rc.category}:</span> {rc.message}
-                          </div>
-                        ),
-                      };
-                    })}
-                  />
-                  {raceControl.length === 0 && (
-                    <div className="flex items-center justify-center h-full text-neutral-500 text-sm">
-                      Awaiting Race Control messages...
-                    </div>
-                  )}
-                </div>
-              </div>
-            }
-          />
-        </BentoGrid>
+          ]}
+        />
       </div>
     </div>
   );

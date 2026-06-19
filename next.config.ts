@@ -14,20 +14,24 @@ const nextConfig: NextConfig = {
       },
       // OpenF1 Live Telemetry Proxy Rewrites
       {
+        source: "/api/openf1/sessions",
+        destination: "https://api.openf1.org/v1/sessions?session_key=latest",
+      },
+      {
         source: "/api/openf1/position",
-        destination: "https://api.openf1.org/v1/position",
+        destination: "https://api.openf1.org/v1/position?session_key=latest",
       },
       {
         source: "/api/openf1/intervals",
-        destination: "https://api.openf1.org/v1/intervals",
+        destination: "https://api.openf1.org/v1/intervals?session_key=latest",
       },
       {
         source: "/api/openf1/car_data",
-        destination: "https://api.openf1.org/v1/car_data",
+        destination: "https://api.openf1.org/v1/car_data?session_key=latest",
       },
       {
         source: "/api/openf1/race_control",
-        destination: "https://api.openf1.org/v1/race_control",
+        destination: "https://api.openf1.org/v1/race_control?session_key=latest",
       },
     ];
   },
