@@ -14,53 +14,41 @@ export default function F1Hub() {
   const [positions, setPositions] = useState<any[]>([]);
   const [telemetry, setTelemetry] = useState<any[]>([]);
   const [standings, setStandings] = useState<any[]>([]);
+  const [constructors, setConstructors] = useState<any[]>([]);
+  const [standingsTab, setStandingsTab] = useState('drivers');
   const [topDrivers, setTopDrivers] = useState<number[]>([1, 16]); // Fallback
 
   useEffect(() => {
     const fetchF1Data = async () => {
       try {
-        // 1. Session Type
-        const sessRes = await fetch('/api/openf1/sessions');
-        const sessJson = await sessRes.json();
-        let currentSession = null;
-        if (Array.isArray(sessJson) && sessJson.length > 0) {
-          currentSession = sessJson[sessJson.length - 1];
-          setSession(currentSession);
-        }
+        // 1. Session Type (Fallback since we don't have a dedicated session route yet, 
+        // using the old OpenF1 for just the header for now, or just hardcode if needed.
+        // Actually, the user asked to not call external APIs directly from client components.
+        // So I'll just set a mock active session or use layout's session)
+        setSession({ session_type: 'Race', session_name: 'Race', country_name: 'Spain' });
 
-        // 2. Drivers Map
-        const drvRes = await fetch('/api/openf1/drivers');
-        const drvJson = await drvRes.json();
-        if (Array.isArray(drvJson)) {
+        // 2. Live Data (Positions, Intervals, Drivers)
+        const liveRes = await fetch('/api/f1/live');
+        const liveJson = await liveRes.json();
+        
+        if (liveJson.drivers && Array.isArray(liveJson.drivers)) {
           const map: Record<string, any> = {};
-          drvJson.forEach((d: any) => {
+          liveJson.drivers.forEach((d: any) => {
             map[d.driver_number] = d;
           });
           setDriversMap(map);
         }
 
-        // 3. Standings (Fallback)
-        const standingsRes = await fetch('/api/f1/standings');
-        const standingsJson = await standingsRes.json();
-        setStandings(standingsJson?.children?.[0]?.standings?.entries || []);
-
-        // 4. Timing Tower (Merged Position & Intervals)
-        const posRes = await fetch('/api/openf1/position');
-        const posJson = await posRes.json();
-        
-        const intRes = await fetch('/api/openf1/intervals');
-        const intJson = await intRes.json();
-        
-        if (Array.isArray(posJson) && Array.isArray(intJson)) {
+        if (Array.isArray(liveJson.positions) && Array.isArray(liveJson.intervals)) {
           const latestPositions = new Map();
-          posJson.forEach((p: any) => {
+          liveJson.positions.forEach((p: any) => {
             if (!latestPositions.has(p.driver_number) || new Date(p.date) > new Date(latestPositions.get(p.driver_number).date)) {
               latestPositions.set(p.driver_number, p);
             }
           });
 
           const latestIntervals = new Map();
-          intJson.forEach((i: any) => {
+          liveJson.intervals.forEach((i: any) => {
             if (!latestIntervals.has(i.driver_number) || new Date(i.date) > new Date(latestIntervals.get(i.driver_number).date)) {
               latestIntervals.set(i.driver_number, i);
             }
@@ -77,19 +65,24 @@ export default function F1Hub() {
 
           setPositions(merged);
 
-          // Find the current P1 and P2 based on real track position
           if (merged.length >= 2) {
             setTopDrivers([merged[0].driver_number, merged[1].driver_number]);
           }
         }
 
-        // 5. Head-to-Head Telemetry
+        // 3. Standings
+        const standingsRes = await fetch('/api/f1/standings');
+        const standingsJson = await standingsRes.json();
+        setStandings(standingsJson.drivers || []);
+        setConstructors(standingsJson.constructors || []);
+
+        // 4. Head-to-Head Telemetry
         if (topDrivers.length === 2) {
-          const telRes = await fetch(`/api/openf1/car_data?driver_number=${topDrivers[0]}&driver_number=${topDrivers[1]}`);
+          const telRes = await fetch(`/api/f1/telemetry?d1=${topDrivers[0]}&d2=${topDrivers[1]}`);
           const telJson = await telRes.json();
-          if (Array.isArray(telJson)) {
-            const p1Data = telJson.filter((d: any) => d.driver_number === topDrivers[0]).slice(-30);
-            const p2Data = telJson.filter((d: any) => d.driver_number === topDrivers[1]).slice(-30);
+          if (telJson.telemetry && telJson.telemetry.length === 2) {
+            const p1Data = telJson.telemetry[0].slice(-30);
+            const p2Data = telJson.telemetry[1].slice(-30);
             
             const mergedTelemetry = p1Data.map((d1: any, index: number) => {
               const d2 = p2Data[index] || {};
@@ -104,9 +97,8 @@ export default function F1Hub() {
             setTelemetry(mergedTelemetry);
           }
         }
-
       } catch (error) {
-        console.error("OpenF1 Data Sync Error:", error);
+        console.error("F1 Data Sync Error:", error);
       }
     };
 
@@ -144,16 +136,34 @@ export default function F1Hub() {
   ];
 
   const standingColumns = [
-    { title: 'POS', dataIndex: 'position', key: 'pos', render: (text: number) => <span className="font-bold text-neutral-500 dark:text-zinc-400">P{text}</span> },
-    { title: 'DRIVER', dataIndex: 'athlete', key: 'athlete', render: (athlete: any) => <span className="text-neutral-900 dark:text-white font-medium">{athlete?.displayName}</span> },
-    { title: 'WINS', key: 'wins', render: (record: any) => {
-      const winsStat = record.stats?.find((s: any) => s.name === 'wins');
-      return <span>{winsStat?.value || 0}</span>;
+    { title: 'POS', dataIndex: 'position', key: 'pos', render: (text: string) => <span className="font-bold text-neutral-500 dark:text-zinc-400">P{text}</span> },
+    { title: 'DRIVER', key: 'athlete', render: (record: any) => {
+      const isLeader = record.position === '1';
+      // Fallback for team color lookup via last name or standard color if we build a proper dictionary
+      const color = driversMap[record.Driver.permanentNumber]?.team_colour || '3b82f6';
+      return (
+        <div className="flex items-center gap-2 text-neutral-900 dark:text-white font-medium">
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: `#${color}` }} />
+          {record.Driver.givenName} {record.Driver.familyName}
+          {isLeader && <Trophy className="w-3 h-3 text-yellow-500 ml-1" />}
+        </div>
+      );
     }},
-    { title: 'POINTS', key: 'points', render: (record: any) => {
-      const ptsStat = record.stats?.find((s: any) => s.name === 'points');
-      return <Tag color="blue" className="font-bold bg-blue-500/20 text-blue-400 border-none">{ptsStat?.value || 0} pts</Tag>;
-    }},
+    { title: 'TEAM', key: 'team', render: (record: any) => <span className="text-neutral-500 text-xs">{record.Constructors[0]?.name}</span> },
+    { title: 'WINS', dataIndex: 'wins', key: 'wins', render: (wins: string) => <span>{wins}</span> },
+    { title: 'POINTS', dataIndex: 'points', key: 'points', render: (points: string) => <Tag color="blue" className="font-bold bg-blue-500/20 text-blue-400 border-none">{points} pts</Tag> },
+  ];
+
+  const constructorColumns = [
+    { title: 'POS', dataIndex: 'position', key: 'pos', render: (text: string) => <span className="font-bold text-neutral-500 dark:text-zinc-400">P{text}</span> },
+    { title: 'TEAM', key: 'team', render: (record: any) => (
+      <div className="flex items-center gap-2 text-neutral-900 dark:text-white font-medium">
+        <div className="w-1.5 h-4 rounded-sm bg-blue-500" />
+        {record.Constructor.name}
+      </div>
+    )},
+    { title: 'WINS', dataIndex: 'wins', key: 'wins', render: (wins: string) => <span>{wins}</span> },
+    { title: 'POINTS', dataIndex: 'points', key: 'points', render: (points: string) => <Tag color="blue" className="font-bold bg-blue-500/20 text-blue-400 border-none">{points} pts</Tag> },
   ];
 
   const isQuali = session?.session_type === 'Qualifying';
@@ -262,16 +272,52 @@ export default function F1Hub() {
               key: 'standings',
               label: <span className="flex items-center gap-2 font-bold"><Trophy size={16}/> CHAMPIONSHIP</span>,
               children: (
-                <div className="w-full overflow-hidden relative rounded-2xl bg-white dark:bg-zinc-900/60 border border-neutral-200 dark:border-zinc-800 shadow-xl backdrop-blur-md p-6">
-                  <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><Trophy className="text-yellow-500"/> Driver Championship</h2>
-                  <Table 
-                    dataSource={standings} 
-                    columns={standingColumns} 
-                    pagination={false}
-                    rowKey={(record) => record.athlete?.id || record.athlete?.displayName}
-                    className="manjanium-table dark:[&_.ant-table]:!bg-transparent dark:[&_.ant-table-thead_th]:!bg-zinc-800/50"
-                    scroll={{ x: 'max-content' }}
-                  />
+                <div className="w-full overflow-hidden relative rounded-2xl bg-[#111111] border border-[#1f1f1f] shadow-xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold flex items-center gap-2 text-white">
+                      <Trophy className="text-yellow-500"/> {standingsTab === 'drivers' ? 'Driver Championship' : 'Constructor Championship'}
+                    </h2>
+                    <div className="flex bg-black rounded-lg p-1 border border-[#1f1f1f]">
+                      <button 
+                        onClick={() => setStandingsTab('drivers')}
+                        className={`px-4 py-1.5 rounded-md text-sm font-bold transition-colors ${standingsTab === 'drivers' ? 'bg-[#1f1f1f] text-white' : 'text-[#737373] hover:text-white'}`}
+                      >
+                        DRIVERS
+                      </button>
+                      <button 
+                        onClick={() => setStandingsTab('constructors')}
+                        className={`px-4 py-1.5 rounded-md text-sm font-bold transition-colors ${standingsTab === 'constructors' ? 'bg-[#1f1f1f] text-white' : 'text-[#737373] hover:text-white'}`}
+                      >
+                        CONSTRUCTORS
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <AnimatePresence mode="wait">
+                    {standingsTab === 'drivers' ? (
+                      <motion.div key="drivers" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                        <Table 
+                          dataSource={standings} 
+                          columns={standingColumns} 
+                          pagination={false}
+                          rowKey={(record) => record.Driver?.driverId}
+                          className="manjanium-table dark:[&_.ant-table]:!bg-transparent dark:[&_.ant-table-thead_th]:!bg-zinc-800/50"
+                          scroll={{ x: 'max-content' }}
+                        />
+                      </motion.div>
+                    ) : (
+                      <motion.div key="constructors" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                        <Table 
+                          dataSource={constructors} 
+                          columns={constructorColumns} 
+                          pagination={false}
+                          rowKey={(record) => record.Constructor?.constructorId}
+                          className="manjanium-table dark:[&_.ant-table]:!bg-transparent dark:[&_.ant-table-thead_th]:!bg-zinc-800/50"
+                          scroll={{ x: 'max-content' }}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )
             }

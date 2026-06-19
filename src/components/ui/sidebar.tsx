@@ -98,50 +98,40 @@ export const DesktopSidebar = ({
   );
 };
 
+import { IconHome, IconCarCrash, IconBallFootball, IconSettings } from "@tabler/icons-react";
+import { usePathname } from "next/navigation";
+
 export const MobileSidebar = ({
   className,
   children,
   ...props
 }: React.ComponentProps<"div">) => {
-  const { open, setOpen } = useSidebar();
+  const pathname = usePathname();
+  
+  const bottomLinks = [
+    { href: "/", icon: <IconHome className="h-6 w-6" />, label: "Home" },
+    { href: "/f1", icon: <IconCarCrash className="h-6 w-6" />, label: "F1" },
+    { href: "/football", icon: <IconBallFootball className="h-6 w-6" />, label: "Football" },
+    { href: "/settings", icon: <IconSettings className="h-6 w-6" />, label: "Settings" },
+  ];
+
   return (
     <div
       className={cn(
-        "h-10 px-4 py-4 flex flex-row md:hidden  items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
+        "fixed bottom-0 left-0 right-0 z-50 h-16 px-6 flex md:hidden items-center justify-between bg-white dark:bg-[#0a0a0a] border-t border-neutral-200 dark:border-[#1f1f1f]",
+        className
       )}
       {...props}
     >
-      <div className="flex justify-end z-20 w-full">
-        <IconMenu2
-          className="text-neutral-800 dark:text-neutral-200"
-          onClick={() => setOpen(!open)}
-        />
-      </div>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ x: "-100%", opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: "-100%", opacity: 0 }}
-            transition={{
-              duration: 0.3,
-              ease: "easeInOut",
-            }}
-            className={cn(
-              "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
-              className
-            )}
-          >
-            <div
-              className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
-              onClick={() => setOpen(!open)}
-            >
-              <IconX />
-            </div>
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {bottomLinks.map((link, idx) => {
+        const isActive = pathname === link.href || (link.href !== '/' && pathname?.startsWith(link.href));
+        return (
+          <Link key={idx} href={link.href} className={`flex flex-col items-center justify-center gap-1 transition-colors ${isActive ? 'text-blue-500' : 'text-neutral-500 hover:text-neutral-300'}`}>
+            {link.icon}
+            <span className="text-[10px] font-bold">{link.label}</span>
+          </Link>
+        );
+      })}
     </div>
   );
 };
