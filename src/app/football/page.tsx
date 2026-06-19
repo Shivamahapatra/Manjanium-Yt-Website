@@ -6,29 +6,30 @@ import { Card, Spin } from "antd";
 import { motion } from "framer-motion";
 
 export default function FootballHubPage() {
-  const [data, setData] = useState<any>(null);
+  const [fixtures, setFixtures] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchLiveMatches = async () => {
       try {
-        const res = await fetch("/api/football/live");
-        const json = await res.json();
-        setData(json);
+        const response = await fetch('/api/football/fixtures/live');
+        const data = await response.json();
+        // API-Sports wraps data arrays inside a "response" key
+        if (data.response) {
+          setFixtures(data.response);
+        }
       } catch (error) {
         console.error("Error fetching Football data", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
-    const interval = setInterval(fetchData, 30000); // 30s polling
+    fetchLiveMatches();
+    const interval = setInterval(fetchLiveMatches, 30000); // 30s polling
     return () => clearInterval(interval);
   }, []);
 
-  const isLive = data?.events?.some(
-    (event: any) => event.status?.type?.state === "in"
-  ) ?? true; // Default to true to show off the simulation
+  const isLive = fixtures.length > 0;
 
   return (
     <div className="min-h-screen p-8 bg-neutral-100 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100">
@@ -53,57 +54,60 @@ export default function FootballHubPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {data?.events?.map((event: any) => {
-              const homeTeam = event.competitions[0].competitors.find((c: any) => c.homeAway === 'home');
-              const awayTeam = event.competitions[0].competitors.find((c: any) => c.homeAway === 'away');
+            {fixtures.map((match: any) => {
+              const homeTeam = match.teams.home;
+              const awayTeam = match.teams.away;
+              const fixture = match.fixture;
+              const league = match.league;
 
               return (
                 <Card 
-                  key={event.id}
+                  key={fixture.id}
                   hoverable
                   className="rounded-[20px] overflow-hidden border-neutral-200 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm"
                   bodyStyle={{ padding: 0 }}
                 >
                   <div className="bg-neutral-200 dark:bg-neutral-800 px-4 py-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 flex justify-between">
-                    <span>{event.season?.year} • {event.competitions[0]?.type?.abbreviation || 'Match'}</span>
-                    <span className={event.status.type.state === "in" ? "text-red-500" : ""}>
-                      {event.status.type.detail}
+                    <span className="flex items-center gap-2">
+                      {league.logo && <img src={league.logo} alt={league.name} className="w-4 h-4 object-contain" />}
+                      {league.season} • {league.name}
+                    </span>
+                    <span className="text-red-500">
+                      {fixture.status.elapsed ? `${fixture.status.elapsed}'` : fixture.status.short}
                     </span>
                   </div>
                   
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex flex-col items-center gap-2 w-1/3">
-                        <img src={homeTeam?.team?.logo || "/placeholder.png"} alt={homeTeam?.team?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
-                        <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{homeTeam?.team?.shortDisplayName}</span>
+                        <img src={homeTeam?.logo || "/placeholder.png"} alt={homeTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
+                        <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{homeTeam?.name}</span>
                       </div>
                       
                       <div className="flex flex-col items-center justify-center w-1/3">
                         <div className="text-3xl font-black font-mono dark:text-white">
-                          {homeTeam?.score || "0"} - {awayTeam?.score || "0"}
+                          {match.goals.home ?? 0} - {match.goals.away ?? 0}
                         </div>
                       </div>
 
                       <div className="flex flex-col items-center gap-2 w-1/3">
-                        <img src={awayTeam?.team?.logo || "/placeholder.png"} alt={awayTeam?.team?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
-                        <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{awayTeam?.team?.shortDisplayName}</span>
+                        <img src={awayTeam?.logo || "/placeholder.png"} alt={awayTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
+                        <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{awayTeam?.name}</span>
                       </div>
                     </div>
                   </div>
                   
                   <div className="bg-neutral-50 dark:bg-black px-4 py-3 border-t border-neutral-200 dark:border-neutral-800 text-sm flex justify-between">
-                    <span className="text-neutral-500">{event.competitions[0]?.venue?.fullName || "TBD"}</span>
-                    <a href={event.links?.[0]?.href} target="_blank" rel="noopener noreferrer" className="text-blue-500 font-semibold hover:underline">
-                      Gamecast
-                    </a>
+                    <span className="text-neutral-500">{fixture.venue?.name || "TBD"}</span>
+                    <span className="text-neutral-400 text-xs">{new Date(fixture.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                   </div>
                 </Card>
               );
             })}
             
-            {!data?.events?.length && (
+            {!fixtures.length && (
               <div className="col-span-full text-center py-20 text-neutral-500">
-                No matches found right now.
+                No live matches found right now. Check back later!
               </div>
             )}
           </div>
