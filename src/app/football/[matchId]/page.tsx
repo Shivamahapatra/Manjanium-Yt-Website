@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Clock, MapPin, Activity, AlertCircle, Shield, Goal, Flag, RefreshCw } from 'lucide-react';
+import { LiveTimeline, MatchEvent } from '@/components/football/LiveTimeline';
 
 export default function MatchDetailsPage() {
   const params = useParams();
@@ -213,77 +214,15 @@ export default function MatchDetailsPage() {
   const renderTimeline = () => {
     const events = commentary?.events || [];
     
-    if (events.length === 0) {
-      return (
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl p-8 text-center text-neutral-500 border border-neutral-200 dark:border-neutral-800">
-          <Clock className="w-8 h-8 mx-auto mb-3 opacity-20" />
-          <p>No timeline events available yet.</p>
-        </div>
-      );
-    }
-
     return (
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-sm border border-neutral-200 dark:border-neutral-800">
-        <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-          <Activity className="w-5 h-5 text-blue-500" /> Match Timeline
-        </h3>
-        <div className="relative pl-4 border-l-2 border-neutral-100 dark:border-neutral-800 flex flex-col gap-6">
-          <AnimatePresence>
-            {events.map((evt: any, i: number) => {
-              let icon = <Flag className="w-3 h-3 text-neutral-500" />;
-              let bgColor = "bg-neutral-100 dark:bg-neutral-800";
-              let textColor = "text-neutral-700 dark:text-neutral-300";
-
-              if (evt.type === 'goal') {
-                icon = <Goal className="w-3 h-3 text-white" />;
-                bgColor = "bg-emerald-500";
-                textColor = "text-emerald-700 dark:text-emerald-400 font-bold";
-              } else if (evt.type === 'card') {
-                icon = <Shield className="w-3 h-3 text-white" />;
-                bgColor = evt.cardType === 'red' ? 'bg-red-500' : 'bg-yellow-400';
-              } else if (evt.type === 'substitution') {
-                icon = <RefreshCw className="w-3 h-3 text-white" />;
-                bgColor = "bg-blue-500";
-              }
-
-              const isHome = evt.team === 'home';
-
-              return (
-                <motion.div 
-                  key={evt.id || i}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="relative"
-                >
-                  <div className={`absolute -left-[25px] w-6 h-6 rounded-full flex items-center justify-center ring-4 ring-white dark:ring-neutral-900 ${bgColor}`}>
-                    {icon}
-                  </div>
-                  <div className="ml-4 bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-sm bg-white dark:bg-neutral-800 px-2 py-0.5 rounded shadow-sm">
-                        {evt.minute}'
-                      </span>
-                      {evt.team !== 'unknownTeam' && (
-                        <img 
-                          src={isHome ? match.homeTeam?.logo : match.awayTeam?.logo} 
-                          alt="team" 
-                          className="w-4 h-4 object-contain opacity-50"
-                        />
-                      )}
-                    </div>
-                    <p className={`text-sm ${textColor}`}>{evt.description}</p>
-                    {evt.player && (
-                      <p className="text-xs text-neutral-500 mt-2 font-medium">
-                        {evt.player.name} {evt.assistPlayer ? `(Assist: ${evt.assistPlayer.name})` : ''}
-                      </p>
-                    )}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
-      </div>
+      <LiveTimeline 
+        events={events}
+        isLive={isLive}
+        currentMinute={match.elapsedTime}
+        onEventClick={(evt) => console.log("Event clicked:", evt)}
+        homeTeamLogo={match.homeTeam?.logo}
+        awayTeamLogo={match.awayTeam?.logo}
+      />
     );
   };
 
