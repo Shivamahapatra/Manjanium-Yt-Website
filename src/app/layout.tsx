@@ -3,8 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Topbar } from "@/components/layout/topbar";
+import { SidebarLayout } from "@/components/layout/SidebarLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "F1 Cosmos",
-  description: "High-performance F1 Data Platform",
+  title: "Manjanium Sports Hub",
+  description: "Live F1 Telemetry & Football Match Center",
 };
 
 export default function RootLayout({
@@ -29,26 +28,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-black text-white">
+      <body className="min-h-full flex flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem={false}
+          enableSystem
           disableTransitionOnChange
         >
           <AntdRegistry>
-            <div className="flex h-screen overflow-hidden bg-black">
-              <Sidebar />
-              <div className="flex flex-col flex-1 overflow-hidden relative">
-                <Topbar />
-                <main className="flex-1 overflow-y-auto custom-scrollbar">
-                  {children}
-                </main>
-              </div>
-            </div>
+            <SidebarLayout>{children}</SidebarLayout>
           </AntdRegistry>
         </ThemeProvider>
       </body>
