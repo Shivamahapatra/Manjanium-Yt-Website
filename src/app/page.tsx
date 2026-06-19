@@ -217,23 +217,33 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.7 }}
-              className="flex flex-col sm:flex-row items-center gap-4 mb-10"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 w-full"
             >
-              <Link href="/f1">
+              <Link href="/f1" className="w-full sm:w-auto">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3.5 rounded-full flex items-center gap-2 transition-colors text-lg"
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3.5 rounded-full flex items-center justify-center gap-2 transition-colors text-lg w-full"
                 >
                   Enter F1 Hub <IconArrowRight className="w-5 h-5" />
                 </motion.button>
               </Link>
-              
-              <Link href="https://www.youtube.com/@manjaniumonsofts67" target="_blank" rel="noopener noreferrer">
+
+              <Link href="/football" className="w-full sm:w-auto">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
-                  className="bg-white text-black font-bold px-6 py-3.5 rounded-full flex items-center gap-2 hover:bg-gray-200 transition-colors text-base"
+                  className="bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-3.5 rounded-full flex items-center justify-center gap-2 transition-colors text-lg w-full"
+                >
+                  Enter Football Center <IconArrowRight className="w-5 h-5" />
+                </motion.button>
+              </Link>
+              
+              <Link href="https://www.youtube.com/@manjaniumonsofts67" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="bg-white text-black font-bold px-6 py-3.5 rounded-full flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors text-base w-full"
                 >
                   <IconBrandYoutube className="w-5 h-5 text-red-600" />
                   Subscribe
@@ -246,11 +256,13 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 0.7 }}
-              className="flex items-center gap-4 text-xs font-semibold text-neutral-500 uppercase tracking-widest"
+              className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 text-[10px] sm:text-xs font-semibold text-neutral-500 uppercase tracking-widest"
             >
               <span>20 F1 Drivers</span>
               <span className="w-1 h-1 bg-neutral-700 rounded-full" />
               <span>Real-time Telemetry</span>
+              <span className="w-1 h-1 bg-neutral-700 rounded-full" />
+              <span>Global Football Coverage</span>
               <span className="w-1 h-1 bg-neutral-700 rounded-full hidden sm:block" />
               <span className="hidden sm:block">0 Ads</span>
             </motion.div>
