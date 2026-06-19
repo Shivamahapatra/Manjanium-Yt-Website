@@ -2,56 +2,92 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const apiKey = process.env.API_SPORTS_KEY;
-    
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "API_SPORTS_KEY not set", response: [] },
-        { status: 500 }
-      );
-    }
-
-    const headers = {
-      "x-apisports-key": apiKey
-    };
-
-    // Parallel fetch: Live globally, and Next 10 WC 2026 matches
-    const [liveRes, upcomingRes] = await Promise.all([
-      fetch('https://v3.football.api-sports.io/fixtures?live=all', {
-        headers,
-        cache: 'no-store'
-      }),
-      fetch('https://v3.football.api-sports.io/fixtures?league=1&season=2026&next=10', {
-        headers,
-        cache: 'no-store'
-      })
+    const [liveRes, standingsRes] = await Promise.all([
+      fetch(
+        'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard',
+        { cache: 'no-store' }
+      ),
+      fetch(
+        'https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings',
+        { next: { revalidate: 60 } }
+      )
     ]);
 
     const liveData = await liveRes.json();
-    const upcomingData = await upcomingRes.json();
+    const standingsData = await standingsRes.json();
 
-    const liveMatches = liveData.response || [];
-    const upcomingMatches = upcomingData.response || [];
+    // Map ESPN format to match your existing frontend shape
+    const matches = (liveData.events || []).map((event: any) => {
+      const comp = event.competitions?.[0];
+      const home = comp?.competitors?.find((c: any) => c.homeAway === 'home');
+      const away = comp?.competitors?.find((c: any) => c.homeAway === 'away');
+      const status = event.status;
 
-    // Deduplicate upcoming matches if they are already live
-    const liveMatchIds = new Set(liveMatches.map((m: any) => m.fixture.id));
-    const filteredUpcoming = upcomingMatches.filter((m: any) => !liveMatchIds.has(m.fixture.id));
+      return {
+        fixture: {
+          id: event.id,
+          date: event.date,
+          status: {
+            short: status.type.shortDetail,
+            elapsed: status.displayClock?.replace("'", '') || null,
+          },
+          venue: { name: comp?.venue?.fullName || 'TBD' }
+        },
+        league: {
+          name: 'FIFA World Cup 2026',
+          logo: 'https://a.espncdn.com/i/teamlogos/soccer/500/4f10737c.png',
+          season: '2026'
+        },
+        teams: {
+          home: {
+            name: home?.team?.displayName,
+            logo: home?.team?.logo
+          },
+          away: {
+            name: away?.team?.displayName,
+            logo: away?.team?.logo
+          }
+        },
+        goals: {
+          home: parseInt(home?.score) || 0,
+          away: parseInt(away?.score) || 0
+        },
+        isLive: status.type.state === 'in',
+        isUpcoming: status.type.state === 'pre'
+      };
+    });
 
-    const merged = [...liveMatches, ...filteredUpcoming];
+    // Map ESPN standings format
+    const groups = (standingsData.standings || []).map((group: any) => ({
+      groupName: group.name,
+      teams: (group.entries || []).map((entry: any) => ({
+        team: {
+          name: entry.team.displayName,
+          logo: entry.team.logos?.[0]?.href
+        },
+        played: entry.stats?.find((s: any) => s.name === 'gamesPlayed')?.value || 0,
+        win: entry.stats?.find((s: any) => s.name === 'wins')?.value || 0,
+        draw: entry.stats?.find((s: any) => s.name === 'ties')?.value || 0,
+        lose: entry.stats?.find((s: any) => s.name === 'losses')?.value || 0,
+        goalsDiff: entry.stats?.find((s: any) => s.name === 'pointDifferential')?.value || 0,
+        points: entry.stats?.find((s: any) => s.name === 'points')?.value || 0
+      }))
+    }));
 
     return NextResponse.json({
-      response: merged,
+      response: matches,
+      standings: groups,
       debug: {
-        liveCount: liveMatches.length,
-        wcUpcomingCount: upcomingMatches.length,
-        liveStatus: liveData.errors?.length ? 'error' : 'ok',
-        wcStatus: upcomingData.errors?.length ? 'error' : 'ok'
+        matchCount: matches.length,
+        liveCount: matches.filter((m: any) => m.isLive).length,
+        upcomingCount: matches.filter((m: any) => m.isUpcoming).length,
+        groupCount: groups.length
       }
     });
 
   } catch (error) {
     return NextResponse.json(
-      { response: [], error: String(error) },
+      { response: [], standings: [], error: String(error) },
       { status: 500 }
     );
   }

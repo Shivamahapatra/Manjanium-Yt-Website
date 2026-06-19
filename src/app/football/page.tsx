@@ -18,6 +18,7 @@ export default function FootballHubPage() {
         const data = await response.json();
         if (data.response) {
           setFixtures(data.response);
+          setStandings(data.standings || []);
           setDebugStats(data.debug);
         }
       } catch (error) {
@@ -26,20 +27,8 @@ export default function FootballHubPage() {
         setLoading(false);
       }
     };
-    const fetchStandings = async () => {
-      try {
-        const res = await fetch('/api/football/standings');
-        const data = await res.json();
-        if (data.response && data.response[0]?.league?.standings) {
-          setStandings(data.response[0].league.standings);
-        }
-      } catch (error) {
-        console.error("Error fetching standings", error);
-      }
-    };
 
     fetchLiveMatches();
-    fetchStandings();
     const interval = setInterval(fetchLiveMatches, 30000); // 30s polling
     return () => clearInterval(interval);
   }, []);
@@ -84,10 +73,10 @@ export default function FootballHubPage() {
               <div className="mb-12">
                 <h2 className="text-2xl font-bold mb-6 text-neutral-800 dark:text-neutral-200">FIFA World Cup 2026 — Group Standings</h2>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {standings.map((group: any[], index: number) => (
+                  {standings.map((group: any, index: number) => (
                     <div key={index} className="bg-white dark:bg-neutral-900 rounded-[20px] overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-sm">
                       <div className="bg-neutral-100 dark:bg-neutral-800 px-4 py-2 font-bold text-neutral-800 dark:text-neutral-200 border-b border-neutral-200 dark:border-neutral-800">
-                        {group[0]?.group || `Group ${String.fromCharCode(65 + index)}`}
+                        {group.groupName || `Group ${String.fromCharCode(65 + index)}`}
                       </div>
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
@@ -104,19 +93,20 @@ export default function FootballHubPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {group.map((teamData: any) => {
-                              const isTopTwo = teamData.rank <= 2;
+                            {group.teams.map((teamData: any, idx: number) => {
+                              const rank = idx + 1;
+                              const isTopTwo = rank <= 2;
                               return (
-                                <tr key={teamData.team.id} className="border-b border-neutral-100 dark:border-neutral-800/50 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
-                                  <td className="px-4 py-2 text-center font-semibold text-neutral-500 dark:text-neutral-400">{teamData.rank}</td>
+                                <tr key={idx} className="border-b border-neutral-100 dark:border-neutral-800/50 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
+                                  <td className="px-4 py-2 text-center font-semibold text-neutral-500 dark:text-neutral-400">{rank}</td>
                                   <td className={`px-4 py-2 font-semibold flex items-center gap-2 ${isTopTwo ? 'text-green-600 dark:text-green-500' : 'text-neutral-600 dark:text-neutral-400'}`}>
-                                    <img src={teamData.team.logo} alt={teamData.team.name} className="w-5 h-5 object-contain" />
+                                    {teamData.team.logo && <img src={teamData.team.logo} alt={teamData.team.name} className="w-5 h-5 object-contain" />}
                                     {teamData.team.name}
                                   </td>
-                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.all.played}</td>
-                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.all.win}</td>
-                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.all.draw}</td>
-                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.all.lose}</td>
+                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.played}</td>
+                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.win}</td>
+                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.draw}</td>
+                                  <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.lose}</td>
                                   <td className="px-2 py-2 text-center text-neutral-500 dark:text-neutral-400">{teamData.goalsDiff}</td>
                                   <td className="px-4 py-2 text-center font-bold text-neutral-900 dark:text-white">{teamData.points}</td>
                                 </tr>
@@ -137,7 +127,7 @@ export default function FootballHubPage() {
                 const awayTeam = match.teams.away;
                 const fixture = match.fixture;
                 const league = match.league;
-                const isMatchUpcoming = ['NS', 'TBD'].includes(fixture.status.short);
+                const isMatchUpcoming = match.isUpcoming;
 
                 return (
                   <Card 
