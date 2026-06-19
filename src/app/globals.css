@@ -152,7 +152,7 @@
 }
 
 .manjanium-table .ant-table-tbody > tr:hover > td {
-  @apply bg-neutral-50 dark:bg-zinc-800/50 !important;
+  @apply !bg-neutral-50 dark:!bg-zinc-800/50;
 }
 
 .manjanium-table .ant-table-cell-row-hover {
