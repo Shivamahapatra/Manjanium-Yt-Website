@@ -3,29 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-
-export interface Team {
-  id: string;
-  name: string;
-  logo: string;
-  played: number;
-  wins: number;
-  draws: number;
-  losses: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  goalDifference: number;
-  points: number;
-  qualification: 'qualified' | 'contending' | 'eliminated';
-  // Other properties like flag and players can exist but are optional for this card
-  flag?: string;
-  players?: any[];
-}
-
-export interface GroupData {
-  groupName: string;
-  teams: Team[];
-}
+import { Team, Group as GroupData } from '@/types/football';
 
 export interface GroupStandingsCardProps {
   groupData: GroupData;

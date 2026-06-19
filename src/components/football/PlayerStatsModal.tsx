@@ -3,25 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { X, ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react';
-import { Team } from './GroupStandingsCard';
-
-export interface Player {
-  id: string;
-  name: string;
-  number: number;
-  position: 'GK' | 'DEF' | 'MID' | 'FWD' | string;
-  photo?: string;
-  gamesPlayed: number;
-  goals: number;
-  assists: number;
-  yellowCards: number;
-  redCards: number;
-  minutesPlayed: number;
-  passCompletion: number;
-  shotsOnTarget: number;
-  tackles: number;
-  dribbles: number;
-}
+import { Team, Player } from '@/types/football';
 
 export interface PlayerStatsModalProps {
   isOpen: boolean;

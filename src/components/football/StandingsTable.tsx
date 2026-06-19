@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
-import { Team } from './GroupStandingsCard'; 
+import { Team } from '@/types/football'; 
 
 export type SortField = 'points' | 'goalsFor' | 'name' | 'goalDifference' | 'played' | 'wins' | 'draws' | 'losses' | 'goalsAgainst';
 

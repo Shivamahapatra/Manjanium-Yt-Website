@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Clock, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { Player as BasePlayer } from './PlayerStatsModal';
+import { Player as BasePlayer } from '@/types/football';
 
 export interface ScorerPlayer extends BasePlayer {
   teamName?: string;
