@@ -303,19 +303,19 @@ export function PlayerStatsModal({
                                 <div className="px-6 py-4 flex flex-wrap gap-4 md:gap-8 text-sm">
                                   <div className="flex flex-col">
                                     <span className="text-neutral-500 text-xs uppercase tracking-wider mb-1">Pass Completion</span>
-                                    <span className="text-neutral-200 font-bold text-lg">{player.passCompletion > 0 ? `${player.passCompletion}%` : 'N/A'}</span>
+                                    <span className="text-neutral-200 font-bold text-lg">{(player.passCompletion || 0) > 0 ? `${player.passCompletion}%` : 'N/A'}</span>
                                   </div>
                                   <div className="flex flex-col">
                                     <span className="text-neutral-500 text-xs uppercase tracking-wider mb-1">Shots on Target</span>
-                                    <span className="text-neutral-200 font-bold text-lg">{player.shotsOnTarget}</span>
+                                    <span className="text-neutral-200 font-bold text-lg">{player.shotsOnTarget ?? 'N/A'}</span>
                                   </div>
                                   <div className="flex flex-col">
                                     <span className="text-neutral-500 text-xs uppercase tracking-wider mb-1">Tackles</span>
-                                    <span className="text-neutral-200 font-bold text-lg">{player.tackles}</span>
+                                    <span className="text-neutral-200 font-bold text-lg">{player.tackles ?? 'N/A'}</span>
                                   </div>
                                   <div className="flex flex-col">
                                     <span className="text-neutral-500 text-xs uppercase tracking-wider mb-1">Dribbles</span>
-                                    <span className="text-neutral-200 font-bold text-lg">{player.dribbles}</span>
+                                    <span className="text-neutral-200 font-bold text-lg">{player.dribbles ?? 'N/A'}</span>
                                   </div>
                                 </div>
                               </td>
