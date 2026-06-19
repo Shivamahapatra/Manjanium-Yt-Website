@@ -10,12 +10,16 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/api/f1/standings",
-        destination: "https://site.api.espn.com/apis/v2/sports/racing/f1/standings",
+        destination: "https://site.web.api.espn.com/apis/v2/sports/racing/f1/standings?region=us&lang=en&seasontype=2",
       },
       // OpenF1 Live Telemetry Proxy Rewrites
       {
         source: "/api/openf1/sessions",
         destination: "https://api.openf1.org/v1/sessions?session_key=latest",
+      },
+      {
+        source: "/api/openf1/drivers",
+        destination: "https://api.openf1.org/v1/drivers?session_key=latest",
       },
       {
         source: "/api/openf1/position",

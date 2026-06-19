@@ -38,6 +38,7 @@ const DriverAcronyms: Record<string, string> = {
 
 export default function F1Hub() {
   const [session, setSession] = useState<any>(null);
+  const [driversMap, setDriversMap] = useState<Record<string, any>>({});
   const [positions, setPositions] = useState<any[]>([]);
   const [telemetry, setTelemetry] = useState<any[]>([]);
   const [standings, setStandings] = useState<any[]>([]);
@@ -58,12 +59,23 @@ export default function F1Hub() {
           setSession(currentSession);
         }
 
-        // 2. Standings (Fallback)
+        // 2. Drivers Map
+        const drvRes = await fetch('/api/openf1/drivers');
+        const drvJson = await drvRes.json();
+        if (Array.isArray(drvJson)) {
+          const map: Record<string, any> = {};
+          drvJson.forEach((d: any) => {
+            map[d.driver_number] = d;
+          });
+          setDriversMap(map);
+        }
+
+        // 3. Standings (Fallback)
         const standingsRes = await fetch('/api/f1/standings');
         const standingsJson = await standingsRes.json();
-        setStandings(standingsJson?.sportsStandingsResults?.[0]?.sportsStandingsSubResults?.[0]?.teamStandings || []);
+        setStandings(standingsJson?.children?.[0]?.standings?.entries || []);
 
-        // 3. Timing Tower (Merged Position & Intervals)
+        // 4. Timing Tower (Merged Position & Intervals)
         const posRes = await fetch('/api/openf1/position');
         const posJson = await posRes.json();
         
@@ -154,21 +166,30 @@ export default function F1Hub() {
 
   const timingColumns = [
     { title: 'POS', dataIndex: 'position', key: 'position', render: (text: number) => <span className="font-bold text-neutral-500 dark:text-zinc-400">{text}</span> },
-    { title: 'DRIVER', dataIndex: 'driver_number', key: 'driver', render: (text: number) => (
-      <div className="flex items-center gap-2">
-        <div className="w-1.5 h-4 rounded-sm" style={{ backgroundColor: TeamColors[text.toString()] || '#fff' }} />
-        <span className="font-bold font-mono text-neutral-900 dark:text-white">{DriverAcronyms[text.toString()] || text}</span>
-      </div>
-    )},
+    { title: 'DRIVER', dataIndex: 'driver_number', key: 'driver', render: (text: number) => {
+      const driver = driversMap[text.toString()];
+      return (
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-4 rounded-sm" style={{ backgroundColor: `#${driver?.team_colour || 'fff'}` }} />
+          <span className="font-bold font-mono text-neutral-900 dark:text-white">{driver?.name_acronym || text}</span>
+        </div>
+      );
+    }},
     { title: 'GAP', dataIndex: 'gap_to_leader', key: 'gap', render: (text: number) => <span className="font-mono text-xs font-semibold text-neutral-600 dark:text-neutral-300">{text}</span> },
     { title: 'INT', dataIndex: 'interval', key: 'int', render: (text: number) => <span className="font-mono text-xs text-neutral-400 dark:text-neutral-500">{text}</span> },
   ];
 
   const standingColumns = [
-    { title: 'POS', dataIndex: 'positionInDivision', key: 'pos', render: (text: number) => <span className="font-bold text-neutral-500 dark:text-zinc-400">P{text}</span> },
-    { title: 'TEAM', dataIndex: 'team', key: 'team', render: (text: string) => <span className="text-neutral-900 dark:text-white font-medium">{text}</span> },
-    { title: 'WINS', dataIndex: 'wins', key: 'wins' },
-    { title: 'POINTS', dataIndex: 'points', key: 'points', render: (text: number) => <Tag color="blue" className="font-bold bg-blue-500/20 text-blue-400 border-none">{text} pts</Tag> },
+    { title: 'POS', dataIndex: 'position', key: 'pos', render: (text: number) => <span className="font-bold text-neutral-500 dark:text-zinc-400">P{text}</span> },
+    { title: 'DRIVER', dataIndex: 'athlete', key: 'athlete', render: (athlete: any) => <span className="text-neutral-900 dark:text-white font-medium">{athlete?.displayName}</span> },
+    { title: 'WINS', key: 'wins', render: (record: any) => {
+      const winsStat = record.stats?.find((s: any) => s.name === 'wins');
+      return <span>{winsStat?.value || 0}</span>;
+    }},
+    { title: 'POINTS', key: 'points', render: (record: any) => {
+      const ptsStat = record.stats?.find((s: any) => s.name === 'points');
+      return <Tag color="blue" className="font-bold bg-blue-500/20 text-blue-400 border-none">{ptsStat?.value || 0} pts</Tag>;
+    }},
   ];
 
   // Dynamic Header State Mapping
@@ -262,10 +283,10 @@ export default function F1Hub() {
                             <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
                             
                             {/* P1 Lines */}
-                            <Line yAxisId="left" type="monotone" dataKey="p1Speed" name={`${DriverAcronyms[topDrivers[0]]} Speed`} stroke={TeamColors[topDrivers[0]] || '#3b82f6'} strokeWidth={2} dot={false} isAnimationActive={false} />
+                            <Line yAxisId="left" type="monotone" dataKey="p1Speed" name={`${driversMap[topDrivers[0]]?.name_acronym || topDrivers[0]} Speed`} stroke={`#${driversMap[topDrivers[0]]?.team_colour || '3b82f6'}`} strokeWidth={2} dot={false} isAnimationActive={false} />
                             
                             {/* P2 Lines */}
-                            <Line yAxisId="left" type="monotone" dataKey="p2Speed" name={`${DriverAcronyms[topDrivers[1]]} Speed`} stroke={TeamColors[topDrivers[1]] || '#ef4444'} strokeDasharray="5 5" strokeWidth={2} dot={false} isAnimationActive={false} />
+                            <Line yAxisId="left" type="monotone" dataKey="p2Speed" name={`${driversMap[topDrivers[1]]?.name_acronym || topDrivers[1]} Speed`} stroke={`#${driversMap[topDrivers[1]]?.team_colour || 'ef4444'}`} strokeDasharray="5 5" strokeWidth={2} dot={false} isAnimationActive={false} />
                           </LineChart>
                         </ResponsiveContainer>
                       </div>
