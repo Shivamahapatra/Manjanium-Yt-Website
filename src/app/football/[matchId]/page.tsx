@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Clock, MapPin, Activity, AlertCircle, Shield, Goal, Flag, RefreshCw } from 'lucide-react';
 import { LiveTimeline, MatchEvent } from '@/components/football/LiveTimeline';
+import { TeamLineup } from '@/components/football/TeamLineup';
 
 export default function MatchDetailsPage() {
   const params = useParams();
@@ -153,60 +154,22 @@ export default function MatchDetailsPage() {
   );
 
   const renderLineups = () => {
-    const TeamLineup = ({ team, title }: { team: any, title: string }) => {
-      if (!team || !team.lineup) return null;
-      return (
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-sm border border-neutral-200 dark:border-neutral-800">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-lg flex items-center gap-2">
-              {team.logo && <img src={team.logo} className="w-6 h-6 object-contain" alt="logo" />}
-              {title}
-            </h3>
-            <span className="text-xs font-bold bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded text-neutral-500">{team.formation}</span>
-          </div>
-
-          <div className="mb-6">
-            <h4 className="text-xs font-bold text-neutral-400 mb-3 uppercase tracking-wider">Starting XI</h4>
-            <div className="flex flex-col gap-2">
-              {team.lineup.map((p: any) => (
-                <div key={p.id} className={`flex items-center justify-between p-2 rounded-lg ${p.isSubstituted ? 'opacity-50' : 'bg-neutral-50 dark:bg-neutral-800/50'}`}>
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 text-center text-xs font-bold text-neutral-400">{p.number}</span>
-                    <span className="font-medium text-sm">{p.name}</span>
-                    {p.isSubstituted && <ArrowLeft className="w-3 h-3 text-red-500" />}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {p.yellowCards > 0 && <span className="w-3 h-4 bg-yellow-400 rounded-sm inline-block"></span>}
-                    {p.redCards > 0 && <span className="w-3 h-4 bg-red-500 rounded-sm inline-block"></span>}
-                    <span className="text-xs text-neutral-500 w-8 text-right">{p.position}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-xs font-bold text-neutral-400 mb-3 uppercase tracking-wider">Substitutes</h4>
-            <div className="flex flex-col gap-2">
-              {team.substitutes.map((p: any) => (
-                <div key={p.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 text-center text-xs font-bold text-neutral-400">{p.number}</span>
-                    <span className="font-medium text-sm">{p.name}</span>
-                  </div>
-                  <span className="text-xs text-neutral-500">{p.position}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      );
-    };
+    if (!match.homeTeam || !match.awayTeam) return null;
 
     return (
-      <div className="flex flex-col gap-6">
-        <TeamLineup team={match.homeTeam} title={match.homeTeam?.name} />
-        <TeamLineup team={match.awayTeam} title={match.awayTeam?.name} />
+      <div className="flex flex-col gap-8">
+        <TeamLineup 
+          team={match.homeTeam} 
+          isHomeTeam={true} 
+          highlightedPlayerId={null} 
+          onPlayerClick={(p) => console.log('Player clicked', p)} 
+        />
+        <TeamLineup 
+          team={match.awayTeam} 
+          isHomeTeam={false} 
+          highlightedPlayerId={null} 
+          onPlayerClick={(p) => console.log('Player clicked', p)} 
+        />
       </div>
     );
   };
