@@ -137,3 +137,24 @@
     @apply font-sans;
   }
 }
+
+/* Custom Table Styles */
+.manjanium-table .ant-table {
+  background: transparent !important;
+}
+
+.manjanium-table .ant-table-thead > tr > th {
+  @apply bg-neutral-100 dark:bg-zinc-800 border-b border-neutral-200 dark:border-zinc-700 text-neutral-900 dark:text-white font-bold;
+}
+
+.manjanium-table .ant-table-tbody > tr > td {
+  @apply border-b border-neutral-200 dark:border-zinc-800 transition-colors duration-200;
+}
+
+.manjanium-table .ant-table-tbody > tr:hover > td {
+  @apply bg-neutral-50 dark:bg-zinc-800/50 !important;
+}
+
+.manjanium-table .ant-table-cell-row-hover {
+  background: transparent !important;
+}
