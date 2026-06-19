@@ -117,43 +117,50 @@ export function GroupStandingsCard({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-800/30">
-                  {groupData.teams.map((team, index) => (
-                    <motion.tr
-                      key={team.id || index}
-                      variants={rowVariants}
-                      onClick={() => onTeamClick(team)}
-                      className={`cursor-pointer transition-colors ${getStatusColor(team.qualification, index)}`}
-                    >
-                      <td className="px-3 py-3 text-center text-xs font-semibold text-neutral-400">
-                        {index + 1}
+                  {groupData?.teams && groupData.teams.length > 0 ? (
+                    groupData.teams.map((team, index) => (
+                      <motion.tr
+                        key={team?.id || index}
+                        variants={rowVariants}
+                        onClick={() => onTeamClick && onTeamClick(team)}
+                        className={`cursor-pointer transition-colors ${getStatusColor(team?.qualification || 'contending', index)}`}
+                      >
+                        <td className="px-3 py-3 text-center text-xs font-semibold text-neutral-400">
+                          {index + 1}
+                        </td>
+                        <td className="px-3 py-3 font-medium text-neutral-100 flex items-center gap-2">
+                          {team?.logo && (
+                            <img 
+                              src={team.logo} 
+                              alt={team.name || 'Team'} 
+                              className="w-5 h-5 object-contain"
+                              loading="lazy" 
+                            />
+                          )}
+                          {!team?.logo && team?.flag && (
+                            <span className="text-base leading-none">{team.flag}</span>
+                          )}
+                          <span className="truncate max-w-[110px] sm:max-w-none">{team?.name || 'Unknown Team'}</span>
+                        </td>
+                        <td className="px-2 py-3 text-center text-neutral-300">{team?.played || 0}</td>
+                        <td className="px-2 py-3 text-center text-neutral-300">{team?.wins || 0}</td>
+                        <td className="px-2 py-3 text-center text-neutral-300">{team?.draws || 0}</td>
+                        <td className="px-2 py-3 text-center text-neutral-300">{team?.losses || 0}</td>
+                        <td className="px-2 py-3 text-center text-neutral-300 hidden sm:table-cell">{team?.goalsFor || 0}</td>
+                        <td className="px-2 py-3 text-center text-neutral-300 hidden sm:table-cell">{team?.goalsAgainst || 0}</td>
+                        <td className="px-2 py-3 text-center text-neutral-300">
+                          {team?.goalDifference > 0 ? `+${team.goalDifference}` : (team?.goalDifference || 0)}
+                        </td>
+                        <td className="px-3 py-3 text-center font-bold text-white bg-neutral-900/20">{team?.points || 0}</td>
+                      </motion.tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={10} className="px-3 py-6 text-center text-neutral-500">
+                        No teams available in this group.
                       </td>
-                      <td className="px-3 py-3 font-medium text-neutral-100 flex items-center gap-2">
-                        {team.logo && (
-                          <img 
-                            src={team.logo} 
-                            alt={team.name} 
-                            className="w-5 h-5 object-contain"
-                            loading="lazy" 
-                          />
-                        )}
-                        {/* Fallback to flag if logo is not available */}
-                        {!team.logo && team.flag && (
-                          <span className="text-base leading-none">{team.flag}</span>
-                        )}
-                        <span className="truncate max-w-[110px] sm:max-w-none">{team.name}</span>
-                      </td>
-                      <td className="px-2 py-3 text-center text-neutral-300">{team.played}</td>
-                      <td className="px-2 py-3 text-center text-neutral-300">{team.wins}</td>
-                      <td className="px-2 py-3 text-center text-neutral-300">{team.draws}</td>
-                      <td className="px-2 py-3 text-center text-neutral-300">{team.losses}</td>
-                      <td className="px-2 py-3 text-center text-neutral-300 hidden sm:table-cell">{team.goalsFor}</td>
-                      <td className="px-2 py-3 text-center text-neutral-300 hidden sm:table-cell">{team.goalsAgainst}</td>
-                      <td className="px-2 py-3 text-center text-neutral-300">
-                        {team.goalDifference > 0 ? `+${team.goalDifference}` : team.goalDifference}
-                      </td>
-                      <td className="px-3 py-3 text-center font-bold text-white bg-neutral-900/20">{team.points}</td>
-                    </motion.tr>
-                  ))}
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
