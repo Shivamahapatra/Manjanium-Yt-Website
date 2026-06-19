@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { LiveChatMarquee } from "@/components/chat/LiveChatMarquee";
 import { Card, Spin } from "antd";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, AlertCircle, Clock, Trophy, Activity, Users } from "lucide-react";
 
@@ -188,53 +189,54 @@ export default function FootballHubPage() {
                     const isMatchUpcoming = match.isUpcoming;
 
                     return (
-                      <Card 
-                        key={fixture.id}
-                        hoverable
-                        className="rounded-[20px] overflow-hidden border-neutral-200 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm"
-                        bodyStyle={{ padding: 0 }}
-                      >
-                        <div className="bg-neutral-200 dark:bg-neutral-800 px-4 py-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 flex justify-between">
-                          <span className="flex items-center gap-2">
-                            {league.logo && <img src={league.logo} alt={league.name} className="w-4 h-4 object-contain" />}
-                            {league.season} • {league.name}
-                          </span>
-                          <span className={isMatchUpcoming ? "text-amber-500" : "text-red-500"}>
-                            {fixture.status.elapsed ? `${fixture.status.elapsed}'` : fixture.status.short}
-                          </span>
-                        </div>
-                        
-                        <div className="p-6">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex flex-col items-center gap-2 w-1/3">
-                              <img src={homeTeam?.logo || "/placeholder.png"} alt={homeTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
-                              <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{homeTeam?.name}</span>
-                            </div>
-                            
-                            <div className="flex flex-col items-center justify-center w-1/3">
-                              {isMatchUpcoming ? (
-                                <div className="text-xl font-bold text-neutral-600 dark:text-neutral-400 text-center whitespace-nowrap">
-                                  {new Date(fixture.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </div>
-                              ) : (
-                                <div className="text-3xl font-black font-mono dark:text-white">
-                                  {match.goals.home ?? 0} - {match.goals.away ?? 0}
-                                </div>
-                              )}
-                            </div>
+                      <Link href={`/football/${fixture.id}`} key={fixture.id} className="block transition-transform hover:scale-[1.02]">
+                        <Card 
+                          hoverable
+                          className="rounded-[20px] overflow-hidden border-neutral-200 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm"
+                          bodyStyle={{ padding: 0 }}
+                        >
+                          <div className="bg-neutral-200 dark:bg-neutral-800 px-4 py-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 flex justify-between">
+                            <span className="flex items-center gap-2">
+                              {league.logo && <img src={league.logo} alt={league.name} className="w-4 h-4 object-contain" />}
+                              {league.season} • {league.name}
+                            </span>
+                            <span className={isMatchUpcoming ? "text-amber-500" : "text-red-500"}>
+                              {fixture.status.elapsed ? `${fixture.status.elapsed}'` : fixture.status.short}
+                            </span>
+                          </div>
+                          
+                          <div className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex flex-col items-center gap-2 w-1/3">
+                                <img src={homeTeam?.logo || "/placeholder.png"} alt={homeTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
+                                <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{homeTeam?.name}</span>
+                              </div>
+                              
+                              <div className="flex flex-col items-center justify-center w-1/3">
+                                {isMatchUpcoming ? (
+                                  <div className="text-xl font-bold text-neutral-600 dark:text-neutral-400 text-center whitespace-nowrap">
+                                    {new Date(fixture.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </div>
+                                ) : (
+                                  <div className="text-3xl font-black font-mono dark:text-white">
+                                    {match.goals.home ?? 0} - {match.goals.away ?? 0}
+                                  </div>
+                                )}
+                              </div>
 
-                            <div className="flex flex-col items-center gap-2 w-1/3">
-                              <img src={awayTeam?.logo || "/placeholder.png"} alt={awayTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
-                              <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{awayTeam?.name}</span>
+                              <div className="flex flex-col items-center gap-2 w-1/3">
+                                <img src={awayTeam?.logo || "/placeholder.png"} alt={awayTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
+                                <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{awayTeam?.name}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        
-                        <div className="bg-neutral-50 dark:bg-black px-4 py-3 border-t border-neutral-200 dark:border-neutral-800 text-sm flex justify-between">
-                          <span className="text-neutral-500">{fixture.venue?.name || "TBD"}</span>
-                          <span className="text-neutral-400 text-xs">{new Date(fixture.date).toLocaleDateString()}</span>
-                        </div>
-                      </Card>
+                          
+                          <div className="bg-neutral-50 dark:bg-black px-4 py-3 border-t border-neutral-200 dark:border-neutral-800 text-sm flex justify-between">
+                            <span className="text-neutral-500">{fixture.venue?.name || "TBD"}</span>
+                            <span className="text-neutral-400 text-xs">{new Date(fixture.date).toLocaleDateString()}</span>
+                          </div>
+                        </Card>
+                      </Link>
                     );
                   })}
                   
