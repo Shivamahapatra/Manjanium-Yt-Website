@@ -47,7 +47,7 @@ export default function F1Layout({ children }: { children: React.ReactNode }) {
           target="_blank"
           className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1f1f1f] hover:bg-[#2a2a2a] transition-colors border border-[#333]"
         >
-          <Youtube className="w-4 h-4 text-red-500" />
+          <IconBrandYoutube className="w-4 h-4 text-red-500" />
           <span className="text-xs font-semibold text-white tracking-wide">Subscribe</span>
         </Link>
       </div>
