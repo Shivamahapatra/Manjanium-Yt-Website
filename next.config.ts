@@ -16,30 +16,6 @@ const nextConfig: NextConfig = {
         source: "/api/f1/telemetry",
         destination: "https://api.openf1.org/v1/car_data",
       },
-
-      // Football Match Center Rewrites (Using your verified API-Sports account)
-      {
-        source: "/api/football/fixtures/live",
-        destination: "https://v3.football.api-sports.io/fixtures?live=all",
-        has: [
-          {
-            type: "header",
-            key: "x-apisports-key",
-            value: process.env.API_SPORTS_KEY,
-          },
-        ],
-      },
-      {
-        source: "/api/football/standings",
-        destination: "https://v3.football.api-sports.io/standings",
-        has: [
-          {
-            type: "header",
-            key: "x-apisports-key",
-            value: process.env.API_SPORTS_KEY,
-          },
-        ],
-      },
     ];
   },
   // Optimizing production bundles for smooth Aceternity UI renders
