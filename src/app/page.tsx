@@ -7,6 +7,8 @@ import { IconBrandYoutube, IconArrowRight } from "@tabler/icons-react";
 import Link from "next/link";
 import { Activity, BarChart2, Trophy, Calendar, Rss, MapPin } from "lucide-react";
 
+import { Terminal } from "@/components/ui/terminal";
+
 // --- HOVER EFFECT COMPONENT ---
 const FeaturesHoverEffect = ({ items }: { items: any[] }) => {
   let [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -31,7 +33,7 @@ const FeaturesHoverEffect = ({ items }: { items: any[] }) => {
               />
             )}
           </AnimatePresence>
-          <div className="rounded-2xl h-full w-full p-6 bg-[#111111] border border-[#1f1f1f] relative z-20 flex flex-col overflow-hidden group-hover:border-neutral-700 transition-colors">
+          <div className="rounded-2xl h-full w-full p-6 bg-[#111111]/80 backdrop-blur-md border border-[#1f1f1f] relative z-20 flex flex-col overflow-hidden group-hover:border-neutral-700 transition-colors shadow-2xl">
             <div className={`mb-4 ${item.textColor}`}>{item.icon}</div>
             <h4 className="text-white font-bold tracking-wide mt-4">{item.title}</h4>
             <p className="mt-4 text-neutral-400 tracking-wide leading-relaxed text-sm flex-1">{item.description}</p>
@@ -77,11 +79,11 @@ const MockTimingTower = () => {
   }, []);
 
   return (
-    <div className="bg-[#111111] border border-[#1f1f1f] rounded-2xl overflow-hidden relative shadow-2xl font-mono text-sm h-full flex flex-col w-full max-w-sm mx-auto">
+    <div className="bg-[#111111]/80 backdrop-blur-xl border border-[#1f1f1f] rounded-2xl overflow-hidden relative shadow-2xl font-mono text-sm h-full flex flex-col w-full max-w-sm mx-auto">
       <div className="absolute top-2 right-2 px-2 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded text-[10px] font-sans font-bold text-blue-400 z-10">
         SIMULATED DATA
       </div>
-      <div className="flex bg-[#1a1a1a] p-3 text-xs text-neutral-500 font-bold border-b border-[#222]">
+      <div className="flex bg-[#1a1a1a]/80 p-3 text-xs text-neutral-500 font-bold border-b border-[#222]">
         <div className="w-8">POS</div>
         <div className="flex-1">DRIVER</div>
         <div className="w-20 text-right">GAP</div>
@@ -94,7 +96,7 @@ const MockTimingTower = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ delay: i * 0.08 }}
-            className="flex items-center px-3 py-2 bg-[#0a0a0a] rounded border border-transparent hover:border-[#333] transition-colors"
+            className="flex items-center px-3 py-2 bg-[#0a0a0a]/50 rounded border border-transparent hover:border-[#333] transition-colors"
           >
             <div className="w-8 text-neutral-500 font-bold">{d.pos}</div>
             <div className="flex-1 flex items-center gap-3">
@@ -113,6 +115,19 @@ const MockTimingTower = () => {
 
 // --- MAIN PAGE ---
 export default function HomePage() {
+  const telemetryCommands = [
+    "manjanium config --env=production",
+    "npm run connect --api=f1 --realtime",
+    "Fetching driver data: VER, NOR, LEC...",
+    "Syncing World Cup 2026 data stream..."
+  ];
+  const telemetryOutputs = {
+    0: ["[OK] Environment loaded."],
+    1: ["Starting secure websocket connection to OpenF1...", "Connected: port 8080", "10hz data stream established."],
+    2: ["VER gap to LEADER: 0.000", "NOR gap to LEADER: +1.432", "[Pipeline active]"],
+    3: ["Group A fixtures synced.", "Match Center ready."]
+  };
+
   const features = [
     {
       title: "Live Timing Tower",
@@ -165,109 +180,133 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#0a0a0a] overflow-hidden selection:bg-blue-500/30">
+    <div className="flex flex-col min-h-screen bg-[#0a0a0a] overflow-hidden selection:bg-blue-500/30 relative">
       
+      {/* NOISE BACKGROUND */}
+      <div 
+        className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-20 mix-blend-overlay"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
+      />
+
       {/* SECTION 1 — HERO */}
       <div className="relative">
-        <AuroraBackground showRadialGradient className="h-[90vh] md:h-screen w-full relative">
+        <AuroraBackground showRadialGradient className="min-h-screen w-full relative pb-20 pt-10 lg:pt-0">
           
           {/* Custom Static Grid Background inside Hero */}
           <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
                style={{ backgroundImage: 'radial-gradient(circle at center, #1f1f1f 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
           
           {/* Custom Spotlights */}
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/20 blur-[120px] pointer-events-none z-0" />
-          <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-red-600/10 blur-[120px] pointer-events-none z-0" />
+          <div className="absolute top-[0%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/20 blur-[120px] pointer-events-none z-0" />
+          <div className="absolute top-[0%] right-[-10%] w-[50%] h-[50%] rounded-full bg-red-600/10 blur-[120px] pointer-events-none z-0" />
 
-          <motion.div className="relative z-10 flex flex-col items-center justify-center px-4 w-full max-w-6xl mx-auto h-full text-center">
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 w-full max-w-7xl mx-auto h-full gap-12 lg:gap-8 mt-16 lg:mt-0">
             
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] mb-8"
-            >
-              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-xs font-bold text-white tracking-widest uppercase">LIVE NOW — F1 & Football Data Hub</span>
+            {/* Left Content Column */}
+            <motion.div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left mt-8 lg:mt-0">
+              {/* Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1a1a1a]/80 backdrop-blur-sm border border-[#2a2a2a] mb-8"
+              >
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+                <span className="text-xs font-bold text-white tracking-widest uppercase">LIVE NOW — F1 & Football Data Hub</span>
+              </motion.div>
+
+              {/* Headline */}
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.7 }}
+                className="text-6xl md:text-8xl font-serif font-bold text-white tracking-tight leading-[1.1] mb-6"
+              >
+                Manjanium <br className="hidden lg:block"/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 drop-shadow-sm">On Softs</span>
+              </motion.h1>
+
+              {/* Subheadline */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.7 }}
+                className="text-xl md:text-2xl text-neutral-400 max-w-xl font-light mb-10"
+              >
+                The Ultimate F1 & Football Hub. Track every session and match in real-time.
+              </motion.p>
+
+              {/* Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.7 }}
+                className="flex flex-col sm:flex-row items-center gap-4 mb-10 w-full lg:w-auto"
+              >
+                <Link href="/f1" className="w-full sm:w-auto">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3.5 rounded-full flex items-center justify-center gap-2 transition-colors text-lg w-full shadow-lg shadow-blue-500/20"
+                  >
+                    Enter F1 Hub <IconArrowRight className="w-5 h-5" />
+                  </motion.button>
+                </Link>
+
+                <Link href="/football" className="w-full sm:w-auto">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-3.5 rounded-full flex items-center justify-center gap-2 transition-colors text-lg w-full shadow-lg shadow-green-500/20"
+                  >
+                    Enter Football Center <IconArrowRight className="w-5 h-5" />
+                  </motion.button>
+                </Link>
+                
+                <Link href="https://www.youtube.com/@manjaniumonsofts67" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 text-white font-bold px-6 py-3.5 rounded-full flex items-center justify-center gap-2 transition-colors text-base w-full"
+                  >
+                    <IconBrandYoutube className="w-5 h-5 text-red-500" />
+                    Subscribe
+                  </motion.button>
+                </Link>
+              </motion.div>
+
+              {/* Stats */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1, duration: 0.7 }}
+                className="flex flex-wrap justify-center lg:justify-start items-center gap-3 sm:gap-4 text-[10px] sm:text-xs font-semibold text-neutral-500 uppercase tracking-widest"
+              >
+                <span>20 F1 Drivers</span>
+                <span className="w-1 h-1 bg-neutral-700 rounded-full" />
+                <span>Real-time Telemetry</span>
+                <span className="w-1 h-1 bg-neutral-700 rounded-full" />
+                <span>Global Football Coverage</span>
+                <span className="w-1 h-1 bg-neutral-700 rounded-full hidden sm:block" />
+                <span className="hidden sm:block">0 Ads</span>
+              </motion.div>
             </motion.div>
 
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.7 }}
-              className="text-5xl md:text-8xl font-serif font-bold text-white tracking-tight leading-tight mb-6"
+            {/* Right Content Column — Terminal */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+              className="flex-1 w-full max-w-xl hidden md:block"
             >
-              Manjanium <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">On Softs</span>
-            </motion.h1>
-
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.7 }}
-              className="text-xl md:text-2xl text-neutral-400 max-w-2xl font-light mb-10"
-            >
-              The Ultimate F1 & Football Hub
-            </motion.p>
-
-            {/* Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.7 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 w-full"
-            >
-              <Link href="/f1" className="w-full sm:w-auto">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3.5 rounded-full flex items-center justify-center gap-2 transition-colors text-lg w-full"
-                >
-                  Enter F1 Hub <IconArrowRight className="w-5 h-5" />
-                </motion.button>
-              </Link>
-
-              <Link href="/football" className="w-full sm:w-auto">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-3.5 rounded-full flex items-center justify-center gap-2 transition-colors text-lg w-full"
-                >
-                  Enter Football Center <IconArrowRight className="w-5 h-5" />
-                </motion.button>
-              </Link>
-              
-              <Link href="https://www.youtube.com/@manjaniumonsofts67" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="bg-white text-black font-bold px-6 py-3.5 rounded-full flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors text-base w-full"
-                >
-                  <IconBrandYoutube className="w-5 h-5 text-red-600" />
-                  Subscribe
-                </motion.button>
-              </Link>
+              <Terminal 
+                commands={telemetryCommands} 
+                outputs={telemetryOutputs} 
+                username="manjanium-core" 
+                enableSound={false}
+              />
             </motion.div>
 
-            {/* Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1, duration: 0.7 }}
-              className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 text-[10px] sm:text-xs font-semibold text-neutral-500 uppercase tracking-widest"
-            >
-              <span>20 F1 Drivers</span>
-              <span className="w-1 h-1 bg-neutral-700 rounded-full" />
-              <span>Real-time Telemetry</span>
-              <span className="w-1 h-1 bg-neutral-700 rounded-full" />
-              <span>Global Football Coverage</span>
-              <span className="w-1 h-1 bg-neutral-700 rounded-full hidden sm:block" />
-              <span className="hidden sm:block">0 Ads</span>
-            </motion.div>
-
-          </motion.div>
+          </div>
         </AuroraBackground>
       </div>
 

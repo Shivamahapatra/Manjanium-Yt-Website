@@ -20,11 +20,20 @@ export const metadata: Metadata = {
   description: "Live F1 Telemetry & Football Match Center",
 };
 
+import { FloatingNav } from "@/components/ui/floating-navbar";
+import { IconHome, IconCarCrash, IconBallFootball } from "@tabler/icons-react";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const navItems = [
+    { name: "Home", link: "/", icon: <IconHome className="h-4 w-4 text-neutral-500 dark:text-white" /> },
+    { name: "F1 Hub", link: "/f1", icon: <IconCarCrash className="h-4 w-4 text-neutral-500 dark:text-white" /> },
+    { name: "Football Center", link: "/football", icon: <IconBallFootball className="h-4 w-4 text-neutral-500 dark:text-white" /> },
+  ];
+
   return (
     <html
       lang="en"
@@ -39,6 +48,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AntdRegistry>
+            <FloatingNav navItems={navItems} />
             <SidebarLayout>{children}</SidebarLayout>
           </AntdRegistry>
         </ThemeProvider>

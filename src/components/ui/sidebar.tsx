@@ -83,11 +83,11 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden  md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-[#111111] border-r border-transparent dark:border-[#1f1f1f] w-[300px] flex-shrink-0 z-40",
         className
       )}
       animate={{
-        width: animate ? (open ? "300px" : "60px") : "300px",
+        width: animate ? (open ? "300px" : "70px") : "300px",
       }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
@@ -98,6 +98,7 @@ export const DesktopSidebar = ({
   );
 };
 
+import { FloatingDock } from "./floating-dock";
 import { IconHome, IconCarCrash, IconBallFootball, IconSettings } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
 
@@ -109,29 +110,15 @@ export const MobileSidebar = ({
   const pathname = usePathname();
   
   const bottomLinks = [
-    { href: "/", icon: <IconHome className="h-6 w-6" />, label: "Home" },
-    { href: "/f1", icon: <IconCarCrash className="h-6 w-6" />, label: "F1" },
-    { href: "/football", icon: <IconBallFootball className="h-6 w-6" />, label: "Football" },
-    { href: "/settings", icon: <IconSettings className="h-6 w-6" />, label: "Settings" },
+    { href: "/", icon: <IconHome className="h-full w-full text-neutral-500 dark:text-neutral-300" />, title: "Home" },
+    { href: "/f1", icon: <IconCarCrash className="h-full w-full text-neutral-500 dark:text-neutral-300" />, title: "F1" },
+    { href: "/football", icon: <IconBallFootball className="h-full w-full text-neutral-500 dark:text-neutral-300" />, title: "Football" },
+    { href: "/settings", icon: <IconSettings className="h-full w-full text-neutral-500 dark:text-neutral-300" />, title: "Settings" },
   ];
 
   return (
-    <div
-      className={cn(
-        "fixed bottom-0 left-0 right-0 z-50 h-16 px-6 flex md:hidden items-center justify-between bg-white dark:bg-[#0a0a0a] border-t border-neutral-200 dark:border-[#1f1f1f]",
-        className
-      )}
-      {...props}
-    >
-      {bottomLinks.map((link, idx) => {
-        const isActive = pathname === link.href || (link.href !== '/' && pathname?.startsWith(link.href));
-        return (
-          <Link key={idx} href={link.href} className={`flex flex-col items-center justify-center gap-1 transition-colors ${isActive ? 'text-blue-500' : 'text-neutral-500 hover:text-neutral-300'}`}>
-            {link.icon}
-            <span className="text-[10px] font-bold">{link.label}</span>
-          </Link>
-        );
-      })}
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 md:hidden block">
+      <FloatingDock items={bottomLinks} mobileClassName="translate-y-0" desktopClassName="hidden" />
     </div>
   );
 };
