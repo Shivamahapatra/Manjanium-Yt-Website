@@ -246,7 +246,7 @@ export default function HomePage() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.97 }}
-                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3.5 rounded-full flex items-center justify-center gap-2 transition-colors text-lg w-full shadow-lg shadow-blue-500/20"
+                    className="bg-blue-600 hover:bg-blue-500 hover:shadow-[0_0_20px_rgba(251,191,36,0.4)] text-white font-bold px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all text-lg w-full shadow-lg shadow-blue-500/20"
                   >
                     Enter F1 Hub <IconArrowRight className="w-5 h-5" />
                   </motion.button>
@@ -256,7 +256,7 @@ export default function HomePage() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.97 }}
-                    className="bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-3.5 rounded-full flex items-center justify-center gap-2 transition-colors text-lg w-full shadow-lg shadow-green-500/20"
+                    className="bg-green-600 hover:bg-green-500 hover:shadow-[0_0_20px_rgba(251,191,36,0.4)] text-white font-bold px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all text-lg w-full shadow-lg shadow-green-500/20"
                   >
                     Enter Football Center <IconArrowRight className="w-5 h-5" />
                   </motion.button>
@@ -266,7 +266,7 @@ export default function HomePage() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.97 }}
-                    className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 text-white font-bold px-6 py-3.5 rounded-full flex items-center justify-center gap-2 transition-colors text-base w-full"
+                    className="bg-white/10 hover:bg-white/20 hover:shadow-[0_0_20px_rgba(251,191,36,0.2)] backdrop-blur-md border border-white/10 text-white font-bold px-6 py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all text-base w-full"
                   >
                     <IconBrandYoutube className="w-5 h-5 text-red-500" />
                     Subscribe
@@ -391,7 +391,7 @@ export default function HomePage() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
-              className="bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-3.5 rounded-full flex items-center gap-2 transition-colors whitespace-nowrap"
+              className="bg-green-600 hover:bg-green-500 hover:shadow-[0_0_20px_rgba(251,191,36,0.4)] text-white font-bold px-8 py-3.5 rounded-xl flex items-center gap-2 transition-all whitespace-nowrap shadow-lg shadow-green-500/20"
             >
               Enter Football Center <IconArrowRight className="w-5 h-5" />
             </motion.button>
@@ -417,7 +417,7 @@ export default function HomePage() {
 
             <div>
               <Link href="https://www.youtube.com/@manjaniumonsofts67" target="_blank" rel="noopener noreferrer">
-                <button className="bg-primary hover:bg-primary/80 border border-border text-white px-4 py-2 rounded-full flex items-center gap-2 transition-colors text-xs font-bold">
+                <button className="bg-primary hover:bg-primary/80 border border-border text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all hover:shadow-[0_0_15px_rgba(251,191,36,0.2)] text-xs font-bold">
                   <IconBrandYoutube className="w-4 h-4 text-red-500" /> Subscribe
                 </button>
               </Link>
