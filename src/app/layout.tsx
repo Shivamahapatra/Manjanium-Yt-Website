@@ -3,7 +3,7 @@ import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { SportsSidebar } from "@/components/layout/SportsSidebar";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -26,6 +26,7 @@ export const metadata: Metadata = {
 };
 
 import { MainNavbar } from "@/components/layout/MainNavbar";
+import { FloatingFeatureDock } from "@/components/layout/FloatingFeatureDock";
 
 export default function RootLayout({
   children,
@@ -38,7 +39,7 @@ export default function RootLayout({
       className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col pt-16">
+      <body className="min-h-full flex flex-col pt-16 relative">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -47,7 +48,8 @@ export default function RootLayout({
         >
           <AntdRegistry>
             <MainNavbar />
-            <SidebarLayout>{children}</SidebarLayout>
+            <SportsSidebar>{children}</SportsSidebar>
+            <FloatingFeatureDock />
           </AntdRegistry>
         </ThemeProvider>
       </body>

@@ -83,14 +83,12 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-primary border-r border-transparent dark:border-border w-[300px] flex-shrink-0 z-40",
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-primary border-r border-transparent dark:border-border w-[240px] flex-shrink-0 z-40",
         className
       )}
       animate={{
-        width: animate ? (open ? "300px" : "70px") : "300px",
+        width: animate ? (open ? "240px" : "80px") : "240px",
       }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
       {...props}
     >
       {children}
@@ -98,29 +96,12 @@ export const DesktopSidebar = ({
   );
 };
 
-import { FloatingDock } from "./floating-dock";
-import { IconHome, IconCarCrash, IconBallFootball, IconSettings } from "@tabler/icons-react";
-import { usePathname } from "next/navigation";
-
 export const MobileSidebar = ({
   className,
   children,
   ...props
 }: React.ComponentProps<"div">) => {
-  const pathname = usePathname();
-  
-  const bottomLinks = [
-    { href: "/", icon: <IconHome className="h-full w-full text-neutral-500 dark:text-neutral-300" />, title: "Home" },
-    { href: "/f1", icon: <IconCarCrash className="h-full w-full text-neutral-500 dark:text-neutral-300" />, title: "F1" },
-    { href: "/football", icon: <IconBallFootball className="h-full w-full text-neutral-500 dark:text-neutral-300" />, title: "Football" },
-    { href: "/settings", icon: <IconSettings className="h-full w-full text-neutral-500 dark:text-neutral-300" />, title: "Settings" },
-  ];
-
-  return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 md:hidden block">
-      <FloatingDock items={bottomLinks} mobileClassName="translate-y-0" desktopClassName="hidden" />
-    </div>
-  );
+  return null; // Replaced by global FloatingFeatureDock
 };
 
 export const SidebarLink = ({
