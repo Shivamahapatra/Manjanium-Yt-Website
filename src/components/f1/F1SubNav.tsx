@@ -2,20 +2,21 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Zap, RotateCcw, BarChart2, Trophy, Calendar, Flag, Rss } from "lucide-react";
 
 export function F1SubNav() {
-  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get('tab') || 'live';
 
   const navItems = [
-    { label: "Live", href: "/f1/live", icon: <Zap className="h-4 w-4" /> },
-    { label: "Replay", href: "/f1/replay", icon: <RotateCcw className="h-4 w-4" /> },
-    { label: "Telemetry", href: "/f1/telemetry", icon: <BarChart2 className="h-4 w-4" /> },
-    { label: "Standings", href: "/f1/standings", icon: <Trophy className="h-4 w-4" /> },
-    { label: "Calendar", href: "/f1/calendar", icon: <Calendar className="h-4 w-4" /> },
-    { label: "Results", href: "/f1/results", icon: <Flag className="h-4 w-4" /> },
-    { label: "Updates", href: "/f1/updates", icon: <Rss className="h-4 w-4" /> },
+    { label: "Live", tab: "live", href: "/f1?tab=live", icon: <Zap className="h-4 w-4" /> },
+    { label: "Replay", tab: "replay", href: "/f1?tab=replay", icon: <RotateCcw className="h-4 w-4" /> },
+    { label: "Telemetry", tab: "telemetry", href: "/f1?tab=telemetry", icon: <BarChart2 className="h-4 w-4" /> },
+    { label: "Standings", tab: "standings", href: "/f1?tab=standings", icon: <Trophy className="h-4 w-4" /> },
+    { label: "Calendar", tab: "calendar", href: "/f1?tab=calendar", icon: <Calendar className="h-4 w-4" /> },
+    { label: "Results", tab: "results", href: "/f1?tab=results", icon: <Flag className="h-4 w-4" /> },
+    { label: "Updates", tab: "updates", href: "/f1?tab=updates", icon: <Rss className="h-4 w-4" /> },
   ];
 
   return (
@@ -31,7 +32,7 @@ export function F1SubNav() {
       `}} />
       <nav className="flex items-center gap-6 px-6 h-12 min-w-max">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = currentTab === item.tab;
           return (
             <Link
               key={item.href}
