@@ -1,0 +1,25 @@
+/* Premium Sidebar Custom Styling */
+
+.premium-sidebar {
+  /* Subtle glassmorphism */
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 28, 0.98) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+}
+
+.premium-sidebar-mobile {
+  background: linear-gradient(0deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 28, 0.98) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Hide scrollbar but keep functionality if ever needed */
+.sidebar-scroll-area::-webkit-scrollbar {
+  display: none;
+}
+.sidebar-scroll-area {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
