@@ -101,32 +101,37 @@ export function FloatingFeatureDock() {
     {
       title: "Live Timing",
       icon: <Activity className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
-      onClick: handleToggleLiveMatches,
+      href: "/f1?tab=live",
     },
     {
-      title: "Standings",
-      icon: <Trophy className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
-      href: "/f1#standings",
-    },
-    {
-      title: "Drivers",
-      icon: <Users className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
-      href: "/f1#drivers",
+      title: "Replay",
+      icon: <History className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
+      href: "/f1?tab=replay",
     },
     {
       title: "Telemetry",
       icon: <BarChart2 className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
-      href: "/f1#telemetry",
+      href: "/f1?tab=telemetry",
     },
     {
-      title: "Constructors",
-      icon: <Car className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
-      href: "/f1#constructors",
+      title: "Standings",
+      icon: <Trophy className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
+      href: "/f1?tab=standings",
     },
     {
-      title: "Race Control",
+      title: "Calendar",
       icon: <Flag className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
-      href: "/f1#race-control",
+      href: "/f1?tab=calendar",
+    },
+    {
+      title: "Results",
+      icon: <Target className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
+      href: "/f1?tab=results",
+    },
+    {
+      title: "Updates",
+      icon: <Activity className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
+      href: "/f1?tab=updates",
     },
   ];
 
