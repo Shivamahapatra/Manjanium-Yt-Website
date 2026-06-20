@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MainNavbar } from "./MainNavbar";
 import { SportsSidebar } from "./SportsSidebar";
-import { FloatingFeatureDock } from "./FloatingFeatureDock";
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -86,12 +85,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
         </SportsSidebar>
       </div>
 
-      {/* Floating Feature Dock */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none flex justify-center pb-6">
-        <div className="pointer-events-auto">
-          <FloatingFeatureDock />
-        </div>
-      </div>
+
     </div>
   );
 }
