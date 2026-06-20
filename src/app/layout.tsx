@@ -3,7 +3,7 @@ import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { SportsSidebar } from "@/components/layout/SportsSidebar";
+
 
 const inter = Inter({
   variable: "--font-inter",
@@ -25,8 +25,7 @@ export const metadata: Metadata = {
   description: "Live F1 Telemetry & Football Match Center",
 };
 
-import { MainNavbar } from "@/components/layout/MainNavbar";
-import { FloatingFeatureDock } from "@/components/layout/FloatingFeatureDock";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 export default function RootLayout({
   children,
@@ -47,9 +46,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AntdRegistry>
-            <MainNavbar />
-            <SportsSidebar>{children}</SportsSidebar>
-            <FloatingFeatureDock />
+            <MainLayout>{children}</MainLayout>
           </AntdRegistry>
         </ThemeProvider>
       </body>

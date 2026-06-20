@@ -101,7 +101,34 @@ export const MobileSidebar = ({
   children,
   ...props
 }: React.ComponentProps<"div">) => {
-  return null; // Replaced by global FloatingFeatureDock
+  const { open, setOpen } = useSidebar();
+
+  return (
+    <div className={cn("md:hidden", className)} {...props}>
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[3000]"
+              onClick={() => setOpen(false)}
+            />
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="fixed inset-y-0 left-0 w-[240px] bg-primary z-[3010] flex flex-col h-full overflow-y-auto shadow-2xl"
+            >
+              {children}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 };
 
 export const SidebarLink = ({
