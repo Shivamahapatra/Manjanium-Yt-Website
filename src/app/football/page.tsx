@@ -3,25 +3,35 @@
 import React, { useEffect, useState } from "react";
 import { LiveChatMarquee } from "@/components/chat/LiveChatMarquee";
 import { Card, Spin } from "antd";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw, AlertCircle, Clock, Trophy, Activity, Users } from "lucide-react";
+import { RefreshCw, AlertCircle, Clock, Trophy, Activity, Users, History } from "lucide-react";
 
 // Import new components and utils
 import { GroupStandingsCard } from "@/components/football/GroupStandingsCard";
 import { PlayerStatsModal } from "@/components/football/PlayerStatsModal";
 import { TopScorersWidget } from "@/components/football/TopScorersWidget";
 import { getTopScorers } from "@/lib/football-utils";
-import { Team, Group, StandingsResponse } from "@/types/football";
+import { Team, StandingsResponse } from "@/types/football";
+import { MatchSummary } from "@/types/match";
+import { PastMatches } from "@/components/football/PastMatches";
+import { MatchDetailsModal } from "@/components/football/MatchDetailsModal";
 
 export default function FootballHubPage() {
   // Tabs State
-  const [activeTab, setActiveTab] = useState<'live' | 'standings' | 'topScorers' | 'playerSearch'>('live');
+  const [activeTab, setActiveTab] = useState<'live' | 'standings' | 'topScorers' | 'pastMatches' | 'playerSearch'>('live');
 
   // Existing Live Matches State
   const [fixtures, setFixtures] = useState<any[]>([]);
   const [debugStats, setDebugStats] = useState<any>(null);
   const [loadingLive, setLoadingLive] = useState(true);
+
+  // New Past Matches State
+  const [pastMatches, setPastMatches] = useState<MatchSummary[]>([]);
+  const [loadingPast, setLoadingPast] = useState(true);
+  const [errorPast, setErrorPast] = useState<string | null>(null);
+
+  // Match Details Overlay State
+  const [selectedMatch, setSelectedMatch] = useState<{ id: string, isLive: boolean } | null>(null);
 
   // New Standings State
   const [standingsData, setStandingsData] = useState<StandingsResponse | null>(null);
@@ -41,6 +51,21 @@ export default function FootballHubPage() {
       console.error("Error fetching Live Matches", error);
     } finally {
       setLoadingLive(false);
+    }
+  };
+
+  const fetchPastMatches = async () => {
+    setLoadingPast(true);
+    try {
+      const res = await fetch('/api/football/matches/past?limit=20');
+      if (!res.ok) throw new Error('Failed to fetch past matches');
+      const data = await res.json();
+      setPastMatches(data.matches || []);
+    } catch (err: any) {
+      console.error(err);
+      setErrorPast('Failed to load past matches');
+    } finally {
+      setLoadingPast(false);
     }
   };
 
@@ -66,6 +91,7 @@ export default function FootballHubPage() {
 
   useEffect(() => {
     fetchLiveMatches();
+    fetchPastMatches();
     fetchStandingsData();
     const interval = setInterval(fetchLiveMatches, 30000); // 30s polling
     return () => clearInterval(interval);
@@ -75,6 +101,8 @@ export default function FootballHubPage() {
     if (activeTab === 'live') {
       setLoadingLive(true);
       fetchLiveMatches();
+    } else if (activeTab === 'pastMatches') {
+      fetchPastMatches();
     } else {
       fetchStandingsData(true);
     }
@@ -90,6 +118,7 @@ export default function FootballHubPage() {
 
   const tabs = [
     { id: 'live', label: 'LIVE MATCHES', icon: <Activity className="w-4 h-4" /> },
+    { id: 'pastMatches', label: 'PAST MATCHES', icon: <History className="w-4 h-4" /> },
     { id: 'standings', label: 'STANDINGS', icon: <Trophy className="w-4 h-4" /> },
     { id: 'topScorers', label: 'TOP SCORERS', icon: <span className="text-sm leading-none">⚽</span> },
     { id: 'playerSearch', label: 'PLAYER SEARCH', icon: <Users className="w-4 h-4" /> }
@@ -128,10 +157,10 @@ export default function FootballHubPage() {
 
             <button 
               onClick={handleManualRefresh}
-              disabled={loadingLive || loadingStandings}
+              disabled={loadingLive || loadingStandings || loadingPast}
               className="flex items-center gap-2 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-md text-xs font-semibold hover:bg-neutral-300 dark:hover:bg-neutral-800 transition-colors disabled:opacity-50"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${(loadingLive && activeTab === 'live') || (loadingStandings && activeTab !== 'live') ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${(loadingLive && activeTab === 'live') || (loadingStandings && activeTab !== 'live' && activeTab !== 'pastMatches') || (loadingPast && activeTab === 'pastMatches') ? 'animate-spin' : ''}`} />
               Refresh
             </button>
           </div>
@@ -156,7 +185,7 @@ export default function FootballHubPage() {
         </div>
         
         {/* Timestamp Global Info for non-live tabs */}
-        {activeTab !== 'live' && activeTab !== 'playerSearch' && (
+        {activeTab !== 'live' && activeTab !== 'playerSearch' && activeTab !== 'pastMatches' && (
           <div className="flex items-center gap-2 mb-6 text-xs text-neutral-500 font-medium">
             <Clock className="w-3.5 h-3.5 text-emerald-500" />
             <span>Updates daily at 12:00 AM UTC</span>
@@ -189,7 +218,11 @@ export default function FootballHubPage() {
                     const isMatchUpcoming = match.isUpcoming;
 
                     return (
-                      <Link href={`/football/${fixture.id}`} key={fixture.id} className="block transition-transform hover:scale-[1.02]">
+                      <div 
+                        key={fixture.id} 
+                        onClick={() => setSelectedMatch({ id: fixture.id, isLive: true })}
+                        className="block transition-transform hover:scale-[1.02] cursor-pointer"
+                      >
                         <Card 
                           hoverable
                           className="rounded-[20px] overflow-hidden border-neutral-200 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm"
@@ -236,7 +269,7 @@ export default function FootballHubPage() {
                             <span className="text-neutral-400 text-xs">{new Date(fixture.date).toLocaleDateString()}</span>
                           </div>
                         </Card>
-                      </Link>
+                      </div>
                     );
                   })}
                   
@@ -247,6 +280,36 @@ export default function FootballHubPage() {
                     </div>
                   )}
                 </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* PAST MATCHES TAB */}
+          {activeTab === 'pastMatches' && (
+            <motion.div
+              key="pastMatches"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              {errorPast ? (
+                <div className="flex flex-col items-center justify-center h-64 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                  <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+                  <p className="text-red-500 font-bold mb-2">Failed to load past matches</p>
+                  <button 
+                    onClick={() => fetchPastMatches()}
+                    className="px-4 py-2 bg-neutral-900 text-white rounded-md text-sm font-medium hover:bg-neutral-800"
+                  >
+                    Retry Connection
+                  </button>
+                </div>
+              ) : (
+                <PastMatches 
+                  matches={pastMatches} 
+                  isLoading={loadingPast && pastMatches.length === 0} 
+                  onMatchClick={(match) => setSelectedMatch({ id: match.id, isLive: false })}
+                />
               )}
             </motion.div>
           )}
@@ -351,8 +414,18 @@ export default function FootballHubPage() {
         onClose={() => setSelectedTeam(null)}
       />
 
+      <AnimatePresence>
+        {selectedMatch && (
+          <MatchDetailsModal 
+            matchId={selectedMatch.id} 
+            isLive={selectedMatch.isLive} 
+            onClose={() => setSelectedMatch(null)} 
+          />
+        )}
+      </AnimatePresence>
+
       {/* Simulation of Live Chat when active */}
-      <LiveChatMarquee isActive={isLive && activeTab === 'live'} />
+      <LiveChatMarquee isActive={isLive && activeTab === 'live' && !selectedMatch} />
     </div>
   );
 }
