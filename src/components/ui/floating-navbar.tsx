@@ -57,28 +57,51 @@ export const FloatingNav = ({
           className
         )}
       >
-        <div className="flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/80 px-2 py-1.5 shadow-lg shadow-black/10 backdrop-blur-md dark:border-white/10 dark:bg-black/50">
+        <div 
+          className="flex items-center justify-center gap-2 rounded-full border-b-[2px] px-3 py-1.5 backdrop-blur-md"
+          style={{
+            backgroundColor: "rgba(15, 23, 42, 0.8)",
+            borderColor: "var(--color-accent)",
+            boxShadow: "var(--shadow-medium)",
+            transition: "all var(--transition-standard) cubic-bezier(0.4, 0, 0.2, 1)"
+          }}
+        >
           {/* Nav items container */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             {navItems.map((navItem, idx: number) => (
               <a
                 key={`link-${idx}`}
                 href={navItem.link}
                 className={cn(
-                  "relative flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
+                  "relative flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-colors group"
                 )}
+                style={{
+                  color: "var(--color-text)",
+                  transition: "all var(--transition-quick) ease-in-out"
+                }}
               >
-                <span className="block sm:hidden">{navItem.icon}</span>
-                <span className="hidden sm:block">{navItem.name}</span>
+                <span className="block sm:hidden text-[var(--color-text-muted)] group-hover:text-[var(--color-accent)] transition-colors">{navItem.icon}</span>
+                <span className="hidden sm:block group-hover:text-[var(--color-accent)] transition-colors">{navItem.name}</span>
+                
+                {/* Gold hover underline/glow effect */}
+                <span className="absolute inset-x-0 -bottom-px h-px w-0 bg-[var(--color-accent)] transition-all duration-300 group-hover:w-full" style={{ boxShadow: "0 0 10px rgba(251,191,36,0.5)" }} />
               </a>
             ))}
           </div>
 
           {/* Divider */}
-          <div className="h-5 w-px bg-neutral-200 dark:bg-white/10" />
+          <div className="h-5 w-px opacity-30" style={{ backgroundColor: "var(--color-text-muted)" }} />
 
           {/* CTA Button */}
-          <button className="relative rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-neutral-800 hover:shadow-lg hover:shadow-neutral-900/20 dark:bg-white dark:text-black dark:hover:bg-neutral-100 dark:hover:shadow-white/20">
+          <button 
+            className="relative rounded-full px-5 py-2 text-sm font-bold transition-all hover:scale-105"
+            style={{
+              backgroundColor: "var(--color-accent)",
+              color: "var(--color-primary)",
+              boxShadow: "0 0 20px rgba(251,191,36,0.3)",
+              transition: "all var(--transition-quick) ease-in-out"
+            }}
+          >
             <span>Login</span>
           </button>
         </div>

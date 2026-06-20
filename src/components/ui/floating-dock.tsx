@@ -72,17 +72,27 @@ const FloatingDockMobile = ({
                   <a
                     href={item.href}
                     key={item.title}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-900"
+                    className="flex h-12 w-12 items-center justify-center rounded-full"
+                    style={{
+                      backgroundColor: "var(--color-primary)",
+                      border: "1px solid var(--color-accent)",
+                      boxShadow: "var(--shadow-medium)"
+                    }}
                   >
-                    <div className="h-4 w-4">{item.icon}</div>
+                    <div className="h-5 w-5" style={{ color: "var(--color-accent)" }}>{item.icon}</div>
                   </a>
                 ) : (
                   <button
                     key={item.title}
                     onClick={item.onClick}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-900 cursor-pointer"
+                    className="flex h-12 w-12 items-center justify-center rounded-full cursor-pointer"
+                    style={{
+                      backgroundColor: "var(--color-primary)",
+                      border: "1px solid var(--color-accent)",
+                      boxShadow: "var(--shadow-medium)"
+                    }}
                   >
-                    <div className="h-4 w-4">{item.icon}</div>
+                    <div className="h-5 w-5" style={{ color: "var(--color-accent)" }}>{item.icon}</div>
                   </button>
                 )}
               </motion.div>
@@ -92,9 +102,15 @@ const FloatingDockMobile = ({
       </AnimatePresence>
       <button
         onClick={() => setOpen(!open)}
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-800"
+        className="flex h-14 w-14 items-center justify-center rounded-full"
+        style={{
+          backgroundColor: "rgba(15, 23, 42, 0.9)",
+          border: "1px solid var(--color-accent)",
+          boxShadow: "var(--shadow-medium)",
+          backdropFilter: "blur(4px)"
+        }}
       >
-        <IconLayoutNavbarCollapse className="h-5 w-5 text-neutral-500 dark:text-neutral-400" />
+        <IconLayoutNavbarCollapse className="h-6 w-6" style={{ color: "var(--color-accent)" }} />
       </button>
     </div>
   );
@@ -113,9 +129,14 @@ const FloatingDockDesktop = ({
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
-        "mx-auto hidden h-16 items-end gap-4 rounded-2xl bg-gray-50 px-4 pb-3 md:flex dark:bg-neutral-900",
+        "mx-auto hidden h-16 items-end gap-3 rounded-2xl px-4 pb-3 md:flex border-[1px] backdrop-blur-md",
         className,
       )}
+      style={{
+        backgroundColor: "rgba(15, 23, 42, 0.8)",
+        borderColor: "var(--color-accent)",
+        boxShadow: "var(--shadow-medium)"
+      }}
     >
       {items.map((item) => (
         <IconContainer mouseX={mouseX} key={item.title} {...item} />
@@ -145,14 +166,14 @@ function IconContainer({
     return val - bounds.x - bounds.width / 2;
   });
 
-  let widthTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
-  let heightTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
+  let widthTransform = useTransform(distance, [-150, 0, 150], [56, 80, 56]);
+  let heightTransform = useTransform(distance, [-150, 0, 150], [56, 80, 56]);
 
-  let widthTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
+  let widthTransformIcon = useTransform(distance, [-150, 0, 150], [28, 40, 28]);
   let heightTransformIcon = useTransform(
     distance,
     [-150, 0, 150],
-    [20, 40, 20],
+    [28, 40, 28],
   );
 
   let width = useSpring(widthTransform, {
@@ -188,7 +209,12 @@ function IconContainer({
             style={{ width, height }}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
-            className="relative flex aspect-square items-center justify-center rounded-full bg-gray-200 dark:bg-neutral-800"
+            className="relative flex aspect-square items-center justify-center rounded-full transition-all duration-300"
+            style={{
+              backgroundColor: hovered ? "var(--color-primary)" : "rgba(15, 23, 42, 0.4)",
+              boxShadow: hovered ? "0 0 15px rgba(251,191,36,0.4)" : "none",
+              border: hovered ? "1px solid var(--color-accent)" : "1px solid transparent"
+            }}
           >
             <AnimatePresence>
               {hovered && (
@@ -196,7 +222,13 @@ function IconContainer({
                   initial={{ opacity: 0, y: 10, x: "-50%" }}
                   animate={{ opacity: 1, y: 0, x: "-50%" }}
                   exit={{ opacity: 0, y: 2, x: "-50%" }}
-                  className="absolute -top-8 left-1/2 w-fit rounded-md border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs whitespace-pre text-neutral-700 dark:border-neutral-900 dark:bg-neutral-800 dark:text-white"
+                  className="absolute -top-8 left-1/2 w-fit rounded-md px-2 py-0.5 text-xs whitespace-pre"
+                  style={{
+                    backgroundColor: "var(--color-primary)",
+                    color: "var(--color-text)",
+                    border: "1px solid var(--color-accent)",
+                    boxShadow: "0 0 10px rgba(251,191,36,0.2)"
+                  }}
                 >
                   {title}
                 </motion.div>
@@ -205,6 +237,10 @@ function IconContainer({
             <motion.div
               style={{ width: widthIcon, height: heightIcon }}
               className="flex items-center justify-center"
+              style={{
+                color: hovered ? "var(--color-accent)" : "var(--color-text-muted)",
+                transition: "color var(--transition-quick) ease-in-out"
+              }}
             >
               {icon}
             </motion.div>
@@ -217,7 +253,12 @@ function IconContainer({
             style={{ width, height }}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
-            className="relative flex aspect-square items-center justify-center rounded-full bg-gray-200 dark:bg-neutral-800"
+            className="relative flex aspect-square items-center justify-center rounded-full transition-all duration-300"
+            style={{
+              backgroundColor: hovered ? "var(--color-primary)" : "rgba(15, 23, 42, 0.4)",
+              boxShadow: hovered ? "0 0 15px rgba(251,191,36,0.4)" : "none",
+              border: hovered ? "1px solid var(--color-accent)" : "1px solid transparent"
+            }}
           >
             <AnimatePresence>
               {hovered && (
@@ -225,7 +266,13 @@ function IconContainer({
                   initial={{ opacity: 0, y: 10, x: "-50%" }}
                   animate={{ opacity: 1, y: 0, x: "-50%" }}
                   exit={{ opacity: 0, y: 2, x: "-50%" }}
-                  className="absolute -top-8 left-1/2 w-fit rounded-md border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs whitespace-pre text-neutral-700 dark:border-neutral-900 dark:bg-neutral-800 dark:text-white"
+                  className="absolute -top-8 left-1/2 w-fit rounded-md px-2 py-0.5 text-xs whitespace-pre"
+                  style={{
+                    backgroundColor: "var(--color-primary)",
+                    color: "var(--color-text)",
+                    border: "1px solid var(--color-accent)",
+                    boxShadow: "0 0 10px rgba(251,191,36,0.2)"
+                  }}
                 >
                   {title}
                 </motion.div>
@@ -234,6 +281,10 @@ function IconContainer({
             <motion.div
               style={{ width: widthIcon, height: heightIcon }}
               className="flex items-center justify-center"
+              style={{
+                color: hovered ? "var(--color-accent)" : "var(--color-text-muted)",
+                transition: "color var(--transition-quick) ease-in-out"
+              }}
             >
               {icon}
             </motion.div>

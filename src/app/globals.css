@@ -59,6 +59,19 @@
 }
 
 :root {
+  /* Manjanium Design System Variables */
+  --color-primary: #0f172a;
+  --color-accent: #fbbf24;
+  --color-secondary: #0ea5e9;
+  --color-text: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --transition-quick: 150ms;
+  --transition-standard: 300ms;
+  --shadow-subtle: 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-medium: 0 4px 12px rgba(0,0,0,0.15);
+  --shadow-deep: 0 8px 24px rgba(0,0,0,0.2);
+
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
