@@ -1,201 +1,105 @@
-"use client";
+'use client';
+import React from 'react';
 
-import React, { useState } from "react";
-import { useUserPreferences } from "@/hooks/useUserPreferences";
-import { useUser } from "@clerk/nextjs";
-import { User, Bell, Shield, Database, Save, Check } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { useUser } from '@clerk/nextjs';
 
+import { Spin } from 'antd';
 export function UserSettingsComponent() {
-  const { preferences, updatePreferences } = useUserPreferences();
-  const { user } = useUser();
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
-  const [localName, setLocalName] = useState(user?.fullName || "");
 
-  const handleSaveName = async () => {
-    setSaveStatus("saving");
-    if (user) {
-      await user.update({ firstName: localName.split(' ')[0], lastName: localName.split(' ').slice(1).join(' ') });
-    }
-    setTimeout(() => {
-      setSaveStatus("saved");
-      setTimeout(() => setSaveStatus("idle"), 2000);
-    }, 500);
-  };
+const { user, isLoaded } = useUser();
+if (!isLoaded) {
 
-  const ToggleSwitch = ({ 
-    checked, 
-    onChange, 
-    label, 
-    description 
-  }: { 
-    checked: boolean; 
-    onChange: (checked: boolean) => void;
-    label: string;
-    description: string;
-  }) => (
-    <div className="flex items-center justify-between py-4 border-b border-white/5 last:border-0">
-      <div className="pr-4">
-        <div className="font-semibold text-white mb-1">{label}</div>
-        <div className="text-sm text-[#94a3b8]">{description}</div>
-      </div>
-      <button
-        onClick={() => onChange(!checked)}
-        className={cn(
-          "w-12 h-6 rounded-full relative transition-colors shrink-0",
-          checked ? "bg-[#fbbf24]" : "bg-white/20"
-        )}
-      >
-        <motion.div
-          className={cn(
-            "w-4 h-4 rounded-full bg-white absolute top-1",
-            checked ? "shadow-sm" : ""
-          )}
-          initial={false}
-          animate={{
-            left: checked ? "calc(100% - 20px)" : "4px",
-          }}
-          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-        />
-      </button>
-    </div>
-  );
+return <div className="flex items-center justify-center h-full"><Spin size="large" /></div>;
 
-  return (
-    <div className="p-6 md:p-10 max-w-4xl mx-auto flex flex-col gap-10">
+}
+if (!user) {
+
+return <div className="p-8 text-center text-neutral-400">User not found</div>;
+
+}
+return (
+
+<div className="p-8 max-w-2xl">
+
+<h2 className="text-3xl font-bold text-white mb-2">User Settings</h2>
+
+<p className="text-neutral-400 mb-8">Manage your profile, notifications, and privacy.</p>
+  {/* Account Information */}
+  <div className="mb-12 bg-white/5 border border-neutral-800 rounded-lg p-6">
+    <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+      <span className="text-manjanium-gold">👤</span> Account Information
+    </h3>
+
+    <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">User Settings</h2>
-        <p className="text-[#94a3b8]">Manage your profile, notifications, and privacy.</p>
+        <label className="block text-sm text-neutral-400 mb-2">Display Name</label>
+        <input
+          type="text"
+          value={user.firstName || ''}
+          disabled
+          className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-3 text-white"
+        />
       </div>
-
-      {/* Account Info */}
-      <section className="bg-[#0f172a] p-6 rounded-2xl border border-white/5 shadow-lg">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-blue-500/10 text-blue-400 rounded-lg">
-            <User className="w-5 h-5" />
-          </div>
-          <h3 className="font-bold text-white text-lg">Account Information</h3>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-[#94a3b8] mb-1">Display Name</label>
-            <div className="flex gap-3">
-              <input 
-                type="text" 
-                value={localName}
-                onChange={(e) => setLocalName(e.target.value)}
-                className="flex-1 bg-background border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#fbbf24] transition-colors"
-              />
-              <button
-                onClick={handleSaveName}
-                disabled={localName === user?.fullName || saveStatus === "saving"}
-                className={cn(
-                  "px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-all",
-                  saveStatus === "saved" 
-                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50"
-                    : "bg-[#fbbf24] text-black hover:bg-[#fbbf24]/90 disabled:opacity-50 disabled:bg-white/10 disabled:text-white/40"
-                )}
-              >
-                {saveStatus === "saved" ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-                {saveStatus === "saved" ? "Saved" : saveStatus === "saving" ? "Saving..." : "Save"}
-              </button>
-            </div>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-[#94a3b8] mb-1">Email Address</label>
-            <input 
-              type="email" 
-              value={user?.primaryEmailAddress?.emailAddress || ""}
-              disabled
-              className="w-full bg-background/50 border border-white/5 rounded-lg px-4 py-2 text-[#94a3b8] cursor-not-allowed"
-            />
-            <p className="text-xs text-white/40 mt-1">Email address cannot be changed at this time.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Notifications */}
-      <section className="bg-[#0f172a] p-6 rounded-2xl border border-white/5 shadow-lg">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg">
-            <Bell className="w-5 h-5" />
-          </div>
-          <h3 className="font-bold text-white text-lg">Notifications</h3>
-        </div>
-
-        <div className="flex flex-col">
-          <ToggleSwitch 
-            label="Email Notifications" 
-            description="Receive important updates and newsletters via email."
-            checked={preferences?.notifications?.email || false}
-            onChange={(val) => updatePreferences({ notifications: { ...(preferences?.notifications || { email: true, push: true, alerts: true }), email: val } })}
-          />
-          <ToggleSwitch 
-            label="Push Notifications" 
-            description="Allow browser push notifications for real-time alerts."
-            checked={preferences?.notifications?.push || false}
-            onChange={(val) => updatePreferences({ notifications: { ...(preferences?.notifications || { email: true, push: true, alerts: true }), push: val } })}
-          />
-          <ToggleSwitch 
-            label="Match Alerts" 
-            description="Get notified when your favorite football teams score."
-            checked={preferences?.notifications?.alerts || false}
-            onChange={(val) => updatePreferences({ notifications: { ...(preferences?.notifications || { email: true, push: true, alerts: true }), alerts: val } })}
-          />
-          <ToggleSwitch 
-            label="Race Alerts" 
-            description="Session starting alerts and red flag notifications."
-            checked={preferences?.notifications?.alerts || false}
-            onChange={(val) => updatePreferences({ notifications: { ...(preferences?.notifications || { email: true, push: true, alerts: true }), alerts: val } })}
-          />
-        </div>
-      </section>
-
-      {/* Privacy */}
-      <section className="bg-[#0f172a] p-6 rounded-2xl border border-white/5 shadow-lg">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-purple-500/10 text-purple-400 rounded-lg">
-            <Shield className="w-5 h-5" />
-          </div>
-          <h3 className="font-bold text-white text-lg">Privacy & Data</h3>
-        </div>
-
-        <div className="flex flex-col">
-          <ToggleSwitch 
-            label="Analytics" 
-            description="Help us improve by sharing anonymous usage data."
-            checked={true}
-            onChange={(val) => {}}
-          />
-          <ToggleSwitch 
-            label="Personalized Recommendations" 
-            description="Allow us to use your browsing history to recommend content."
-            checked={true}
-            onChange={(val) => {}}
-          />
-        </div>
-        
-        <div className="mt-6 pt-6 border-t border-white/5">
-          <div className="flex items-center gap-3 mb-4">
-            <Database className="w-5 h-5 text-[#94a3b8]" />
-            <h4 className="font-semibold text-white">Data Management</h4>
-          </div>
-          <div className="flex flex-wrap gap-4">
-            <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors text-sm font-medium border border-white/10">
-              Export My Data
-            </button>
-            <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors text-sm font-medium border border-white/10">
-              Clear Cache
-            </button>
-            <button className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors text-sm font-medium border border-red-500/20">
-              Delete Account
-            </button>
-          </div>
-        </div>
-      </section>
+      <div>
+        <label className="block text-sm text-neutral-400 mb-2">Email Address</label>
+        <input
+          type="email"
+          value={user.emailAddresses[0]?.emailAddress || ''}
+          disabled
+          className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-3 text-white"
+        />
+      </div>
     </div>
-  );
+  </div>
+
+  {/* Notifications */}
+  <div className="mb-12 bg-white/5 border border-neutral-800 rounded-lg p-6">
+    <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+      <span className="text-manjanium-gold">🔔</span> Notifications
+    </h3>
+
+    <div className="space-y-4">
+      {[
+        { label: 'Email Notifications', desc: 'Receive important updates and newsletters via email.' },
+        { label: 'Push Notifications', desc: 'Allow browser push notifications for real-time alerts.' },
+        { label: 'Match Alerts', desc: 'Get notified when your favorite football teams score.' },
+        { label: 'Race Alerts', desc: 'Session starting alerts and red flag notifications.' }
+      ].map((notif) => (
+        <div key={notif.label} className="flex items-start gap-4">
+          <input type="checkbox" defaultChecked className="mt-1 w-5 h-5" />
+          <div>
+            <label className="block text-white font-medium">{notif.label}</label>
+            <p className="text-sm text-neutral-500">{notif.desc}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* Privacy & Data */}
+  <div className="bg-white/5 border border-neutral-800 rounded-lg p-6">
+    <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+      <span className="text-manjanium-gold">🔒</span> Privacy & Data
+    </h3>
+
+    <div className="space-y-4">
+      <label className="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" defaultChecked className="w-5 h-5" />
+        <div>
+          <p className="text-white font-medium">Analytics</p>
+          <p className="text-sm text-neutral-500">Help us improve by sharing anonymous usage data.</p>
+        </div>
+      </label>
+      <label className="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" defaultChecked className="w-5 h-5" />
+        <div>
+          <p className="text-white font-medium">Personalized Recommendations</p>
+          <p className="text-sm text-neutral-500">Allow us to use your browsing history to recommend content.</p>
+        </div>
+      </label>
+    </div>
+  </div>
+</div>
+);
+
 }
