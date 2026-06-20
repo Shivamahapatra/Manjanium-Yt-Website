@@ -27,6 +27,7 @@ export const metadata: Metadata = {
 
 import { MainLayout } from "@/components/layout/MainLayout";
 import { SettingsProvider } from "@/lib/settings-context";
+import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 
 export default function RootLayout({
   children,
@@ -40,6 +41,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col pt-16 relative">
+        <OnboardingModal />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

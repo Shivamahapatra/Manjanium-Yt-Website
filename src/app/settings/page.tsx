@@ -8,6 +8,9 @@ import { AppearanceSettings } from "@/components/settings/AppearanceSettings";
 import { UserSettingsComponent } from "@/components/settings/UserSettings";
 import { AboutApp } from "@/components/settings/AboutApp";
 import { SuggestionPage } from "@/components/settings/SuggestionPage";
+import { useOnboarding } from "@/hooks/useOnboarding";
+import { Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const SETTINGS_CATEGORIES = [
   { id: "appearance", label: "APPEARANCE", icon: <Palette className="w-5 h-5" /> },
@@ -18,8 +21,35 @@ const SETTINGS_CATEGORIES = [
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("appearance");
+  const { isGuest, setLoginIntention } = useOnboarding();
+  const router = useRouter();
+
+  const handleLoginClick = () => {
+    setLoginIntention();
+    router.push("/login");
+  };
 
   const renderActiveTab = () => {
+    if (isGuest && activeTab !== "about") {
+      return (
+        <div className="flex flex-col items-center justify-center h-full p-8 text-center max-w-md mx-auto">
+          <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-6">
+            <Lock className="w-8 h-8 text-[#94a3b8]" />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Sign in to customize</h2>
+          <p className="text-[#94a3b8] mb-8">
+            Guest users can browse the dashboard, but you need an account to customize your appearance, dashboard layouts, and notification preferences.
+          </p>
+          <button
+            onClick={handleLoginClick}
+            className="w-full sm:w-auto px-8 py-3 bg-[#0ea5e9] hover:bg-[#0284c7] hover:shadow-[0_0_15px_rgba(14,165,233,0.5)] text-white font-semibold rounded-xl transition-all duration-200"
+          >
+            Sign Up / Login
+          </button>
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case "appearance":
         return <AppearanceSettings />;
