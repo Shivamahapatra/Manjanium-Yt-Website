@@ -13,7 +13,8 @@ import {
   Target,
   Settings,
   Flag,
-  Car
+  Car,
+  History
 } from "lucide-react";
 
 interface DockItem {
@@ -66,27 +67,32 @@ export function FloatingFeatureDock() {
     {
       title: "Live Matches",
       icon: <Activity className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
-      onClick: handleToggleLiveMatches,
+      href: "/football?tab=live",
     },
     {
       title: "Standings",
       icon: <Trophy className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
-      href: "/football#standings",
+      href: "/football?tab=standings",
     },
     {
       title: "Players",
       icon: <Users className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
-      href: "/football#players",
+      href: "/football?tab=playerSearch",
     },
     {
-      title: "Stats",
-      icon: <BarChart2 className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
-      href: "/football#stats",
+      title: "Past Matches",
+      icon: <History className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
+      href: "/football?tab=pastMatches",
     },
     {
       title: "Top Scorers",
       icon: <Medal className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
-      href: "/football#top-scorers",
+      href: "/football?tab=topScorers",
+    },
+    {
+      title: "Match Details",
+      icon: <Target className="h-full w-full text-neutral-300 group-hover:text-manjanium-gold transition-colors" />,
+      href: "/football?tab=live", // Points to live tab where match details are accessible
     },
   ];
 

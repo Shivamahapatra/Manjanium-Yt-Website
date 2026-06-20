@@ -1,12 +1,16 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { LiveChatMarquee } from "@/components/chat/LiveChatMarquee";
-import { Card, Spin } from "antd";
+import { Spin } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw, AlertCircle, Clock, Trophy, Activity, Users, History } from "lucide-react";
+import { RefreshCw, AlertCircle, Clock, Trophy, Activity, Users, History, Medal } from "lucide-react";
 
-// Import new components and utils
+// Shadcn Tabs
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/shadcn-tabs";
+
+// Components
 import { GroupStandingsCard } from "@/components/football/GroupStandingsCard";
 import { PlayerStatsModal } from "@/components/football/PlayerStatsModal";
 import { TopScorersWidget } from "@/components/football/TopScorersWidget";
@@ -16,24 +20,38 @@ import { MatchSummary } from "@/types/match";
 import { PastMatches } from "@/components/football/PastMatches";
 import { MatchDetailsModal } from "@/components/football/MatchDetailsModal";
 
-export default function FootballHubPage() {
-  // Tabs State
-  const [activeTab, setActiveTab] = useState<'live' | 'standings' | 'topScorers' | 'pastMatches' | 'playerSearch'>('live');
+function FootballHubContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  // Tabs State (Initialize from URL if present)
+  const defaultTab = searchParams.get("tab") || "live";
+  const [activeTab, setActiveTab] = useState<string>(defaultTab);
 
-  // Existing Live Matches State
+  // Sync tab state with URL without triggering full reloads
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    router.push(`/football?tab=${value}`, { scroll: false });
+  };
+
+  // State
   const [fixtures, setFixtures] = useState<any[]>([]);
   const [debugStats, setDebugStats] = useState<any>(null);
   const [loadingLive, setLoadingLive] = useState(true);
 
-  // New Past Matches State
   const [pastMatches, setPastMatches] = useState<MatchSummary[]>([]);
   const [loadingPast, setLoadingPast] = useState(true);
   const [errorPast, setErrorPast] = useState<string | null>(null);
 
-  // Match Details Overlay State
   const [selectedMatch, setSelectedMatch] = useState<{ id: string, isLive: boolean } | null>(null);
 
-  // New Standings State
   const [standingsData, setStandingsData] = useState<StandingsResponse | null>(null);
   const [loadingStandings, setLoadingStandings] = useState(true);
   const [errorStandings, setErrorStandings] = useState<string | null>(null);
@@ -108,7 +126,6 @@ export default function FootballHubPage() {
     }
   };
 
-  // Derived Data
   const liveCount = debugStats?.liveCount || 0;
   const isLive = liveCount > 0;
   const isUpcoming = !isLive && fixtures.length > 0;
@@ -116,94 +133,92 @@ export default function FootballHubPage() {
   const topScorers = standingsData?.groups ? getTopScorers(standingsData.groups, 10) : [];
   const lastUpdated = standingsData?.lastUpdated || new Date().toISOString();
 
-  const tabs = [
-    { id: 'live', label: 'LIVE MATCHES', icon: <Activity className="w-4 h-4" /> },
-    { id: 'pastMatches', label: 'PAST MATCHES', icon: <History className="w-4 h-4" /> },
-    { id: 'standings', label: 'STANDINGS', icon: <Trophy className="w-4 h-4" /> },
-    { id: 'topScorers', label: 'TOP SCORERS', icon: <span className="text-sm leading-none">⚽</span> },
-    { id: 'playerSearch', label: 'PLAYER SEARCH', icon: <Users className="w-4 h-4" /> }
-  ];
-
   return (
-    <div className="min-h-screen pb-20 bg-neutral-100 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100">
+    <div className="w-full flex flex-col pt-8 px-4 sm:px-8 max-w-7xl mx-auto z-10 relative">
       
-      {/* Header Area */}
-      <div className="pt-8 px-4 sm:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-4 border-b border-neutral-300 dark:border-neutral-800 gap-4">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-3xl md:text-4xl font-black text-blue-600 dark:text-blue-500 tracking-tight">
+      {/* Hero Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-6 border-b border-white/10 gap-4">
+        <div className="flex flex-col gap-2">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3"
+          >
+            <div className="w-1.5 h-8 bg-manjanium-gold rounded-full" />
+            <h1 className="text-3xl md:text-5xl font-black font-heading tracking-tight text-white drop-shadow-md">
               Football Hub
             </h1>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
-              FIFA World Cup 2026 Live Coverage
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-3 self-start md:self-auto">
-            {isLive ? (
-              <motion.div
-                animate={{ opacity: [1, 0.5, 1] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-                className="bg-red-500 text-white px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-2 shadow-sm"
-              >
-                <div className="w-2 h-2 bg-white rounded-full"></div>
-                LIVE MATCHES
-              </motion.div>
-            ) : isUpcoming ? (
-              <div className="bg-amber-500/10 text-amber-600 dark:text-amber-500 border border-amber-500/20 px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-2">
-                UPCOMING MATCHES
-              </div>
-            ) : null}
-
-            <button 
-              onClick={handleManualRefresh}
-              disabled={loadingLive || loadingStandings || loadingPast}
-              className="flex items-center gap-2 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-md text-xs font-semibold hover:bg-neutral-300 dark:hover:bg-neutral-800 transition-colors disabled:opacity-50"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${(loadingLive && activeTab === 'live') || (loadingStandings && activeTab !== 'live' && activeTab !== 'pastMatches') || (loadingPast && activeTab === 'pastMatches') ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
-          </div>
-        </div>
-
-        {/* Tab Navigation */}
-        <div className="flex overflow-x-auto scrollbar-none gap-2 mb-8 bg-neutral-200/50 dark:bg-neutral-900/50 p-1.5 rounded-xl border border-neutral-300 dark:border-neutral-800">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap transition-all ${
-                activeTab === tab.id 
-                  ? 'bg-white dark:bg-neutral-800 text-blue-600 dark:text-blue-500 shadow-sm' 
-                  : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-800/50'
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
+          </motion.div>
+          <p className="text-sm md:text-base text-neutral-400 font-medium pl-4">
+            FIFA World Cup 2026 Live Coverage
+          </p>
         </div>
         
-        {/* Timestamp Global Info for non-live tabs */}
+        <div className="flex items-center gap-3 self-start md:self-auto">
+          {isLive ? (
+            <motion.div
+              animate={{ opacity: [1, 0.6, 1] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+              className="bg-red-500/20 border border-red-500/50 text-red-500 px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.3)] backdrop-blur-sm"
+            >
+              <div className="w-2.5 h-2.5 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
+              {liveCount} LIVE MATCHES
+            </motion.div>
+          ) : isUpcoming ? (
+            <div className="bg-amber-500/10 border border-amber-500/20 text-amber-500 px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2">
+              UPCOMING MATCHES
+            </div>
+          ) : null}
+
+          <button 
+            onClick={handleManualRefresh}
+            disabled={loadingLive || loadingStandings || loadingPast}
+            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-xs font-semibold text-white hover:bg-white/10 hover:border-white/20 transition-all disabled:opacity-50 group"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 group-hover:text-manjanium-gold transition-colors ${(loadingLive && activeTab === 'live') || (loadingStandings && activeTab !== 'live' && activeTab !== 'pastMatches') || (loadingPast && activeTab === 'pastMatches') ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Tabs System */}
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex flex-col">
+        
+        {/* Tab Navigation */}
+        <div className="w-full overflow-x-auto scrollbar-hide pb-2 mb-6">
+          <TabsList className="bg-primary/50 border border-white/5 p-1 rounded-xl flex w-max sm:w-full sm:justify-start">
+            <TabsTrigger value="live" className="gap-2 px-6 rounded-lg data-[state=active]:bg-manjanium-gold data-[state=active]:text-black transition-all">
+              <Activity className="w-4 h-4" /> LIVE MATCHES
+            </TabsTrigger>
+            <TabsTrigger value="standings" className="gap-2 px-6 rounded-lg data-[state=active]:bg-manjanium-gold data-[state=active]:text-black transition-all">
+              <Trophy className="w-4 h-4" /> STANDINGS
+            </TabsTrigger>
+            <TabsTrigger value="topScorers" className="gap-2 px-6 rounded-lg data-[state=active]:bg-manjanium-gold data-[state=active]:text-black transition-all">
+              <Medal className="w-4 h-4" /> TOP SCORERS
+            </TabsTrigger>
+            <TabsTrigger value="playerSearch" className="gap-2 px-6 rounded-lg data-[state=active]:bg-manjanium-gold data-[state=active]:text-black transition-all">
+              <Users className="w-4 h-4" /> PLAYER SEARCH
+            </TabsTrigger>
+            <TabsTrigger value="pastMatches" className="gap-2 px-6 rounded-lg data-[state=active]:bg-manjanium-gold data-[state=active]:text-black transition-all">
+              <History className="w-4 h-4" /> PAST MATCHES
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        {/* Global Timestamp */}
         {activeTab !== 'live' && activeTab !== 'playerSearch' && activeTab !== 'pastMatches' && (
-          <div className="flex items-center gap-2 mb-6 text-xs text-neutral-500 font-medium">
+          <div className="flex items-center gap-2 mb-6 text-xs text-neutral-400 font-medium px-2">
             <Clock className="w-3.5 h-3.5 text-emerald-500" />
             <span>Updates daily at 12:00 AM UTC</span>
           </div>
         )}
 
-        {/* --- TAB CONTENT --- */}
-        <AnimatePresence mode="wait">
+        {/* Tab Contents */}
+        <div className="relative min-h-[500px] w-full">
           
-          {/* LIVE MATCHES TAB */}
-          {activeTab === 'live' && (
-            <motion.div
-              key="live"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
+          {/* LIVE MATCHES */}
+          <TabsContent value="live" className="mt-0 outline-none">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
               {loadingLive && fixtures.length === 0 ? (
                 <div className="flex justify-center items-center h-64">
                   <Spin size="large" />
@@ -218,111 +233,84 @@ export default function FootballHubPage() {
                     const isMatchUpcoming = match.isUpcoming;
 
                     return (
-                      <div 
-                        key={fixture.id} 
+                      <motion.div 
+                        key={fixture.id}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="group"
                         onClick={() => setSelectedMatch({ id: fixture.id, isLive: true })}
-                        className="block transition-transform hover:scale-[1.02] cursor-pointer"
                       >
-                        <Card 
-                          hoverable
-                          className="rounded-[20px] overflow-hidden border-neutral-200 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm"
-                          bodyStyle={{ padding: 0 }}
-                        >
-                          <div className="bg-neutral-200 dark:bg-neutral-800 px-4 py-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 flex justify-between">
+                        <div className="bg-primary border border-white/5 hover:border-manjanium-gold/50 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 shadow-lg hover:shadow-manjanium-gold/10 hover:-translate-y-1">
+                          
+                          {/* Card Header */}
+                          <div className="bg-black/40 px-5 py-3 text-xs font-semibold text-neutral-400 flex justify-between items-center border-b border-white/5">
                             <span className="flex items-center gap-2">
-                              {league.logo && <img src={league.logo} alt={league.name} className="w-4 h-4 object-contain" />}
-                              {league.season} • {league.name}
+                              {league.logo && <img src={league.logo} alt={league.name} className="w-4 h-4 object-contain brightness-200" />}
+                              {league.name}
                             </span>
-                            <span className={isMatchUpcoming ? "text-amber-500" : "text-red-500"}>
+                            <span className={cn("px-2 py-1 rounded-md bg-black/50 border", isMatchUpcoming ? "text-amber-500 border-amber-500/20" : "text-red-500 border-red-500/20 animate-pulse")}>
                               {fixture.status.elapsed ? `${fixture.status.elapsed}'` : fixture.status.short}
                             </span>
                           </div>
                           
+                          {/* Card Body */}
                           <div className="p-6">
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex flex-col items-center gap-2 w-1/3">
-                                <img src={homeTeam?.logo || "/placeholder.png"} alt={homeTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
-                                <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{homeTeam?.name}</span>
+                            <div className="flex items-center justify-between mb-2">
+                              {/* Home Team */}
+                              <div className="flex flex-col items-center gap-3 w-[35%]">
+                                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/10 p-2 shadow-inner">
+                                  <img src={homeTeam?.logo || "/placeholder.png"} alt={homeTeam?.name} className="w-full h-full object-contain" />
+                                </div>
+                                <span className="text-sm font-bold text-center text-white line-clamp-2">{homeTeam?.name}</span>
                               </div>
                               
-                              <div className="flex flex-col items-center justify-center w-1/3">
+                              {/* Score */}
+                              <div className="flex flex-col items-center justify-center w-[30%]">
                                 {isMatchUpcoming ? (
-                                  <div className="text-xl font-bold text-neutral-600 dark:text-neutral-400 text-center whitespace-nowrap">
+                                  <div className="text-2xl font-bold text-neutral-400 text-center whitespace-nowrap font-mono">
                                     {new Date(fixture.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </div>
                                 ) : (
-                                  <div className="text-3xl font-black font-mono dark:text-white">
+                                  <div className="text-4xl font-black font-mono text-manjanium-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">
                                     {match.goals.home ?? 0} - {match.goals.away ?? 0}
                                   </div>
                                 )}
                               </div>
 
-                              <div className="flex flex-col items-center gap-2 w-1/3">
-                                <img src={awayTeam?.logo || "/placeholder.png"} alt={awayTeam?.name} className="w-12 h-12 object-contain bg-white rounded-full p-1" />
-                                <span className="text-sm font-bold text-center dark:text-white line-clamp-1">{awayTeam?.name}</span>
+                              {/* Away Team */}
+                              <div className="flex flex-col items-center gap-3 w-[35%]">
+                                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/10 p-2 shadow-inner">
+                                  <img src={awayTeam?.logo || "/placeholder.png"} alt={awayTeam?.name} className="w-full h-full object-contain" />
+                                </div>
+                                <span className="text-sm font-bold text-center text-white line-clamp-2">{awayTeam?.name}</span>
                               </div>
                             </div>
                           </div>
                           
-                          <div className="bg-neutral-50 dark:bg-black px-4 py-3 border-t border-neutral-200 dark:border-neutral-800 text-sm flex justify-between">
-                            <span className="text-neutral-500">{fixture.venue?.name || "TBD"}</span>
-                            <span className="text-neutral-400 text-xs">{new Date(fixture.date).toLocaleDateString()}</span>
+                          {/* Card Footer */}
+                          <div className="bg-black/20 px-5 py-3 border-t border-white/5 text-xs flex justify-between items-center text-neutral-500">
+                            <span className="truncate max-w-[70%]">{fixture.venue?.name || "TBD Stadium"}</span>
+                            <span className="whitespace-nowrap">{new Date(fixture.date).toLocaleDateString()}</span>
                           </div>
-                        </Card>
-                      </div>
+                        </div>
+                      </motion.div>
                     );
                   })}
                   
                   {!fixtures.length && !loadingLive && (
-                    <div className="col-span-full flex flex-col items-center justify-center h-64 border border-dashed border-neutral-300 dark:border-neutral-800 rounded-2xl">
-                      <p className="text-neutral-500 dark:text-neutral-400 text-lg font-medium mb-2">No matches scheduled today.</p>
-                      <p className="text-sm text-neutral-400">Check back later for live updates.</p>
+                    <div className="col-span-full flex flex-col items-center justify-center h-64 border border-dashed border-white/10 rounded-2xl bg-black/20">
+                      <p className="text-neutral-400 text-lg font-medium mb-2">No matches scheduled right now.</p>
+                      <p className="text-sm text-neutral-500">Check back later for live updates.</p>
                     </div>
                   )}
                 </div>
               )}
             </motion.div>
-          )}
+          </TabsContent>
 
-          {/* PAST MATCHES TAB */}
-          {activeTab === 'pastMatches' && (
-            <motion.div
-              key="pastMatches"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              {errorPast ? (
-                <div className="flex flex-col items-center justify-center h-64 bg-red-500/10 border border-red-500/20 rounded-2xl">
-                  <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-                  <p className="text-red-500 font-bold mb-2">Failed to load past matches</p>
-                  <button 
-                    onClick={() => fetchPastMatches()}
-                    className="px-4 py-2 bg-neutral-900 text-white rounded-md text-sm font-medium hover:bg-neutral-800"
-                  >
-                    Retry Connection
-                  </button>
-                </div>
-              ) : (
-                <PastMatches 
-                  matches={pastMatches} 
-                  isLoading={loadingPast && pastMatches.length === 0} 
-                  onMatchClick={(match) => setSelectedMatch({ id: match.id, isLive: false })}
-                />
-              )}
-            </motion.div>
-          )}
-
-          {/* STANDINGS TAB */}
-          {activeTab === 'standings' && (
-            <motion.div
-              key="standings"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
+          {/* STANDINGS */}
+          <TabsContent value="standings" className="mt-0 outline-none">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
               {loadingStandings && !standingsData ? (
                 <div className="flex justify-center items-center h-64">
                   <Spin size="large" />
@@ -331,43 +319,26 @@ export default function FootballHubPage() {
                 <div className="flex flex-col items-center justify-center h-64 bg-red-500/10 border border-red-500/20 rounded-2xl">
                   <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
                   <p className="text-red-500 font-bold mb-2">Failed to load standings</p>
-                  <button 
-                    onClick={() => fetchStandingsData(true)}
-                    className="px-4 py-2 bg-neutral-900 text-white rounded-md text-sm font-medium hover:bg-neutral-800"
-                  >
+                  <button onClick={() => fetchStandingsData(true)} className="px-4 py-2 bg-neutral-900 text-white rounded-md text-sm font-medium hover:bg-neutral-800">
                     Retry Connection
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {standingsData?.groups?.map((group) => (
-                    <GroupStandingsCard 
-                      key={group.groupName} 
-                      groupData={group} 
-                      onTeamClick={(team) => setSelectedTeam(team)} 
-                      isExpanded={true}
-                    />
+                    <GroupStandingsCard key={group.groupName} groupData={group} onTeamClick={(team) => setSelectedTeam(team)} isExpanded={true} />
                   ))}
                   {(!standingsData?.groups || standingsData.groups.length === 0) && (
-                    <div className="col-span-full text-center py-12 text-neutral-500">
-                      Standings data is not available yet.
-                    </div>
+                    <div className="col-span-full text-center py-12 text-neutral-500">Standings data is not available yet.</div>
                   )}
                 </div>
               )}
             </motion.div>
-          )}
+          </TabsContent>
 
-          {/* TOP SCORERS TAB */}
-          {activeTab === 'topScorers' && (
-            <motion.div
-              key="topScorers"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="flex justify-center"
-            >
+          {/* TOP SCORERS */}
+          <TabsContent value="topScorers" className="mt-0 outline-none">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex justify-center">
               {loadingStandings && !standingsData ? (
                 <div className="flex justify-center items-center h-64">
                   <Spin size="large" />
@@ -377,55 +348,64 @@ export default function FootballHubPage() {
                   Failed to load scorer data.
                 </div>
               ) : (
-                <TopScorersWidget 
-                  scorers={topScorers} 
-                  lastUpdated={lastUpdated} 
-                />
+                <div className="w-full max-w-4xl">
+                  <TopScorersWidget scorers={topScorers} lastUpdated={lastUpdated} />
+                </div>
               )}
             </motion.div>
-          )}
+          </TabsContent>
 
-          {/* PLAYER SEARCH TAB (Placeholder) */}
-          {activeTab === 'playerSearch' && (
-            <motion.div
-              key="playerSearch"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="flex justify-center"
-            >
-               <div className="flex flex-col items-center justify-center h-64 border border-dashed border-neutral-300 dark:border-neutral-800 rounded-2xl w-full max-w-3xl bg-neutral-50 dark:bg-neutral-900/50">
-                  <Users className="w-12 h-12 text-neutral-400 mb-4 opacity-50" />
-                  <p className="text-neutral-500 dark:text-neutral-400 text-xl font-bold mb-2">Player Search</p>
-                  <p className="text-sm text-neutral-400 bg-neutral-200 dark:bg-neutral-800 px-3 py-1 rounded-full">Coming Soon</p>
+          {/* PAST MATCHES */}
+          <TabsContent value="pastMatches" className="mt-0 outline-none">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+              {errorPast ? (
+                <div className="flex flex-col items-center justify-center h-64 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                  <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+                  <p className="text-red-500 font-bold mb-2">Failed to load past matches</p>
+                  <button onClick={() => fetchPastMatches()} className="px-4 py-2 bg-neutral-900 text-white rounded-md text-sm font-medium hover:bg-neutral-800">
+                    Retry Connection
+                  </button>
+                </div>
+              ) : (
+                <div className="w-full bg-primary/50 rounded-2xl border border-white/5 p-6 shadow-xl">
+                  <PastMatches matches={pastMatches} isLoading={loadingPast && pastMatches.length === 0} onMatchClick={(match) => setSelectedMatch({ id: match.id, isLive: false })} />
+                </div>
+              )}
+            </motion.div>
+          </TabsContent>
+
+          {/* PLAYER SEARCH */}
+          <TabsContent value="playerSearch" className="mt-0 outline-none">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex justify-center">
+               <div className="flex flex-col items-center justify-center h-80 border border-dashed border-white/10 rounded-2xl w-full max-w-3xl bg-black/20">
+                  <Users className="w-16 h-16 text-neutral-600 mb-4 opacity-50" />
+                  <p className="text-white text-2xl font-bold mb-3 font-heading">Global Player Search</p>
+                  <p className="text-sm text-manjanium-gold bg-manjanium-gold/10 border border-manjanium-gold/20 px-4 py-1.5 rounded-full font-bold">Coming Soon</p>
                 </div>
             </motion.div>
-          )}
+          </TabsContent>
 
-        </AnimatePresence>
-      </div>
+        </div>
+      </Tabs>
 
       {/* Global Modals */}
-      <PlayerStatsModal 
-        isOpen={selectedTeam !== null}
-        team={selectedTeam}
-        players={selectedTeam?.players || []}
-        onClose={() => setSelectedTeam(null)}
-      />
-
+      <PlayerStatsModal isOpen={selectedTeam !== null} team={selectedTeam} players={selectedTeam?.players || []} onClose={() => setSelectedTeam(null)} />
       <AnimatePresence>
-        {selectedMatch && (
-          <MatchDetailsModal 
-            matchId={selectedMatch.id} 
-            isLive={selectedMatch.isLive} 
-            onClose={() => setSelectedMatch(null)} 
-          />
-        )}
+        {selectedMatch && <MatchDetailsModal matchId={selectedMatch.id} isLive={selectedMatch.isLive} onClose={() => setSelectedMatch(null)} />}
       </AnimatePresence>
 
       {/* Simulation of Live Chat when active */}
       <LiveChatMarquee isActive={isLive && activeTab === 'live' && !selectedMatch} />
+      
     </div>
+  );
+}
+
+// Wrap in Suspense boundary for useSearchParams
+export default function FootballHubPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Spin size="large" /></div>}>
+      <FootballHubContent />
+    </Suspense>
   );
 }
