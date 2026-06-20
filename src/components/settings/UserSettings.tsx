@@ -1,20 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
-import { useSettings } from "@/lib/settings-context";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { useUser } from "@clerk/nextjs";
 import { User, Bell, Shield, Database, Save, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 export function UserSettingsComponent() {
-  const { settings, updateSettings } = useSettings();
-  const { user, notifications, privacy } = settings;
+  const { preferences, updatePreferences } = useUserPreferences();
+  const { user } = useUser();
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
-  const [localName, setLocalName] = useState(user.displayName);
+  const [localName, setLocalName] = useState(user?.fullName || "");
 
-  const handleSaveName = () => {
+  const handleSaveName = async () => {
     setSaveStatus("saving");
-    updateSettings("user", { displayName: localName });
+    if (user) {
+      await user.update({ firstName: localName.split(' ')[0], lastName: localName.split(' ').slice(1).join(' ') });
+    }
     setTimeout(() => {
       setSaveStatus("saved");
       setTimeout(() => setSaveStatus("idle"), 2000);
@@ -87,7 +90,7 @@ export function UserSettingsComponent() {
               />
               <button
                 onClick={handleSaveName}
-                disabled={localName === user.displayName || saveStatus === "saving"}
+                disabled={localName === user?.fullName || saveStatus === "saving"}
                 className={cn(
                   "px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-all",
                   saveStatus === "saved" 
@@ -105,7 +108,7 @@ export function UserSettingsComponent() {
             <label className="block text-sm font-medium text-[#94a3b8] mb-1">Email Address</label>
             <input 
               type="email" 
-              value={user.email}
+              value={user?.primaryEmailAddress?.emailAddress || ""}
               disabled
               className="w-full bg-background/50 border border-white/5 rounded-lg px-4 py-2 text-[#94a3b8] cursor-not-allowed"
             />
@@ -127,26 +130,26 @@ export function UserSettingsComponent() {
           <ToggleSwitch 
             label="Email Notifications" 
             description="Receive important updates and newsletters via email."
-            checked={notifications.emailNotifications}
-            onChange={(val) => updateSettings("notifications", { emailNotifications: val })}
+            checked={preferences?.notifications?.email || false}
+            onChange={(val) => updatePreferences({ notifications: { ...(preferences?.notifications || { email: true, push: true, alerts: true }), email: val } })}
           />
           <ToggleSwitch 
             label="Push Notifications" 
             description="Allow browser push notifications for real-time alerts."
-            checked={notifications.pushNotifications}
-            onChange={(val) => updateSettings("notifications", { pushNotifications: val })}
+            checked={preferences?.notifications?.push || false}
+            onChange={(val) => updatePreferences({ notifications: { ...(preferences?.notifications || { email: true, push: true, alerts: true }), push: val } })}
           />
           <ToggleSwitch 
             label="Match Alerts" 
             description="Get notified when your favorite football teams score."
-            checked={notifications.matchAlerts}
-            onChange={(val) => updateSettings("notifications", { matchAlerts: val })}
+            checked={preferences?.notifications?.alerts || false}
+            onChange={(val) => updatePreferences({ notifications: { ...(preferences?.notifications || { email: true, push: true, alerts: true }), alerts: val } })}
           />
           <ToggleSwitch 
             label="Race Alerts" 
             description="Session starting alerts and red flag notifications."
-            checked={notifications.raceAlerts}
-            onChange={(val) => updateSettings("notifications", { raceAlerts: val })}
+            checked={preferences?.notifications?.alerts || false}
+            onChange={(val) => updatePreferences({ notifications: { ...(preferences?.notifications || { email: true, push: true, alerts: true }), alerts: val } })}
           />
         </div>
       </section>
@@ -164,14 +167,14 @@ export function UserSettingsComponent() {
           <ToggleSwitch 
             label="Analytics" 
             description="Help us improve by sharing anonymous usage data."
-            checked={privacy.analytics}
-            onChange={(val) => updateSettings("privacy", { analytics: val })}
+            checked={true}
+            onChange={(val) => {}}
           />
           <ToggleSwitch 
             label="Personalized Recommendations" 
             description="Allow us to use your browsing history to recommend content."
-            checked={privacy.personalizedRecommendations}
-            onChange={(val) => updateSettings("privacy", { personalizedRecommendations: val })}
+            checked={true}
+            onChange={(val) => {}}
           />
         </div>
         

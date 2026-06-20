@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { useSettings } from "@/lib/settings-context";
 import { F1_PRESETS, FOOTBALL_PRESETS, PresetDefinition } from "@/lib/dashboard-presets";
 import { motion, AnimatePresence } from "framer-motion";
 import { LayoutDashboard, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 
 // Helper to render a miniature version of the grid for thumbnails
 const PresetThumbnail = ({ preset, isActive }: { preset: PresetDefinition, isActive: boolean }) => {
@@ -75,32 +75,20 @@ const PreviewModal = ({ preset, type }: { preset: PresetDefinition, type: "F1" |
 };
 
 export function DashboardPresets() {
-  const { settings, updateSettings } = useSettings();
+  const { preferences, updatePreferences } = useUserPreferences();
   const [hoveredPreset, setHoveredPreset] = useState<{ preset: PresetDefinition, type: "F1" | "Football" } | null>(null);
 
-  const handleSelect = async (type: "f1Preset" | "footballPreset", presetId: string) => {
-    // 1. Update local state immediately
-    updateSettings("dashboard", { [type]: presetId });
-
-    // 2. Fire background API request to save to Supabase
-    try {
-      await fetch('/api/user/dashboard-preset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [type]: presetId })
-      });
-    } catch (e) {
-      console.error("Failed to save preset to API", e);
-    }
+  const handleSelect = async (type: "f1DashboardPreset" | "footballDashboardPreset", presetId: string) => {
+    updatePreferences({ [type]: presetId });
   };
 
-  const PresetCard = ({ preset, type, currentSelectedId }: { preset: PresetDefinition, type: "f1Preset" | "footballPreset", currentSelectedId: string }) => {
+  const PresetCard = ({ preset, type, currentSelectedId }: { preset: PresetDefinition, type: "f1DashboardPreset" | "footballDashboardPreset", currentSelectedId: string }) => {
     const isActive = currentSelectedId === preset.id;
 
     return (
       <div
         className="relative group cursor-pointer"
-        onMouseEnter={() => setHoveredPreset({ preset, type: type === "f1Preset" ? "F1" : "Football" })}
+        onMouseEnter={() => setHoveredPreset({ preset, type: type === "f1DashboardPreset" ? "F1" : "Football" })}
         onMouseLeave={() => setHoveredPreset(null)}
         onClick={() => handleSelect(type, preset.id)}
       >
@@ -158,8 +146,8 @@ export function DashboardPresets() {
                 <PresetCard 
                   key={preset.id} 
                   preset={preset} 
-                  type="f1Preset" 
-                  currentSelectedId={settings.dashboard.f1Preset} 
+                  type="f1DashboardPreset" 
+                  currentSelectedId={preferences?.f1DashboardPreset || 'live_focused'} 
                 />
               ))}
             </div>
@@ -173,8 +161,8 @@ export function DashboardPresets() {
                 <PresetCard 
                   key={preset.id} 
                   preset={preset} 
-                  type="footballPreset" 
-                  currentSelectedId={settings.dashboard.footballPreset} 
+                  type="footballDashboardPreset" 
+                  currentSelectedId={preferences?.footballDashboardPreset || 'live_matches'} 
                 />
               ))}
             </div>

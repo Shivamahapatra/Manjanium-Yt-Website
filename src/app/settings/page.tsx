@@ -11,6 +11,9 @@ import { SuggestionPage } from "@/components/settings/SuggestionPage";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { useAuth } from "@clerk/nextjs";
+import { Spin } from "antd";
 
 const SETTINGS_CATEGORIES = [
   { id: "appearance", label: "APPEARANCE", icon: <Palette className="w-5 h-5" /> },
@@ -23,6 +26,9 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("appearance");
   const { isGuest, setLoginIntention } = useOnboarding();
   const router = useRouter();
+  
+  const { isSignedIn, isLoaded } = useAuth();
+  const { preferences, loading, updatePreferences } = useUserPreferences();
 
   const handleLoginClick = () => {
     setLoginIntention();
@@ -63,6 +69,29 @@ export default function SettingsPage() {
         return <AppearanceSettings />;
     }
   };
+
+  if (!isLoaded) {
+    return <div className="flex items-center justify-center min-h-screen"><Spin size="large" /></div>;
+  }
+
+  if (!isSignedIn) {
+    return (
+      <div className="p-8 text-center min-h-screen flex flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold mb-4 text-white">Settings</h1>
+        <p className="text-neutral-400 mb-8">Please sign in to access your settings.</p>
+        <button
+          onClick={handleLoginClick}
+          className="px-8 py-3 bg-[#0ea5e9] hover:bg-[#0284c7] hover:shadow-[0_0_15px_rgba(14,165,233,0.5)] text-white font-semibold rounded-xl transition-all duration-200"
+        >
+          Sign Up / Login
+        </button>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen"><Spin size="large" /></div>;
+  }
 
   return (
     <div className="min-h-full w-full bg-background flex flex-col md:flex-row">

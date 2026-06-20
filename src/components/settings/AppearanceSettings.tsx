@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { useSettings, Theme, FontSize, ColorIntensity, AnimationSpeed } from "@/lib/settings-context";
+import { Theme, FontSize, ColorIntensity, AnimationSpeed } from "@/lib/settings-context";
 import { Monitor, Moon, Sun, Type, Zap, PaintBucket, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DashboardPresets } from "./DashboardPresets";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 
 export function AppearanceSettings() {
-  const { settings, updateSettings } = useSettings();
-  const { appearance } = settings;
+  const { preferences, updatePreferences } = useUserPreferences();
 
   const themes: { id: Theme; label: string; icon: React.ReactNode }[] = [
     { id: "light", label: "LIGHT MODE", icon: <Sun className="w-5 h-5" /> },
@@ -37,11 +37,11 @@ export function AppearanceSettings() {
         {/* Theme Selection */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {themes.map((theme) => {
-            const isActive = appearance.theme === theme.id;
+            const isActive = (preferences?.theme || "dark") === theme.id;
             return (
               <button
                 key={theme.id}
-                onClick={() => updateSettings("appearance", { theme: theme.id })}
+                onClick={() => updatePreferences({ theme: theme.id as any })}
                 className={cn(
                   "flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-200 gap-3",
                   isActive
@@ -77,10 +77,10 @@ export function AppearanceSettings() {
             {fontSizes.map((size) => (
               <button
                 key={size.id}
-                onClick={() => updateSettings("appearance", { fontSize: size.id })}
+                onClick={() => updatePreferences({ fontSize: size.id as any })}
                 className={cn(
                   "flex-1 py-2 text-sm font-medium rounded-lg transition-colors",
-                  appearance.fontSize === size.id
+                  (preferences?.fontSize || "normal") === size.id
                     ? "bg-[#fbbf24] text-black shadow-md"
                     : "text-[#94a3b8] hover:text-white"
                 )}
@@ -106,10 +106,10 @@ export function AppearanceSettings() {
             {animationSpeeds.map((speed) => (
               <button
                 key={speed.id}
-                onClick={() => updateSettings("appearance", { animationSpeed: speed.id })}
+                onClick={() => updatePreferences({ animationSpeed: speed.id as any })}
                 className={cn(
                   "flex-1 py-2 text-sm font-medium rounded-lg transition-colors",
-                  appearance.animationSpeed === speed.id
+                  (preferences?.animationSpeed || "normal") === speed.id
                     ? "bg-[#fbbf24] text-black shadow-md"
                     : "text-[#94a3b8] hover:text-white"
                 )}
@@ -129,26 +129,26 @@ export function AppearanceSettings() {
         <h3 className="text-xl font-bold text-white mb-4">Live Preview</h3>
         <div className={cn(
           "w-full rounded-2xl border overflow-hidden shadow-2xl transition-all duration-300",
-          appearance.theme === "light" 
+          (preferences?.theme || "dark") === "light" 
             ? "bg-[#f8fafc] border-[#e2e8f0]" 
             : "bg-[#0f172a] border-white/10"
         )}>
           {/* Mock Header */}
           <div className={cn(
             "h-14 border-b flex items-center px-6 transition-colors",
-            appearance.theme === "light" ? "border-[#e2e8f0] bg-white" : "border-white/10 bg-[#0f172a]"
+            (preferences?.theme || "dark") === "light" ? "border-[#e2e8f0] bg-white" : "border-white/10 bg-[#0f172a]"
           )}>
             <div className="w-8 h-8 rounded bg-[#fbbf24] flex items-center justify-center font-black text-black">M</div>
             <div className="flex gap-4 ml-8 hidden sm:flex">
-               <div className={cn("h-4 w-16 rounded", appearance.theme === "light" ? "bg-slate-200" : "bg-white/10")} />
-               <div className={cn("h-4 w-20 rounded", appearance.theme === "light" ? "bg-slate-200" : "bg-white/10")} />
+               <div className={cn("h-4 w-16 rounded", (preferences?.theme || "dark") === "light" ? "bg-slate-200" : "bg-white/10")} />
+               <div className={cn("h-4 w-20 rounded", (preferences?.theme || "dark") === "light" ? "bg-slate-200" : "bg-white/10")} />
             </div>
           </div>
           {/* Mock Content */}
           <div className="p-6 md:p-10 flex flex-col gap-6">
             <div className={cn(
               "text-3xl font-bold transition-colors",
-              appearance.theme === "light" ? "text-slate-900" : "text-white"
+              (preferences?.theme || "dark") === "light" ? "text-slate-900" : "text-white"
             )}>
               Welcome to Manjanium
             </div>
@@ -156,26 +156,26 @@ export function AppearanceSettings() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className={cn(
                 "p-6 rounded-xl border transition-colors",
-                appearance.theme === "light" ? "bg-white border-slate-200 shadow-sm" : "bg-background border-white/5"
+                (preferences?.theme || "dark") === "light" ? "bg-white border-slate-200 shadow-sm" : "bg-background border-white/5"
               )}>
                 <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center mb-4">
                   <Zap className="w-5 h-5" />
                 </div>
-                <div className={cn("font-bold mb-2 transition-colors", appearance.theme === "light" ? "text-slate-900" : "text-white")}>Live Telemetry</div>
-                <div className={cn("text-sm transition-colors", appearance.theme === "light" ? "text-slate-500" : "text-slate-400")}>
+                <div className={cn("font-bold mb-2 transition-colors", (preferences?.theme || "dark") === "light" ? "text-slate-900" : "text-white")}>Live Telemetry</div>
+                <div className={cn("text-sm transition-colors", (preferences?.theme || "dark") === "light" ? "text-slate-500" : "text-slate-400")}>
                   Experience real-time data directly from the paddock.
                 </div>
               </div>
 
               <div className={cn(
                 "p-6 rounded-xl border transition-colors",
-                appearance.theme === "light" ? "bg-white border-slate-200 shadow-sm" : "bg-background border-white/5"
+                (preferences?.theme || "dark") === "light" ? "bg-white border-slate-200 shadow-sm" : "bg-background border-white/5"
               )}>
                 <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center mb-4">
                   <Trophy className="w-5 h-5" />
                 </div>
-                <div className={cn("font-bold mb-2 transition-colors", appearance.theme === "light" ? "text-slate-900" : "text-white")}>Match Center</div>
-                <div className={cn("text-sm transition-colors", appearance.theme === "light" ? "text-slate-500" : "text-slate-400")}>
+                <div className={cn("font-bold mb-2 transition-colors", (preferences?.theme || "dark") === "light" ? "text-slate-900" : "text-white")}>Match Center</div>
+                <div className={cn("text-sm transition-colors", (preferences?.theme || "dark") === "light" ? "text-slate-500" : "text-slate-400")}>
                   Track live football stats and commentaries.
                 </div>
               </div>
