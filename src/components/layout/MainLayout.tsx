@@ -73,7 +73,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
         currentSport={currentSport}
         liveMatchCount={liveMatchCount}
         onSportChange={handleSportChange}
-        onSettingsClick={() => alert("Settings coming soon")}
+        onSettingsClick={() => window.location.href = "/settings"}
       />
 
       {/* Main Content Area (SportsSidebar handles the left/right flex layout natively) */}
