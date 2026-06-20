@@ -9,6 +9,7 @@ import { RefreshCw, AlertCircle, Clock, Trophy, Activity, Users, History, Medal 
 
 // Shadcn Tabs
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/shadcn-tabs";
+import { cn } from "@/lib/utils";
 
 // Components
 import { GroupStandingsCard } from "@/components/football/GroupStandingsCard";
