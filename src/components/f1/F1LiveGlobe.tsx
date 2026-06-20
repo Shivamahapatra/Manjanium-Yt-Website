@@ -81,18 +81,8 @@ export default function F1LiveGlobe({ sessionVenue }: F1LiveGlobeProps) {
     config: { tension: 40, friction: 20 },
   }));
 
-  // Handle responsive size and WebGL availability checks
+  // Handle WebGL availability checks
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 375) {
-        setSize(280); // mobile fallback handled by layout
-      } else {
-        setSize(320);
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
     try {
       const canvas = document.createElement("canvas");
       const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
@@ -100,8 +90,6 @@ export default function F1LiveGlobe({ sessionVenue }: F1LiveGlobeProps) {
     } catch {
       setHasWebGL(false);
     }
-
-    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Sync focused round coordinate changes
@@ -180,11 +168,14 @@ export default function F1LiveGlobe({ sessionVenue }: F1LiveGlobeProps) {
       diffuse: 1.2,
       mapSamples: 16000,
       mapBrightness: 6,
-      baseColor: [0.05, 0.05, 0.1], // deep navy base
-      markerColor: [0.1, 0.2, 0.4],
-      glowColor: [0.15, 0.3, 0.6], // atmosphere blue tint
+      baseColor: [0.1, 0.1, 0.2],
+      markerColor: [0.1, 0.8, 1.0],
+      glowColor: [0.2, 0.4, 1.0],
       markers,
       onRender: (state: any) => {
+        state.width = size * 2;
+        state.height = size * 2;
+
         if (sessionVenue) {
           // Snaps then slowly auto-rotates
           state.phi = phi.get() + phiOffset;
@@ -278,10 +269,15 @@ export default function F1LiveGlobe({ sessionVenue }: F1LiveGlobeProps) {
     <div className="flex flex-col items-center select-none w-[320px] mx-auto">
       {/* Globe Area */}
       <div
-        className="relative flex items-center justify-center overflow-hidden rounded-full border border-neutral-800/30 bg-[#070714]"
+        className="relative overflow-hidden rounded-full border border-neutral-800/30 bg-[#070714] flex items-center justify-center"
         style={{ width: size, height: size }}
       >
-        <canvas ref={canvasRef} className="w-full h-full" />
+        <canvas
+          ref={canvasRef}
+          width={size * 2}
+          height={size * 2}
+          style={{ width: size, height: size, cursor: "grab", outline: "none" }}
+        />
 
         {/* Pulsing overlay rings (Correction 1) */}
         {sessionVenue && (

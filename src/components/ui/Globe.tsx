@@ -57,14 +57,16 @@ export function Globe({
         theta,
         dark,
         diffuse,
-        mapSamples,
-        mapBrightness,
-        baseColor,
-        markerColor,
-        glowColor,
+        mapSamples: 16000,
+        mapBrightness: 6,
+        baseColor: [0.1, 0.1, 0.2],
+        markerColor: [0.1, 0.8, 1.0],
+        glowColor: [0.2, 0.4, 1.0],
         markers,
         onRender: (state: any) => {
           state.phi = phiVal + r.get();
+          state.width = width * 2;
+          state.height = height * 2;
           phiVal += 0.005;
         },
       } as any);
@@ -75,15 +77,17 @@ export function Globe({
         globe.destroy();
       }
     };
-  }, [width, height, phi, theta, dark, diffuse, mapSamples, mapBrightness, baseColor, markerColor, glowColor, markers, r]);
+  }, [width, height, phi, theta, dark, diffuse, markers, r]);
 
   return (
-    <div className={className} style={{ width, height, position: "relative" }}>
+    <div className={`${className} relative overflow-hidden`} style={{ width, height }}>
       <canvas
         ref={canvasRef}
+        width={width * 2}
+        height={height * 2}
         style={{
-          width: "100%",
-          height: "100%",
+          width,
+          height,
           cursor: "grab",
           outline: "none",
         }}

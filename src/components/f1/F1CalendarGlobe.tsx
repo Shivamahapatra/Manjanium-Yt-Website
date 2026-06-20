@@ -86,12 +86,10 @@ export default function F1CalendarGlobe({
   // Handle responsive size and WebGL capability checks
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 375) {
-        setSize(280); // simplified mobile fallback handled by page layout
-      } else if (window.innerWidth < 768) {
+      if (window.innerWidth < 768) {
         setSize(320);
       } else {
-        setSize(500);
+        setSize(600);
       }
     };
     handleResize();
@@ -198,14 +196,17 @@ export default function F1CalendarGlobe({
       diffuse: 1.2,
       mapSamples: 16000,
       mapBrightness: 6,
-      baseColor: [0.05, 0.05, 0.1], // deep navy base
-      markerColor: [0.23, 0.51, 0.97],
-      glowColor: [0.15, 0.3, 0.6], // atmosphere blue tint
+      baseColor: [0.1, 0.1, 0.2],
+      markerColor: [0.1, 0.8, 1.0],
+      glowColor: [0.2, 0.4, 1.0],
       markers,
       arcs,
       arcWidth: 1.5,
       arcHeight: 0.2,
       onRender: (state: any) => {
+        state.width = size * 2;
+        state.height = size * 2;
+
         // Handle rotation state and snap animations
         if (isHovered || targetRound) {
           state.phi = phi.get();
@@ -331,14 +332,17 @@ export default function F1CalendarGlobe({
     <div className="w-full flex flex-col items-center justify-center relative select-none">
       {/* Globe rendering canvas container */}
       <div
-        className="relative mx-auto flex items-center justify-center"
+        className="relative overflow-hidden mx-auto flex items-center justify-center"
         style={{ width: size, height: size }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={handlePointerLeave}
       >
         <canvas
           ref={canvasRef}
-          className="w-full h-full cursor-grab active:cursor-grabbing"
+          width={size * 2}
+          height={size * 2}
+          style={{ width: size, height: size, cursor: "grab", outline: "none" }}
+          className="active:cursor-grabbing"
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}
           onPointerMove={handlePointerMove}
