@@ -19,7 +19,6 @@ import { getTopScorers } from "@/lib/football-utils";
 import { Team, StandingsResponse } from "@/types/football";
 import { MatchSummary } from "@/types/match";
 import { PastMatches } from "@/components/football/PastMatches";
-import { MatchDetailsModal } from "@/components/football/MatchDetailsModal";
 
 function FootballHubContent() {
   const searchParams = useSearchParams();
@@ -51,7 +50,6 @@ function FootballHubContent() {
   const [loadingPast, setLoadingPast] = useState(true);
   const [errorPast, setErrorPast] = useState<string | null>(null);
 
-  const [selectedMatch, setSelectedMatch] = useState<{ id: string, isLive: boolean } | null>(null);
 
   const [standingsData, setStandingsData] = useState<StandingsResponse | null>(null);
   const [loadingStandings, setLoadingStandings] = useState(true);
@@ -239,7 +237,7 @@ function FootballHubContent() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="group"
-                        onClick={() => setSelectedMatch({ id: fixture.id, isLive: true })}
+                        onClick={() => router.push(`/football/matches/${fixture.id}`)}
                       >
                         <div className="bg-primary border border-white/5 hover:border-manjanium-gold/50 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 shadow-lg hover:shadow-manjanium-gold/10 hover:-translate-y-1">
                           
@@ -369,7 +367,7 @@ function FootballHubContent() {
                 </div>
               ) : (
                 <div className="w-full bg-primary/50 rounded-2xl border border-white/5 p-6 shadow-xl">
-                  <PastMatches matches={pastMatches} isLoading={loadingPast && pastMatches.length === 0} onMatchClick={(match) => setSelectedMatch({ id: match.id, isLive: false })} />
+                  <PastMatches matches={pastMatches} isLoading={loadingPast && pastMatches.length === 0} onMatchClick={(match) => router.push(`/football/matches/${match.id}`)} />
                 </div>
               )}
             </motion.div>
@@ -391,12 +389,9 @@ function FootballHubContent() {
 
       {/* Global Modals */}
       <PlayerStatsModal isOpen={selectedTeam !== null} team={selectedTeam} players={selectedTeam?.players || []} onClose={() => setSelectedTeam(null)} />
-      <AnimatePresence>
-        {selectedMatch && <MatchDetailsModal matchId={selectedMatch.id} isLive={selectedMatch.isLive} onClose={() => setSelectedMatch(null)} />}
-      </AnimatePresence>
 
       {/* Simulation of Live Chat when active */}
-      <LiveChatMarquee isActive={isLive && activeTab === 'live' && !selectedMatch} />
+      <LiveChatMarquee isActive={isLive && activeTab === 'live'} />
       
     </div>
   );

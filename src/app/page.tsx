@@ -411,8 +411,8 @@ export default function HomePage() {
             <div className="flex items-center gap-6 text-sm font-semibold text-neutral-400">
               <Link href="/f1" className="hover:text-white transition-colors">F1 Hub</Link>
               <Link href="/football" className="hover:text-white transition-colors">Football</Link>
-              <Link href="/f1/calendar" className="hover:text-white transition-colors">Calendar</Link>
-              <Link href="/f1/standings" className="hover:text-white transition-colors">Standings</Link>
+              <Link href="/f1?tab=calendar" className="hover:text-white transition-colors">Calendar</Link>
+              <Link href="/f1?tab=standings" className="hover:text-white transition-colors">Standings</Link>
             </div>
 
             <div>
