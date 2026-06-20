@@ -29,7 +29,6 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { SettingsProvider } from "@/lib/settings-context";
 import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from '@clerk/themes';
 
 export default function RootLayout({
   children,
@@ -37,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider appearance={{ baseTheme: dark }}>
+    <ClerkProvider>
       <html
         lang="en"
         className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}

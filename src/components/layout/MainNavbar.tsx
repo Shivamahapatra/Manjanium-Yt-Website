@@ -8,7 +8,6 @@ import { IconSettings, IconUser, IconMenu2, IconChevronDown } from "@tabler/icon
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
 import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs";
-import { dark } from '@clerk/themes';
 
 interface MainNavbarProps {
   currentSport?: "f1" | "football" | "other";
@@ -192,10 +191,8 @@ export function MainNavbar({
                 avatarBox: "w-8 h-8 rounded-full",
                 userButtonBox: "flex-row-reverse",
                 userButtonPopoverCard: "rounded-xl shadow-xl border border-white/10"
-              },
-              baseTheme: dark
+              }
             }}
-            afterSignOutUrl="/"
           />
         )}
 
