@@ -8,7 +8,6 @@ import { AppearanceSettings } from "@/components/settings/AppearanceSettings";
 import { UserSettingsComponent } from "@/components/settings/UserSettings";
 import { AboutApp } from "@/components/settings/AboutApp";
 import { SuggestionPage } from "@/components/settings/SuggestionPage";
-import { useOnboarding } from "@/hooks/useOnboarding";
 import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -24,19 +23,21 @@ const SETTINGS_CATEGORIES = [
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("appearance");
-  const { isGuest, setLoginIntention } = useOnboarding();
   const router = useRouter();
   
   const { isSignedIn, isLoaded } = useAuth();
   const { preferences, loading, updatePreferences } = useUserPreferences();
 
   const handleLoginClick = () => {
-    setLoginIntention();
-    router.push("/login");
+    router.push("/sign-up");
   };
 
   const renderActiveTab = () => {
-    if (isGuest && activeTab !== "about") {
+    if (!isSignedIn && !isLoaded) {
+      return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    }
+
+    if (!isSignedIn && activeTab !== "about") {
       return (
         <div className="flex flex-col items-center justify-center h-full p-8 text-center max-w-md mx-auto">
           <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-6">
@@ -70,26 +71,7 @@ export default function SettingsPage() {
     }
   };
 
-  if (!isLoaded) {
-    return <div className="flex items-center justify-center min-h-screen"><Spin size="large" /></div>;
-  }
-
-  if (!isSignedIn) {
-    return (
-      <div className="p-8 text-center min-h-screen flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold mb-4 text-white">Settings</h1>
-        <p className="text-neutral-400 mb-8">Please sign in to access your settings.</p>
-        <button
-          onClick={handleLoginClick}
-          className="px-8 py-3 bg-[#0ea5e9] hover:bg-[#0284c7] hover:shadow-[0_0_15px_rgba(14,165,233,0.5)] text-white font-semibold rounded-xl transition-all duration-200"
-        >
-          Sign Up / Login
-        </button>
-      </div>
-    );
-  }
-
-  if (loading) {
+  if (isSignedIn && loading) {
     return <div className="flex items-center justify-center min-h-screen"><Spin size="large" /></div>;
   }
 
