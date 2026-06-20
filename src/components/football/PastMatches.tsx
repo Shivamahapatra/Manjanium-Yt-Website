@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, MapPin, Trophy, Calendar, Filter, X, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Search, MapPin, Trophy, Calendar, Filter, X, ChevronRight, CheckCircle2, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export interface GoalScorer {
