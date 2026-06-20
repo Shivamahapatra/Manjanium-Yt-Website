@@ -1,0 +1,82 @@
+/* src/styles/design-tokens.css */
+
+@theme inline {
+  /* Colors */
+  --color-manjanium-navy: #0f172a;
+  --color-manjanium-gold: #fbbf24;
+  --color-manjanium-blue: #0ea5e9;
+  --color-manjanium-emerald: #10b981;
+  --color-manjanium-scarlet: #ef4444;
+  --color-manjanium-black: #09090b;
+  --color-manjanium-text: #f1f5f9;
+
+  /* Typography Fonts */
+  --font-heading: var(--font-space-grotesk);
+  --font-body: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Typography Sizes */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 48px;
+
+  /* Spacing */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-full: 50%;
+
+  /* Shadows */
+  --shadow-manjanium-subtle: 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-manjanium-medium: 0 4px 12px rgba(0,0,0,0.15);
+  --shadow-manjanium-deep: 0 8px 24px rgba(0,0,0,0.2);
+  --shadow-manjanium-glow: 0 0 20px rgba(251,191,36,0.3);
+
+  /* Animations & Transitions */
+  --transition-timing-function-manjanium: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-duration-quick: 150ms;
+  --transition-duration-standard: 300ms;
+  --transition-duration-slow: 500ms;
+}
+
+:root {
+  /* Mapping to Tailwind / Shadcn UI defaults for global harmony */
+  --background: oklch(0.145 0 0); /* Fallback */
+  --foreground: oklch(0.985 0 0); /* Fallback */
+}
+
+.dark {
+  /* Injecting Manjanium design tokens into root dark mode variables */
+  --background: #09090b;
+  --foreground: #f1f5f9;
+  
+  --primary: #0f172a;
+  --primary-foreground: #fbbf24;
+  
+  --accent: #fbbf24;
+  --accent-foreground: #09090b;
+
+  --secondary: #0ea5e9;
+  --secondary-foreground: #f1f5f9;
+
+  --destructive: #ef4444;
+  --success: #10b981;
+
+  --border: #1f2937;
+  --input: #1f2937;
+  --ring: #fbbf24;
+}

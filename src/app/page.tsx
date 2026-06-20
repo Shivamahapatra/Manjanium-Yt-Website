@@ -33,7 +33,7 @@ const FeaturesHoverEffect = ({ items }: { items: any[] }) => {
               />
             )}
           </AnimatePresence>
-          <div className="rounded-2xl h-full w-full p-6 bg-[#111111]/80 backdrop-blur-md border border-[#1f1f1f] relative z-20 flex flex-col overflow-hidden group-hover:border-neutral-700 transition-colors shadow-2xl">
+          <div className="rounded-2xl h-full w-full p-6 bg-primary/80 backdrop-blur-md border border-border relative z-20 flex flex-col overflow-hidden group-hover:border-manjanium-gold transition-colors shadow-2xl">
             <div className={`mb-4 ${item.textColor}`}>{item.icon}</div>
             <h4 className="text-white font-bold tracking-wide mt-4">{item.title}</h4>
             <p className="mt-4 text-neutral-400 tracking-wide leading-relaxed text-sm flex-1">{item.description}</p>
@@ -79,11 +79,11 @@ const MockTimingTower = () => {
   }, []);
 
   return (
-    <div className="bg-[#111111]/80 backdrop-blur-xl border border-[#1f1f1f] rounded-2xl overflow-hidden relative shadow-2xl font-mono text-sm h-full flex flex-col w-full max-w-sm mx-auto">
+    <div className="bg-primary/80 backdrop-blur-xl border border-border rounded-2xl overflow-hidden relative shadow-2xl font-mono text-sm h-full flex flex-col w-full max-w-sm mx-auto">
       <div className="absolute top-2 right-2 px-2 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded text-[10px] font-sans font-bold text-blue-400 z-10">
         SIMULATED DATA
       </div>
-      <div className="flex bg-[#1a1a1a]/80 p-3 text-xs text-neutral-500 font-bold border-b border-[#222]">
+      <div className="flex bg-primary p-3 text-xs text-neutral-500 font-bold border-b border-border">
         <div className="w-8">POS</div>
         <div className="flex-1">DRIVER</div>
         <div className="w-20 text-right">GAP</div>
@@ -96,7 +96,7 @@ const MockTimingTower = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ delay: i * 0.08 }}
-            className="flex items-center px-3 py-2 bg-[#0a0a0a]/50 rounded border border-transparent hover:border-[#333] transition-colors"
+            className="flex items-center px-3 py-2 bg-background/50 rounded border border-transparent hover:border-border transition-colors"
           >
             <div className="w-8 text-neutral-500 font-bold">{d.pos}</div>
             <div className="flex-1 flex items-center gap-3">
@@ -180,7 +180,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#0a0a0a] overflow-hidden selection:bg-blue-500/30 relative">
+    <div className="flex flex-col min-h-screen bg-background overflow-hidden selection:bg-blue-500/30 relative">
       
       {/* NOISE BACKGROUND */}
       <div 
@@ -209,7 +209,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1a1a1a]/80 backdrop-blur-sm border border-[#2a2a2a] mb-8"
+                className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/80 backdrop-blur-sm border border-border mb-8"
               >
                 <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
                 <span className="text-xs font-bold text-white tracking-widest uppercase">LIVE NOW — F1 & Football Data Hub</span>
@@ -311,7 +311,7 @@ export default function HomePage() {
       </div>
 
       {/* SECTION 2 — LIVE TELEMETRY PREVIEW */}
-      <div className="w-full bg-[#0d0d0d] py-24 border-y border-[#1a1a1a] relative z-10">
+      <div className="w-full bg-background py-24 border-y border-border relative z-10">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           
           <motion.div 
@@ -348,7 +348,7 @@ export default function HomePage() {
       </div>
 
       {/* SECTION 3 — FEATURES GRID */}
-      <div className="w-full bg-[#0a0a0a] py-24 relative z-10">
+      <div className="w-full bg-background py-24 relative z-10">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -378,7 +378,7 @@ export default function HomePage() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8 }}
-        className="w-full bg-gradient-to-r from-[#030b1a] to-black py-16 border-y border-[#1a1a1a] relative z-10"
+        className="w-full bg-gradient-to-r from-primary to-background py-16 border-y border-border relative z-10"
       >
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-8">
           <div>
@@ -400,7 +400,7 @@ export default function HomePage() {
       </motion.div>
 
       {/* SECTION 5 — FOOTER */}
-      <footer className="w-full bg-[#0a0a0a] py-12 border-t border-[#1a1a1a] relative z-10">
+      <footer className="w-full bg-background py-12 border-t border-border relative z-10">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
             <div className="text-center md:text-left">
@@ -417,14 +417,14 @@ export default function HomePage() {
 
             <div>
               <Link href="https://www.youtube.com/@manjaniumonsofts67" target="_blank" rel="noopener noreferrer">
-                <button className="bg-[#1a1a1a] hover:bg-[#2a2a2a] border border-[#333] text-white px-4 py-2 rounded-full flex items-center gap-2 transition-colors text-xs font-bold">
+                <button className="bg-primary hover:bg-primary/80 border border-border text-white px-4 py-2 rounded-full flex items-center gap-2 transition-colors text-xs font-bold">
                   <IconBrandYoutube className="w-4 h-4 text-red-500" /> Subscribe
                 </button>
               </Link>
             </div>
           </div>
           
-          <div className="text-center text-xs text-neutral-600 pt-8 border-t border-[#1a1a1a]">
+          <div className="text-center text-xs text-neutral-600 pt-8 border-t border-border">
             Data sourced from OpenF1, Jolpica & ESPN. Not affiliated with Formula 1 or FIFA.
           </div>
         </div>
