@@ -26,6 +26,7 @@ export const metadata: Metadata = {
 };
 
 import { MainLayout } from "@/components/layout/MainLayout";
+import { SettingsProvider } from "@/lib/settings-context";
 
 export default function RootLayout({
   children,
@@ -45,9 +46,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AntdRegistry>
-            <MainLayout>{children}</MainLayout>
-          </AntdRegistry>
+          <SettingsProvider>
+            <AntdRegistry>
+              <MainLayout>{children}</MainLayout>
+            </AntdRegistry>
+          </SettingsProvider>
         </ThemeProvider>
       </body>
     </html>
