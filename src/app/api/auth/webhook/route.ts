@@ -1,80 +1,59 @@
-import { Webhook } from 'svix'
-import { headers } from 'next/headers'
-import { WebhookEvent } from '@clerk/nextjs/server'
-import { supabase } from '@/lib/supabase'
+import { Webhook } from "svix";
+import { headers } from "next/headers";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(req: Request) {
-  // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
-  const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET
+  const headersList = await headers();
+  const svixId = headersList.get("svix-id");
+  const svixTimestamp = headersList.get("svix-timestamp");
+  const svixSignature = headersList.get("svix-signature");
 
-  if (!WEBHOOK_SECRET) {
-    throw new Error('Please add CLERK_WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local')
-  }
+  const body = await req.text();
 
-  // Get the headers
-  const headerPayload = await headers()
-  const svix_id = headerPayload.get('svix-id')
-  const svix_timestamp = headerPayload.get('svix-timestamp')
-  const svix_signature = headerPayload.get('svix-signature')
+  const webhook = new Webhook(process.env.CLERK_WEBHOOK_SECRET!);
 
-  // If there are no headers, error out
-  if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response('Error occured -- no svix headers', {
-      status: 400,
-    })
-  }
-
-  // Get the body
-  const payload = await req.json()
-  const body = JSON.stringify(payload)
-
-  // Create a new Svix instance with your secret.
-  const wh = new Webhook(WEBHOOK_SECRET)
-
-  let evt: WebhookEvent
-
-  // Verify the payload with the headers
   try {
-    evt = wh.verify(body, {
-      'svix-id': svix_id,
-      'svix-timestamp': svix_timestamp,
-      'svix-signature': svix_signature,
-    }) as WebhookEvent
-  } catch (err) {
-    console.error('Error verifying webhook:', err)
-    return new Response('Error occured', {
-      status: 400,
-    })
-  }
+    const evt = webhook.verify(body, {
+      "svix-id": svixId!,
+      "svix-timestamp": svixTimestamp!,
+      "svix-signature": svixSignature!,
+    }) as any;
 
-  const { id } = evt.data
-  const eventType = evt.type
+    if (evt.type === "user.created") {
+      const userId = evt.data.id;
 
-  if (eventType === 'user.created') {
-    console.log(`User created with ID: ${id}`)
-    
-    // Create default user settings in Supabase
-    try {
-      const { error } = await supabase.from('users_preferences').insert({
-        user_id: id,
-        theme: 'dark',
-        font_size: 'md',
-        animation_speed: 'normal',
-        sidebar_expanded: true,
-        notifications: { email: true, push: true, alerts: true },
-        f1_dashboard_preset: 'live_focused',
-        football_dashboard_preset: 'live_matches'
-      })
+      // Create preferences row in Supabase
+      const { error } = await supabase
+        .from("users_preferences")
+        .insert({
+          user_id: userId,
+          theme: "dark",
+          font_size: "md",
+          animation_speed: "normal",
+          sidebar_expanded: true,
+          favorite_teams: [],
+          f1_dashboard_preset: "live_focused",
+          football_dashboard_preset: "live_matches",
+          notifications: {
+            email: true,
+            push: true,
+            alerts: true,
+          },
+          language: "en",
+          timezone: "Asia/Kolkata",
+        });
 
       if (error) {
-        console.error('Error creating user settings in Supabase:', error)
-        return new Response('Error creating user settings', { status: 500 })
+        console.error("Webhook error creating preferences:", error);
+        return new Response("Error creating preferences", { status: 500 });
       }
-    } catch (err) {
-      console.error('Database error:', err)
-      return new Response('Database error', { status: 500 })
-    }
-  }
 
-  return new Response('', { status: 200 })
+      console.log(`✓ Preferences created for user ${userId}`);
+    }
+
+    return new Response("Webhook processed", { status: 200 });
+  } catch (err) {
+    console.error("Webhook verification error:", err);
+    return new Response("Webhook error", { status: 400 });
+  }
 }
