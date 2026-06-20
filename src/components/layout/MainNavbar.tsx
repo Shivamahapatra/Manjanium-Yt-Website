@@ -150,7 +150,7 @@ export function MainNavbar({
         {liveMatchCount > 0 && (
           <button 
             onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-colors"
           >
             <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
             <span className="text-xs font-bold text-red-400 tracking-wider hidden sm:block">
@@ -174,12 +174,12 @@ export function MainNavbar({
         {!isSignedIn ? (
           <div className="flex items-center gap-2">
             <SignInButton mode="modal">
-              <button className="hidden sm:block px-4 py-1.5 rounded-full text-sm font-medium text-white hover:bg-white/10 transition-colors border border-white/20">
+              <button className="hidden sm:block px-4 py-1.5 rounded-lg text-sm font-medium text-white hover:bg-white/10 transition-colors border border-white/20">
                 Sign In
               </button>
             </SignInButton>
             <SignUpButton mode="modal">
-              <button className="hidden sm:block px-4 py-1.5 rounded-full text-sm font-medium bg-manjanium-gold text-black hover:bg-manjanium-gold/90 transition-colors">
+              <button className="hidden sm:block px-4 py-1.5 rounded-lg text-sm font-medium bg-manjanium-gold text-black hover:bg-manjanium-gold/90 transition-colors">
                 Sign Up
               </button>
             </SignUpButton>
