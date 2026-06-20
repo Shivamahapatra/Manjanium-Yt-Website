@@ -1,10 +1,24 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { Calendar as CalendarIcon, Clock, MapPin, ChevronDown, ChevronUp, Flag, Trophy } from 'lucide-react';
 import { Tag, Spin } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getCountryFlag } from '@/lib/f1-helpers';
+import { getCountryFlag, F1_CANCELED_2026, F1_VENUES_2026 } from '@/lib/f1-helpers';
+
+// Dynamic import for the 3D Globe with loading placeholder
+const F1CalendarGlobe = dynamic(
+  () => import('@/components/f1/F1CalendarGlobe'),
+  { 
+    ssr: false, 
+    loading: () => (
+      <div className="w-full h-[500px] rounded-2xl bg-neutral-900 animate-pulse flex items-center justify-center border border-neutral-800">
+        <span className="text-neutral-500 text-sm font-mono">Loading 3D Globe...</span>
+      </div>
+    )
+  }
+);
 
 export default function CalendarPage() {
   const [races, setRaces] = useState<any[]>([]);
@@ -12,6 +26,7 @@ export default function CalendarPage() {
   const [nextRace, setNextRace] = useState<any>(null);
   const [countdown, setCountdown] = useState<string>('');
   const [expandedRound, setExpandedRound] = useState<string | null>(null);
+  const [hoveredRound, setHoveredRound] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchCalendar = async () => {
@@ -105,19 +120,41 @@ export default function CalendarPage() {
     );
   }
 
+  // Calculate completed rounds
+  const completedRounds = races
+    .filter((race: any) => {
+      const raceDate = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
+      return raceDate < new Date();
+    })
+    .map((race: any) => Number(race.round));
+
   return (
     <div className="p-4 md:p-8 min-h-full bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto">
         {/* ===== HEADER ===== */}
-        <header className="mb-8">
-          <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-200 to-zinc-500 mb-2 flex items-center gap-3">
-            <CalendarIcon className="w-8 h-8 text-white" />
-            RACE CALENDAR
+        <header className="mb-6">
+          <h1 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-200 to-zinc-500 mb-2 flex items-center gap-3">
+            <CalendarIcon className="w-7 h-7 text-white" />
+            2026 Season — 22 Rounds Across 20 Countries
           </h1>
           <p className="text-neutral-500">
-            Full season schedule and countdown.
+            Bahrain & Saudi Arabia canceled. Madrid joins as new venue.
           </p>
         </header>
+
+        {/* ===== 3D GLOBE DISPLAY ===== */}
+        <div className="w-full mb-6 bg-[#111111]/30 border border-[#1f1f1f] rounded-2xl p-4">
+          <F1CalendarGlobe
+            completedRounds={completedRounds}
+            nextRound={Number(nextRace?.round || 1)}
+            activeRound={hoveredRound}
+          />
+        </div>
+
+        {/* ===== CANCELED GP BANNER ===== */}
+        <div className="bg-neutral-900 border-l-4 border-amber-500 text-neutral-400 text-sm p-4 rounded-r-xl mb-6 shadow-md">
+          ⚠️ Bahrain GP, Saudi Arabian GP and Emilia Romagna GP are not on the 2026 calendar. Season runs 22 rounds.
+        </div>
 
         {/* ===== NEXT RACE HERO ===== */}
         {nextRace && (
@@ -167,20 +204,29 @@ export default function CalendarPage() {
             const isNext = nextRace?.round === race.round;
             const isExpanded = expandedRound === race.round;
             const flag = getRaceFlag(race);
-            const isSprint = race.Sprint || race.isSprint;
+            
+            const isHovered = hoveredRound === Number(race.round);
+            const venueInfo = F1_VENUES_2026.find(v => v.round === Number(race.round));
+            const isNew = venueInfo?.isNew;
+            const isSprint = venueInfo?.sprint || race.Sprint || race.isSprint;
 
             return (
               <motion.div
+                id={`round-${race.round}`}
+                onMouseEnter={() => setHoveredRound(Number(race.round))}
+                onMouseLeave={() => setHoveredRound(null)}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.04, duration: 0.35 }}
                 key={race.round}
                 className={`rounded-xl border transition-all overflow-hidden ${
-                  isNext
-                    ? 'bg-[#1a1a1a] border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.12)]'
-                    : isPast
-                      ? 'bg-[#0a0a0a] border-[#1f1f1f] opacity-60'
-                      : 'bg-[#111111] border-[#1f1f1f] hover:border-[#333]'
+                  isHovered
+                    ? 'bg-[#111111] border-blue-500 border-l-4 shadow-[0_0_20px_rgba(59,130,246,0.15)]'
+                    : isNext
+                      ? 'bg-[#1a1a1a] border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.12)]'
+                      : isPast
+                        ? 'bg-[#0a0a0a] border-[#1f1f1f] opacity-60'
+                        : 'bg-[#111111] border-[#1f1f1f] hover:border-[#333]'
                 }`}
               >
                 {/* Card header */}
@@ -190,6 +236,14 @@ export default function CalendarPage() {
                       ROUND {race.round}
                     </span>
                     <div className="flex items-center gap-2">
+                      {isNew && (
+                        <Tag
+                          color="warning"
+                          className="m-0 border-none font-bold text-[10px] bg-amber-500/20 text-amber-400"
+                        >
+                          NEW
+                        </Tag>
+                      )}
                       {isSprint && (
                         <Tag
                           color="orange"
