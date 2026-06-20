@@ -31,6 +31,11 @@ export interface PrivacySettings {
   shareProfileData: boolean;
 }
 
+export interface DashboardSettings {
+  f1Preset: string;
+  footballPreset: string;
+}
+
 export interface AppSettings {
   appearance: {
     theme: Theme;
@@ -39,6 +44,7 @@ export interface AppSettings {
     animationSpeed: AnimationSpeed;
     sidebarAlwaysExpanded: boolean;
   };
+  dashboard: DashboardSettings;
   user: UserSettings;
   notifications: NotificationSettings;
   privacy: PrivacySettings;
@@ -51,6 +57,10 @@ const defaultSettings: AppSettings = {
     colorIntensity: "normal",
     animationSpeed: "normal",
     sidebarAlwaysExpanded: false,
+  },
+  dashboard: {
+    f1Preset: "live_focused",
+    footballPreset: "live_matches",
   },
   user: {
     displayName: "Guest User",
@@ -98,6 +108,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
           ...prev,
           ...parsed,
           appearance: { ...prev.appearance, ...(parsed.appearance || {}) },
+          dashboard: { ...prev.dashboard, ...(parsed.dashboard || {}) },
           user: { ...prev.user, ...(parsed.user || {}) },
           notifications: { ...prev.notifications, ...(parsed.notifications || {}) },
           privacy: { ...prev.privacy, ...(parsed.privacy || {}) },

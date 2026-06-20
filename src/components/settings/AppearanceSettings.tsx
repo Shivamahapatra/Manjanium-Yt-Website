@@ -4,6 +4,7 @@ import React from "react";
 import { useSettings, Theme, FontSize, ColorIntensity, AnimationSpeed } from "@/lib/settings-context";
 import { Monitor, Moon, Sun, Type, Zap, PaintBucket, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DashboardPresets } from "./DashboardPresets";
 
 export function AppearanceSettings() {
   const { settings, updateSettings } = useSettings();
@@ -182,6 +183,11 @@ export function AppearanceSettings() {
           </div>
         </div>
       </div>
+
+      <div className="h-[1px] w-full bg-white/10" />
+
+      {/* Dashboard Layout Presets */}
+      <DashboardPresets />
     </div>
   );
 }
