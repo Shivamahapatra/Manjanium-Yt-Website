@@ -26,6 +26,9 @@ import { formatGap, getTeamColor } from '@/lib/f1-helpers';
 import { LiveTimingTower } from '@/components/f1/LiveTimingTower';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/shadcn-tabs';
 import { cn } from '@/lib/utils';
+import { ChannelsBanner } from '@/components/social/ChannelsBanner';
+import { ChannelsGrid } from '@/components/social/ChannelsGrid';
+import { IconBrandTwitch, IconBrandYoutube, IconBrandDiscord, IconBrandX } from "@tabler/icons-react";
 
 /* ------------------------------------------------------------------ */
 /*  MAIN F1 HUB PAGE CONTENT                                          */
@@ -624,6 +627,51 @@ function F1HubContent() {
 
         </div>
       </Tabs>
+
+      {/* ===== F1 SOCIAL PROMO ===== */}
+      <div className="mt-16 flex flex-col gap-12 relative z-10 w-full">
+        <ChannelsBanner
+          title="Live Timing & Race Analysis"
+          description="Watch our real-time telemetry streams on Twitch. We cover every practice, qualifying, and race session with deep technical analysis."
+          icon={<IconBrandTwitch className="w-10 h-10 text-purple-400" />}
+          buttonText="Watch on Twitch"
+          url="#"
+          accentColor="bg-purple-600/20"
+        />
+
+        <div>
+          <h3 className="text-2xl font-bold text-white mb-6">Stay Updated</h3>
+          <ChannelsGrid channels={[
+            {
+              name: "YouTube",
+              description: "Race highlights, strategy breakdowns, and data analysis.",
+              icon: <IconBrandYoutube className="w-8 h-8" />,
+              followers: "100K",
+              buttonText: "Subscribe",
+              url: "https://www.youtube.com/@manjaniumonsofts67",
+              accentColor: "text-red-500 border-red-500/20 group-hover:border-red-500/50",
+            },
+            {
+              name: "Discord",
+              description: "Join the F1 community. Discuss live timing and strategy.",
+              icon: <IconBrandDiscord className="w-8 h-8" />,
+              followers: "5K",
+              buttonText: "Join Server",
+              url: "#",
+              accentColor: "text-indigo-400 border-indigo-400/20 group-hover:border-indigo-400/50",
+            },
+            {
+              name: "Twitter / X",
+              description: "Live session updates, penalties, and breaking news.",
+              icon: <IconBrandX className="w-8 h-8" />,
+              followers: "25K",
+              buttonText: "Follow",
+              url: "#",
+              accentColor: "text-neutral-200 border-neutral-200/20 group-hover:border-neutral-200/50",
+            }
+          ]} />
+        </div>
+      </div>
     </div>
   );
 }

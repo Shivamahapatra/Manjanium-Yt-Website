@@ -10,6 +10,9 @@ import { RefreshCw, AlertCircle, Clock, Trophy, Activity, Users, History, Medal 
 // Shadcn Tabs
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/shadcn-tabs";
 import { cn } from "@/lib/utils";
+import { ChannelsBanner } from '@/components/social/ChannelsBanner';
+import { ChannelsGrid } from '@/components/social/ChannelsGrid';
+import { IconBrandYoutube, IconBrandDiscord, IconBrandX } from "@tabler/icons-react";
 
 // Components
 import { GroupStandingsCard } from "@/components/football/GroupStandingsCard";
@@ -386,6 +389,51 @@ function FootballHubContent() {
 
         </div>
       </Tabs>
+
+      {/* ===== FOOTBALL SOCIAL PROMO ===== */}
+      <div className="mt-16 mb-8 flex flex-col gap-12 relative z-10 w-full">
+        <ChannelsBanner
+          title="World Cup Highlights"
+          description="Subscribe to our YouTube channel for exclusive match highlights, deep-dive tactical analysis, and World Cup predictions."
+          icon={<IconBrandYoutube className="w-10 h-10 text-red-500" />}
+          buttonText="Subscribe Now"
+          url="https://www.youtube.com/@manjaniumonsofts67"
+          accentColor="bg-red-600/20"
+        />
+
+        <div>
+          <h3 className="text-2xl font-bold text-white mb-6">Connect With Us</h3>
+          <ChannelsGrid channels={[
+            {
+              name: "Twitter / X",
+              description: "Live score updates, goal alerts, and breaking transfer news.",
+              icon: <IconBrandX className="w-8 h-8" />,
+              followers: "25K",
+              buttonText: "Follow",
+              url: "#",
+              accentColor: "text-neutral-200 border-neutral-200/20 group-hover:border-neutral-200/50",
+            },
+            {
+              name: "YouTube",
+              description: "Post-match analysis, player ratings, and weekly recaps.",
+              icon: <IconBrandYoutube className="w-8 h-8" />,
+              followers: "100K",
+              buttonText: "Subscribe",
+              url: "https://www.youtube.com/@manjaniumonsofts67",
+              accentColor: "text-red-500 border-red-500/20 group-hover:border-red-500/50",
+            },
+            {
+              name: "Discord",
+              description: "Join the Football community. Live match chat and debates.",
+              icon: <IconBrandDiscord className="w-8 h-8" />,
+              followers: "5K",
+              buttonText: "Join Server",
+              url: "#",
+              accentColor: "text-indigo-400 border-indigo-400/20 group-hover:border-indigo-400/50",
+            }
+          ]} />
+        </div>
+      </div>
 
       {/* Global Modals */}
       <PlayerStatsModal isOpen={selectedTeam !== null} team={selectedTeam} players={selectedTeam?.players || []} onClose={() => setSelectedTeam(null)} />

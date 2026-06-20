@@ -3,8 +3,19 @@
 import React, { useState, useEffect } from "react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconBrandYoutube, IconArrowRight } from "@tabler/icons-react";
+import { 
+  IconBrandYoutube, 
+  IconArrowRight,
+  IconBrandTwitch,
+  IconBrandDiscord,
+  IconBrandInstagram,
+  IconBrandTiktok,
+  IconBrandX,
+  IconBrandPinterest,
+  IconBrandReddit
+} from "@tabler/icons-react";
 import Link from "next/link";
+import { ChannelsGrid } from "@/components/social/ChannelsGrid";
 import { Activity, BarChart2, Trophy, Calendar, Rss, MapPin } from "lucide-react";
 
 import { Terminal } from "@/components/ui/terminal";
@@ -176,6 +187,80 @@ export default function HomePage() {
       accent: "neutral",
       textColor: "text-neutral-400",
       hoverBg: "bg-neutral-500/[0.1]",
+    },
+  ];
+
+  const socialChannels = [
+    {
+      name: "Twitch",
+      description: "Live F1 Telemetry & Analysis. Watch real-time data streams.",
+      icon: <IconBrandTwitch className="w-8 h-8" />,
+      followers: "50K",
+      buttonText: "Watch Live",
+      url: "#",
+      accentColor: "text-purple-500 border-purple-500/20 group-hover:border-purple-500/50",
+    },
+    {
+      name: "YouTube",
+      description: "Highlights & Deep Dives. Match replays and F1 analysis.",
+      icon: <IconBrandYoutube className="w-8 h-8" />,
+      followers: "100K",
+      buttonText: "Subscribe",
+      url: "https://www.youtube.com/@manjaniumonsofts67",
+      accentColor: "text-red-500 border-red-500/20 group-hover:border-red-500/50",
+    },
+    {
+      name: "Discord",
+      description: "Join Our Community. Chat with fans, discuss races and matches.",
+      icon: <IconBrandDiscord className="w-8 h-8" />,
+      followers: "5K",
+      buttonText: "Join Server",
+      url: "#",
+      accentColor: "text-indigo-400 border-indigo-400/20 group-hover:border-indigo-400/50",
+    },
+    {
+      name: "Twitter / X",
+      description: "Fast-paced updates, news flashes, and live commentary.",
+      icon: <IconBrandX className="w-8 h-8" />,
+      followers: "25K",
+      buttonText: "Follow",
+      url: "#",
+      accentColor: "text-neutral-200 border-neutral-200/20 group-hover:border-neutral-200/50",
+    },
+    {
+      name: "Instagram",
+      description: "Behind-the-scenes, paddock photos, and matchday vibes.",
+      icon: <IconBrandInstagram className="w-8 h-8" />,
+      followers: "75K",
+      buttonText: "Follow",
+      url: "#",
+      accentColor: "text-pink-500 border-pink-500/20 group-hover:border-pink-500/50",
+    },
+    {
+      name: "TikTok",
+      description: "Short clips, funny moments, and quick technical analysis.",
+      icon: <IconBrandTiktok className="w-8 h-8" />,
+      followers: "150K",
+      buttonText: "Follow",
+      url: "#",
+      accentColor: "text-teal-400 border-teal-400/20 group-hover:border-teal-400/50",
+    },
+    {
+      name: "Reddit",
+      description: "Deep technical discussions, strategy analysis, and memes.",
+      icon: <IconBrandReddit className="w-8 h-8" />,
+      followers: "10K",
+      buttonText: "Join Subreddit",
+      url: "#",
+      accentColor: "text-orange-500 border-orange-500/20 group-hover:border-orange-500/50",
+    },
+    {
+      name: "Pinterest",
+      description: "High-res wallpapers, data viz graphics, and car designs.",
+      icon: <IconBrandPinterest className="w-8 h-8" />,
+      buttonText: "Follow",
+      url: "#",
+      accentColor: "text-red-600 border-red-600/20 group-hover:border-red-600/50",
     },
   ];
 
@@ -372,7 +457,30 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* SECTION 4 — WORLD CUP STRIP */}
+      {/* SECTION 4 — SOCIAL CHANNELS */}
+      <div className="w-full bg-background py-24 border-t border-border relative z-10">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-block px-4 py-1.5 rounded-full bg-primary border border-border mb-4">
+              <span className="text-xs font-bold text-manjanium-gold tracking-widest uppercase">Community</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Follow Us on Social Media</h2>
+            <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
+              Join thousands of fans across our platforms. Live streams, updates, and community discussions.
+            </p>
+          </motion.div>
+
+          <ChannelsGrid channels={socialChannels} />
+        </div>
+      </div>
+
+      {/* SECTION 5 — WORLD CUP STRIP */}
       <motion.div 
         initial={{ opacity: 0, x: 100 }}
         whileInView={{ opacity: 1, x: 0 }}
