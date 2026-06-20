@@ -206,15 +206,16 @@ function IconContainer({
         <a href={href} className="block">
           <motion.div
             ref={ref}
-            style={{ width, height }}
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-            className="relative flex aspect-square items-center justify-center rounded-full transition-all duration-300"
-            style={{
+            style={{ 
+              width, 
+              height,
               backgroundColor: hovered ? "var(--color-primary)" : "rgba(15, 23, 42, 0.4)",
               boxShadow: hovered ? "0 0 15px rgba(251,191,36,0.4)" : "none",
               border: hovered ? "1px solid var(--color-accent)" : "1px solid transparent"
             }}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            className="relative flex aspect-square items-center justify-center rounded-full transition-all duration-300"
           >
             <AnimatePresence>
               {hovered && (
@@ -235,12 +236,13 @@ function IconContainer({
               )}
             </AnimatePresence>
             <motion.div
-              style={{ width: widthIcon, height: heightIcon }}
-              className="flex items-center justify-center"
-              style={{
+              style={{ 
+                width: widthIcon, 
+                height: heightIcon,
                 color: hovered ? "var(--color-accent)" : "var(--color-text-muted)",
                 transition: "color var(--transition-quick) ease-in-out"
               }}
+              className="flex items-center justify-center"
             >
               {icon}
             </motion.div>
@@ -250,15 +252,16 @@ function IconContainer({
         <button onClick={onClick} className="block cursor-pointer">
           <motion.div
             ref={ref}
-            style={{ width, height }}
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-            className="relative flex aspect-square items-center justify-center rounded-full transition-all duration-300"
-            style={{
+            style={{ 
+              width, 
+              height,
               backgroundColor: hovered ? "var(--color-primary)" : "rgba(15, 23, 42, 0.4)",
               boxShadow: hovered ? "0 0 15px rgba(251,191,36,0.4)" : "none",
               border: hovered ? "1px solid var(--color-accent)" : "1px solid transparent"
             }}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            className="relative flex aspect-square items-center justify-center rounded-full transition-all duration-300"
           >
             <AnimatePresence>
               {hovered && (
@@ -279,12 +282,13 @@ function IconContainer({
               )}
             </AnimatePresence>
             <motion.div
-              style={{ width: widthIcon, height: heightIcon }}
-              className="flex items-center justify-center"
-              style={{
+              style={{ 
+                width: widthIcon, 
+                height: heightIcon,
                 color: hovered ? "var(--color-accent)" : "var(--color-text-muted)",
                 transition: "color var(--transition-quick) ease-in-out"
               }}
+              className="flex items-center justify-center"
             >
               {icon}
             </motion.div>
