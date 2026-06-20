@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Zap, RotateCcw, BarChart2, Trophy, Calendar, Flag, Rss } from "lucide-react";
 
-export function F1SubNav() {
+function F1SubNavContent() {
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab') || 'live';
 
@@ -50,5 +50,13 @@ export function F1SubNav() {
         })}
       </nav>
     </div>
+  );
+}
+
+export function F1SubNav() {
+  return (
+    <Suspense fallback={<div className="w-full bg-[#111111] border-b border-[#1f1f1f] h-12 shrink-0"></div>}>
+      <F1SubNavContent />
+    </Suspense>
   );
 }
