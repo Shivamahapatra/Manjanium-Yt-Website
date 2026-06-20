@@ -250,6 +250,7 @@ export function F1LiveTab() {
       "united kingdom": "uk",
       "united states": "usa",
       "united states gp": "usa",
+      "united arab emirates": "uae",
     };
 
     const targetCountry = countryAliases[countryStr] || countryStr;

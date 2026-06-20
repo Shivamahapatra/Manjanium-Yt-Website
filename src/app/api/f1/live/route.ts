@@ -253,10 +253,16 @@ export async function GET(request: Request) {
 
       return {
         driverNumber: dNum,
+        driver_number: dNum,
         nameAcronym: driver.name_acronym || '',
+        name_acronym: driver.name_acronym || '',
         fullName: driver.full_name || '',
+        full_name: driver.full_name || '',
+        broadcast_name: driver.broadcast_name || driver.full_name || '',
         teamName: driver.team_name || '',
+        team_name: driver.team_name || '',
         teamColor: driver.team_colour || '3b82f6',
+        team_colour: driver.team_colour || '3b82f6',
         position: pos ? pos.position : 20,
         gapToLeader: intv ? intv.gap_to_leader : '-',
         interval: intv ? intv.interval : '-',
@@ -299,6 +305,8 @@ export async function GET(request: Request) {
     return NextResponse.json({
       drivers: unifiedDrivers,
       session: session || null,
+      positions: positions || [],
+      intervals: intervals || [],
     });
   } catch (error) {
     console.error("Live API route error:", error);
