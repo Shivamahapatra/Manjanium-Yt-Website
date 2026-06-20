@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { IconSettings, IconUser, IconMenu2, IconChevronDown } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
+import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs";
+import { dark } from '@clerk/themes';
 
 interface MainNavbarProps {
   currentSport?: "f1" | "football" | "other";
@@ -23,6 +25,7 @@ export function MainNavbar({
 }: MainNavbarProps) {
   const pathname = usePathname();
   const [isSportDropdownOpen, setIsSportDropdownOpen] = useState(false);
+  const { isSignedIn } = useAuth();
   
   // Attempt to use Sidebar context if available (it might fail if not wrapped, so we conditionally use it)
   let setOpenSidebar: any = null;
@@ -169,9 +172,32 @@ export function MainNavbar({
         </button>
 
         {/* User Avatar */}
-        <button className="w-8 h-8 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center overflow-hidden hover:border-neutral-500 transition-colors">
-          <IconUser className="w-4 h-4 text-neutral-400" />
-        </button>
+        {!isSignedIn ? (
+          <div className="flex items-center gap-2">
+            <SignInButton mode="modal">
+              <button className="hidden sm:block px-4 py-1.5 rounded-full text-sm font-medium text-white hover:bg-white/10 transition-colors border border-white/20">
+                Sign In
+              </button>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <button className="hidden sm:block px-4 py-1.5 rounded-full text-sm font-medium bg-manjanium-gold text-black hover:bg-manjanium-gold/90 transition-colors">
+                Sign Up
+              </button>
+            </SignUpButton>
+          </div>
+        ) : (
+          <UserButton 
+            appearance={{
+              elements: {
+                avatarBox: "w-8 h-8 rounded-full",
+                userButtonBox: "flex-row-reverse",
+                userButtonPopoverCard: "rounded-xl shadow-xl border border-white/10"
+              },
+              baseTheme: dark
+            }}
+            afterSignOutUrl="/"
+          />
+        )}
 
         {/* Mobile Hamburger (only visible when < lg) */}
         <button 
