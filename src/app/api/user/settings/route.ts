@@ -10,9 +10,9 @@ export async function GET() {
     }
 
     const { data, error } = await supabase
-      .from('user_customization')
+      .from('users_preferences')
       .select('*')
-      .eq('clerk_id', userId)
+      .eq('user_id', userId)
       .single();
 
     if (error) {
@@ -40,12 +40,12 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const { error } = await supabase
-      .from('user_customization')
+      .from('users_preferences')
       .upsert({ 
-         clerk_id: userId,
+         user_id: userId,
          ...body,
          updated_at: new Date().toISOString()
-      }, { onConflict: 'clerk_id' });
+      }, { onConflict: 'user_id' });
 
     if (error) throw error;
 

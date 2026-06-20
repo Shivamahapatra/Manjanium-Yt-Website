@@ -55,13 +55,13 @@ export async function POST(req: Request) {
     
     // Create default user settings in Supabase
     try {
-      const { error } = await supabase.from('user_customization').insert({
-        clerk_id: id,
+      const { error } = await supabase.from('users_preferences').insert({
+        user_id: id,
         theme: 'dark',
-        font_size: 'normal',
+        font_size: 'md',
         animation_speed: 'normal',
-        sidebar_state: 'expanded',
-        notifications_enabled: true,
+        sidebar_expanded: true,
+        notifications: { email: true, push: true, alerts: true },
         f1_dashboard_preset: 'live_focused',
         football_dashboard_preset: 'live_matches'
       })
