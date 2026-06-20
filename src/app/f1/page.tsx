@@ -3,13 +3,14 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Table, Tabs as AntTabs, Tag, Spin } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Radio, Activity, Trophy, Clock, BarChart2 } from 'lucide-react';
+import { Radio, Activity, Trophy, BarChart2 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip as RechartsTooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { TEAM_COLORS } from '@/lib/f1-types';
 import { formatGap, getTeamColor } from '@/lib/f1-helpers';
+import { LiveTimingTower } from '@/components/f1/LiveTimingTower';
 
 /* ------------------------------------------------------------------ */
 /*  MAIN F1 HUB PAGE                                                  */
@@ -159,106 +160,7 @@ export default function F1Hub() {
     return d?.name_acronym || String(driverNumber);
   };
 
-  // Fastest lap detection (look for any driver with fastest_lap flag)
-  const fastestLapDriver = positions.find((p) => p.fastest_lap)?.driver_number;
-
-  /* --------- Motion row for antd Table --------- */
-  const MotionRow = (props: any) => (
-    <motion.tr
-      {...props}
-      layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-    />
-  );
-
-  /* --------- Timing columns --------- */
-  const timingColumns = [
-    {
-      title: <span className="text-[#737373] text-xs">POS</span>,
-      dataIndex: 'position',
-      key: 'position',
-      width: 55,
-      render: (pos: number) => (
-        <span className="font-bold font-mono text-zinc-400 text-sm">P{pos}</span>
-      ),
-    },
-    {
-      title: <span className="text-[#737373] text-xs">DRIVER</span>,
-      dataIndex: 'driver_number',
-      key: 'driver',
-      render: (num: number) => {
-        const driver = driversMap[String(num)];
-        const teamColor = driver?.team_colour ? `#${driver.team_colour}` : '#3b82f6';
-        return (
-          <div className="flex items-center gap-2">
-            <div
-              className="w-[3px] h-8 rounded-sm shrink-0"
-              style={{ backgroundColor: teamColor }}
-            />
-            <div className="flex flex-col">
-              <span className="font-bold font-mono text-white text-sm leading-tight">
-                {driver?.name_acronym || num}
-              </span>
-              <span className="text-[10px] text-neutral-500 leading-tight">
-                {driver?.team_name || ''}
-              </span>
-            </div>
-          </div>
-        );
-      },
-    },
-    {
-      title: <span className="text-[#737373] text-xs">TEAM</span>,
-      dataIndex: 'driver_number',
-      key: 'team',
-      responsive: ['lg'] as any,
-      render: (num: number) => {
-        const driver = driversMap[String(num)];
-        return (
-          <span className="text-xs text-neutral-500 truncate">
-            {driver?.team_name || '—'}
-          </span>
-        );
-      },
-    },
-    {
-      title: <span className="text-[#737373] text-xs text-right block">GAP</span>,
-      dataIndex: 'gap_to_leader',
-      key: 'gap',
-      align: 'right' as const,
-      render: (gap: string, record: any) => {
-        const isFastest = record.driver_number === fastestLapDriver;
-        const isLeader = record.position === 1;
-        return (
-          <span
-            className={`font-mono text-xs font-semibold text-right block ${
-              isFastest
-                ? 'text-[#a855f7]'
-                : isLeader
-                  ? 'text-neutral-300'
-                  : 'text-neutral-400'
-            }`}
-          >
-            {isLeader ? 'LEADER' : gap}
-          </span>
-        );
-      },
-    },
-    {
-      title: <span className="text-[#737373] text-xs text-right block">INT</span>,
-      dataIndex: 'interval',
-      key: 'int',
-      align: 'right' as const,
-      render: (intv: string, record: any) => (
-        <span className="font-mono text-xs text-neutral-500 text-right block">
-          {record.position === 1 ? '—' : intv}
-        </span>
-      ),
-    },
-  ];
+  // Legacy Timing Columns and MotionRow removed as they are now handled by LiveTimingTower
 
   /* --------- Standing columns --------- */
   const standingColumns = [
@@ -443,43 +345,8 @@ export default function F1Hub() {
               children: (
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                   {/* TIMING TOWER — left 3 cols */}
-                  <div className="lg:col-span-3 bg-[#111111] border border-[#1f1f1f] rounded-xl overflow-hidden">
-                    <div className="flex items-center justify-between px-5 py-3 border-b border-[#1f1f1f]">
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-neutral-500" />
-                        <span className="text-sm font-bold text-white tracking-wide">
-                          Live Timing Tower
-                        </span>
-                      </div>
-                      <span className="text-xs text-neutral-500 font-mono">
-                        {isQuali
-                          ? 'Q1 / Q2 / Q3 Knockouts'
-                          : 'Live Interval Gaps'}
-                      </span>
-                    </div>
-
-                    {liveLoading && positions.length === 0 ? (
-                      <div className="flex items-center justify-center py-20">
-                        <Spin size="large" />
-                      </div>
-                    ) : (
-                      <div className="overflow-y-auto max-h-[700px] custom-scrollbar">
-                        <Table
-                          dataSource={positions}
-                          columns={timingColumns}
-                          pagination={false}
-                          rowKey="driver_number"
-                          className="manjanium-table [&_.ant-table]:!bg-transparent [&_.ant-table-thead_th]:!bg-[#0a0a0a] [&_.ant-table-thead_th]:!border-b-[#1f1f1f]"
-                          components={{ body: { row: MotionRow } }}
-                          size="small"
-                          rowClassName={(record) =>
-                            record.position === 1
-                              ? '!bg-[#1a1a1a]'
-                              : '!bg-[#111111]'
-                          }
-                        />
-                      </div>
-                    )}
+                  <div className="lg:col-span-3">
+                    <LiveTimingTower />
                   </div>
 
                   {/* TELEMETRY PANEL — right 2 cols */}
