@@ -115,13 +115,13 @@ export const GlobeComponent = React.memo(function GlobeComponent({
       // Arcs rendering
       globe
         .arcsData(data)
-        .arcStartLat((d: ArcData) => d.startLat)
-        .arcStartLng((d: ArcData) => d.startLng)
-        .arcEndLat((d: ArcData) => d.endLat)
-        .arcEndLng((d: ArcData) => d.endLng)
-        .arcColor((d: ArcData) => d.color || "#0ea5e9")
-        .arcAltitude((d: ArcData) => d.arcAlt || 0.3)
-        .arcStroke((d: ArcData) => d.stroke || 0.6)
+        .arcStartLat((d: object) => (d as ArcData).startLat)
+        .arcStartLng((d: object) => (d as ArcData).startLng)
+        .arcEndLat((d: object) => (d as ArcData).endLat)
+        .arcEndLng((d: object) => (d as ArcData).endLng)
+        .arcColor((d: object) => (d as ArcData).color || "#0ea5e9")
+        .arcAltitude((d: object) => (d as ArcData).arcAlt || 0.3)
+        .arcStroke((d: object) => (d as ArcData).stroke || 0.6)
         .arcDashLength(0.9)
         .arcDashGap(3)
         .arcDashAnimateTime(isMobile ? 600 : 1200);
@@ -129,9 +129,9 @@ export const GlobeComponent = React.memo(function GlobeComponent({
       // Markers on arc start/end points using memoized points
       globe
         .pointsData(points)
-        .pointLat((d: PointData) => d.lat)
-        .pointLng((d: PointData) => d.lng)
-        .pointColor((d: PointData) => d.color || "#ef4444")
+        .pointLat((d: object) => (d as PointData).lat)
+        .pointLng((d: object) => (d as PointData).lng)
+        .pointColor((d: object) => (d as PointData).color || "#ef4444")
         .pointAltitude(0.01)
         .pointRadius(0.8);
     }
