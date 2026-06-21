@@ -75,14 +75,14 @@ function WeatherWidget({ sessionKey }: { sessionKey: string }) {
     return () => clearInterval(interval);
   }, [sessionKey]);
 
-  if (loading) return <div className="text-neutral-500 font-mono text-xs p-4 bg-neutral-900 border border-neutral-800 rounded-xl">Loading Weather...</div>;
-  if (!weatherData) return <div className="text-neutral-500 font-mono text-xs p-4 bg-neutral-900 border border-neutral-800 rounded-xl">No Weather Data</div>;
+  if (loading) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">Loading Weather...</div>;
+  if (!weatherData) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">No Weather Data</div>;
 
   const isRaining = weatherData.rainfall === 1 || weatherData.rainfall === "1";
 
   return (
-    <div className="bg-[#111111] border border-[#1f1f1f] rounded-xl p-4 shadow-xl">
-      <h4 className="text-white font-bold text-xs mb-3 flex items-center gap-2 border-b border-[#1f1f1f] pb-2 uppercase tracking-wider">
+    <div className="bg-surface border border-border-color rounded-xl p-4 shadow-medium transition-colors">
+      <h4 className="text-text-primary font-bold text-xs mb-3 flex items-center gap-2 border-b border-border-color pb-2 uppercase tracking-wider">
         <CloudRain className="w-4 h-4 text-blue-400" />
         Track Weather Conditions
       </h4>
@@ -149,13 +149,13 @@ function RaceControlFeed({ sessionKey }: { sessionKey: string }) {
     return () => clearInterval(interval);
   }, [sessionKey]);
 
-  if (loading) return <div className="text-neutral-500 font-mono text-xs p-4 bg-neutral-900 border border-neutral-800 rounded-xl">Loading Feed...</div>;
-  if (messages.length === 0) return <div className="text-neutral-500 font-mono text-xs p-4 bg-neutral-900 border border-neutral-800 rounded-xl">No Messages</div>;
+  if (loading) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">Loading Feed...</div>;
+  if (messages.length === 0) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">No Messages</div>;
 
   return (
-    <div className="bg-[#111111] border border-[#1f1f1f] rounded-xl p-4 shadow-xl flex flex-col h-[320px]">
-      <h4 className="text-white font-bold text-xs mb-3 flex items-center gap-2 border-b border-[#1f1f1f] pb-2 uppercase tracking-wider shrink-0">
-        <Flag className="w-4 h-4 text-red-500 animate-pulse" />
+    <div className="bg-surface border border-border-color rounded-xl p-4 shadow-medium flex flex-col h-[320px] transition-colors">
+      <h4 className="text-text-primary font-bold text-xs mb-3 flex items-center gap-2 border-b border-border-color pb-2 uppercase tracking-wider shrink-0">
+        <Flag className="w-4 h-4 text-semantic-red animate-pulse" />
         Race Control Messages
       </h4>
       <div className="flex-1 overflow-y-auto space-y-2 pr-1 scrollbar-hide">
@@ -212,13 +212,13 @@ function TeamRadioPanel({ sessionKey }: { sessionKey: string }) {
     return () => clearInterval(interval);
   }, [sessionKey]);
 
-  if (loading) return <div className="text-neutral-500 font-mono text-xs p-4 bg-[#111111] border border-[#1f1f1f] rounded-xl">Loading Team Radio...</div>;
-  if (radioMsgs.length === 0) return <div className="text-neutral-500 font-mono text-xs p-4 bg-[#111111] border border-[#1f1f1f] rounded-xl">No Radio Transmissions</div>;
+  if (loading) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">Loading Team Radio...</div>;
+  if (radioMsgs.length === 0) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">No Radio Transmissions</div>;
 
   return (
-    <div className="bg-[#111111] border border-[#1f1f1f] rounded-xl p-4 shadow-xl">
-      <h4 className="text-white font-bold text-xs mb-3 flex items-center gap-2 border-b border-[#1f1f1f] pb-2 uppercase tracking-wider">
-        <Volume2 className="w-4 h-4 text-green-400" />
+    <div className="bg-surface border border-border-color rounded-xl p-4 shadow-medium transition-colors">
+      <h4 className="text-text-primary font-bold text-xs mb-3 flex items-center gap-2 border-b border-border-color pb-2 uppercase tracking-wider">
+        <Volume2 className="w-4 h-4 text-semantic-green" />
         Live Team Radio Transmissions
       </h4>
       <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
@@ -355,14 +355,14 @@ export function F1LiveTab() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a]">
+      <div className="flex items-center justify-center min-h-screen bg-bg-primary">
         <Spin size="large" />
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-8 min-h-screen bg-[#0a0a0a]">
+    <div className="p-4 md:p-8 min-h-screen bg-bg-primary transition-colors duration-200">
       <div className="max-w-7xl mx-auto">
         
         {/* Dual column responsive sidebar layout (65% / 35%) */}
@@ -378,23 +378,23 @@ export function F1LiveTab() {
           {preset.layout !== 'compact' && preset.timingSize !== 'large' && (
             <div className={`${preset.timingSize === 'medium' ? 'lg:col-span-1' : 'col-span-1'} space-y-6`}>
               {/* Live Globe container */}
-              <div className="bg-[#111111]/30 border border-[#1f1f1f] rounded-2xl p-4 flex flex-col items-center justify-center shadow-xl w-full">
-                <span className="text-xs text-neutral-500 font-mono uppercase tracking-wider block mb-4">
+              <div className="bg-surface/30 border border-border-color rounded-2xl p-4 flex flex-col items-center justify-center shadow-medium w-full transition-colors">
+                <span className="text-xs text-text-secondary font-mono uppercase tracking-wider block mb-4">
                   Live Circuit Focus
                 </span>
-                <div className="relative w-full aspect-square md:h-[320px] overflow-hidden rounded-full border border-neutral-800/30 bg-[#070714] flex items-center justify-center mb-4">
+                <div className="relative w-full aspect-square md:h-[320px] overflow-hidden rounded-full border border-border-color/30 bg-surface flex items-center justify-center mb-4 transition-colors">
                   <Globe globeConfig={globeConfig} data={globeArcs} />
                 </div>
 
                 {/* Info Card Below Globe */}
-                <div className="w-full mt-2 bg-neutral-900 border border-neutral-800 rounded-xl p-4 text-center shadow-xl">
+                <div className="w-full mt-2 bg-surface border border-border-color rounded-xl p-4 text-center shadow-medium transition-colors">
                   {currentVenue ? (
                     <>
                       <div className="text-5xl mb-2">{getCountryFlag(currentVenue.country)}</div>
-                      <div className="text-neutral-400 text-xs font-bold uppercase tracking-wider mb-1">
+                      <div className="text-text-secondary text-xs font-bold uppercase tracking-wider mb-1">
                         {currentVenue.country}
                       </div>
-                      <h4 className="text-white font-bold text-base leading-tight mb-3">
+                      <h4 className="text-text-primary font-bold text-base leading-tight mb-3">
                         {currentVenue.circuitName}
                       </h4>
 
@@ -436,8 +436,8 @@ export function F1LiveTab() {
 
         {preset.showTelemetry && (
           <div className="mt-8">
-            <h3 className="text-xl font-bold text-white mb-4">Live Telemetry</h3>
-            <div className="bg-[#111111] rounded-2xl border border-[#1f1f1f] p-4">
+            <h3 className="text-xl font-bold text-text-primary mb-4">Live Telemetry</h3>
+            <div className="bg-surface rounded-2xl border border-border-color p-4 shadow-medium transition-colors">
               <F1TelemetryTab />
             </div>
           </div>
@@ -445,8 +445,8 @@ export function F1LiveTab() {
 
         {preset.showStandings && (
           <div className="mt-8">
-            <h3 className="text-xl font-bold text-white mb-4">Current Standings</h3>
-            <div className="bg-[#111111] rounded-2xl border border-[#1f1f1f] p-4">
+            <h3 className="text-xl font-bold text-text-primary mb-4">Current Standings</h3>
+            <div className="bg-surface rounded-2xl border border-border-color p-4 shadow-medium transition-colors">
               <F1StandingsTab />
             </div>
           </div>

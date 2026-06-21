@@ -152,12 +152,12 @@ function FootballHubContent() {
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-3"
           >
-            <div className="w-1.5 h-8 bg-manjanium-gold rounded-full" />
-            <h1 className="text-3xl md:text-5xl font-black font-heading tracking-tight text-white drop-shadow-md">
+            <div className="w-1.5 h-8 bg-accent rounded-full shadow-[0_0_8px_var(--accent)]" />
+            <h1 className="text-3xl md:text-5xl font-black font-heading tracking-tight text-text-primary drop-shadow-md">
               Football Hub
             </h1>
           </motion.div>
-          <p className="text-sm md:text-base text-neutral-400 font-medium pl-4">
+          <p className="text-sm md:text-base text-text-secondary font-medium pl-4">
             FIFA World Cup 2026 Live Coverage
           </p>
         </div>
@@ -194,20 +194,20 @@ function FootballHubContent() {
         
         {/* Tab Navigation */}
         <div className="w-full overflow-x-auto scrollbar-hide pb-2 mb-6">
-          <TabsList className="bg-primary/50 border border-white/5 p-1 rounded-xl flex w-max sm:w-full sm:justify-start">
-            <TabsTrigger value="live" className="gap-2 px-6 rounded-lg data-[state=active]:bg-manjanium-gold data-[state=active]:text-black transition-all">
+          <TabsList className="bg-surface border border-border-color p-1 rounded-xl flex w-max sm:w-full sm:justify-start shadow-sm">
+            <TabsTrigger value="live" className="gap-2 px-6 rounded-lg data-[state=active]:bg-accent data-[state=active]:text-bg-primary data-[state=active]:shadow-md transition-all">
               <Activity className="w-4 h-4" /> LIVE MATCHES
             </TabsTrigger>
-            <TabsTrigger value="standings" className="gap-2 px-6 rounded-lg data-[state=active]:bg-manjanium-gold data-[state=active]:text-black transition-all">
+            <TabsTrigger value="standings" className="gap-2 px-6 rounded-lg data-[state=active]:bg-accent data-[state=active]:text-bg-primary data-[state=active]:shadow-md transition-all">
               <Trophy className="w-4 h-4" /> STANDINGS
             </TabsTrigger>
-            <TabsTrigger value="topScorers" className="gap-2 px-6 rounded-lg data-[state=active]:bg-manjanium-gold data-[state=active]:text-black transition-all">
+            <TabsTrigger value="topScorers" className="gap-2 px-6 rounded-lg data-[state=active]:bg-accent data-[state=active]:text-bg-primary data-[state=active]:shadow-md transition-all">
               <Medal className="w-4 h-4" /> TOP SCORERS
             </TabsTrigger>
-            <TabsTrigger value="playerSearch" className="gap-2 px-6 rounded-lg data-[state=active]:bg-manjanium-gold data-[state=active]:text-black transition-all">
+            <TabsTrigger value="playerSearch" className="gap-2 px-6 rounded-lg data-[state=active]:bg-accent data-[state=active]:text-bg-primary data-[state=active]:shadow-md transition-all">
               <Users className="w-4 h-4" /> PLAYER SEARCH
             </TabsTrigger>
-            <TabsTrigger value="pastMatches" className="gap-2 px-6 rounded-lg data-[state=active]:bg-manjanium-gold data-[state=active]:text-black transition-all">
+            <TabsTrigger value="pastMatches" className="gap-2 px-6 rounded-lg data-[state=active]:bg-accent data-[state=active]:text-bg-primary data-[state=active]:shadow-md transition-all">
               <History className="w-4 h-4" /> PAST MATCHES
             </TabsTrigger>
           </TabsList>
@@ -215,8 +215,8 @@ function FootballHubContent() {
 
         {/* Global Timestamp */}
         {activeTab !== 'live' && activeTab !== 'playerSearch' && activeTab !== 'pastMatches' && (
-          <div className="flex items-center gap-2 mb-6 text-xs text-neutral-400 font-medium px-2">
-            <Clock className="w-3.5 h-3.5 text-emerald-500" />
+          <div className="flex items-center gap-2 mb-6 text-xs text-text-secondary font-medium px-2">
+            <Clock className="w-3.5 h-3.5 text-semantic-green" />
             <span>Updates daily at 12:00 AM UTC</span>
           </div>
         )}
@@ -232,7 +232,7 @@ function FootballHubContent() {
                 {/* MATCHES COLUMN */}
                 {preset.showMatches && (
                   <div className={`${preset.layout === 'three-column' ? 'lg:col-span-2' : 'col-span-1'}`}>
-                    {preset.layout !== 'main-only' && <h3 className="text-xl font-bold text-white mb-4">Live Matches</h3>}
+                    {preset.layout !== 'main-only' && <h3 className="text-xl font-bold text-text-primary mb-4">Live Matches</h3>}
                     {loadingLive && fixtures.length === 0 ? (
                       <div className="flex justify-center items-center h-64">
                         <Spin size="large" />
@@ -254,56 +254,56 @@ function FootballHubContent() {
                               className="group"
                               onClick={() => router.push(`/football/matches/${fixture.id}`)}
                             >
-                              <div className="bg-primary border border-white/5 hover:border-manjanium-gold/50 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 shadow-lg hover:shadow-manjanium-gold/10 hover:-translate-y-1">
+                              <div className="bg-surface border border-border-color hover:border-accent/50 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 shadow-medium hover:shadow-[0_4px_20px_rgba(var(--accent-rgb),0.1)] hover:-translate-y-1 flex flex-col h-full">
                                 
                                 {/* Card Header */}
-                                <div className="bg-black/40 px-5 py-3 text-xs font-semibold text-neutral-400 flex justify-between items-center border-b border-white/5">
+                                <div className="bg-bg-primary/50 px-5 py-3 text-xs font-semibold text-text-secondary flex justify-between items-center border-b border-border-color">
                                   <span className="flex items-center gap-2">
                                     {league.logo && <img src={league.logo} alt={league.name} className="w-4 h-4 object-contain brightness-200" />}
                                     {league.name}
                                   </span>
-                                  <span className={cn("px-2 py-1 rounded-md bg-black/50 border", isMatchUpcoming ? "text-amber-500 border-amber-500/20" : "text-red-500 border-red-500/20 animate-pulse")}>
+                                  <span className={cn("px-2 py-1 rounded-md font-bold border", isMatchUpcoming ? "text-amber-500 border-amber-500/20 bg-amber-500/5" : "text-semantic-red border-red-500/20 bg-red-500/5 animate-pulse")}>
                                     {fixture.status.elapsed ? `${fixture.status.elapsed}'` : fixture.status.short}
                                   </span>
                                 </div>
                                 
                                 {/* Card Body */}
-                                <div className="p-6">
-                                  <div className="flex items-center justify-between mb-2">
+                                <div className="p-6 flex-1 flex flex-col justify-center">
+                                  <div className="flex items-center justify-between">
                                     {/* Home Team */}
-                                    <div className="flex flex-col items-center gap-3 w-[35%]">
-                                      <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/10 p-2 shadow-inner">
+                                    <div className="flex flex-col items-center gap-4 w-[35%]">
+                                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-bg-primary flex items-center justify-center border border-border-color p-3 shadow-inner transition-transform group-hover:scale-105">
                                         <img src={homeTeam?.logo || "/placeholder.png"} alt={homeTeam?.name} className="w-full h-full object-contain" />
                                       </div>
-                                      <span className="text-sm font-bold text-center text-white line-clamp-2">{homeTeam?.name}</span>
+                                      <span className="text-sm sm:text-base font-bold text-center text-text-primary line-clamp-2 leading-tight">{homeTeam?.name}</span>
                                     </div>
                                     
                                     {/* Score */}
                                     <div className="flex flex-col items-center justify-center w-[30%]">
                                       {isMatchUpcoming ? (
-                                        <div className="text-2xl font-bold text-neutral-400 text-center whitespace-nowrap font-mono">
+                                        <div className="text-xl sm:text-2xl font-bold text-text-secondary text-center whitespace-nowrap font-mono bg-bg-primary px-3 py-1.5 rounded-lg border border-border-color">
                                           {new Date(fixture.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </div>
                                       ) : (
-                                        <div className="text-4xl font-black font-mono text-manjanium-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">
-                                          {match.goals.home ?? 0} - {match.goals.away ?? 0}
+                                        <div className="text-3xl sm:text-5xl font-black font-mono text-accent drop-shadow-[0_0_12px_var(--accent)] tracking-tighter">
+                                          {match.goals.home ?? 0} <span className="text-text-secondary font-sans text-2xl mx-1">-</span> {match.goals.away ?? 0}
                                         </div>
                                       )}
                                     </div>
 
                                     {/* Away Team */}
-                                    <div className="flex flex-col items-center gap-3 w-[35%]">
-                                      <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/10 p-2 shadow-inner">
+                                    <div className="flex flex-col items-center gap-4 w-[35%]">
+                                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-bg-primary flex items-center justify-center border border-border-color p-3 shadow-inner transition-transform group-hover:scale-105">
                                         <img src={awayTeam?.logo || "/placeholder.png"} alt={awayTeam?.name} className="w-full h-full object-contain" />
                                       </div>
-                                      <span className="text-sm font-bold text-center text-white line-clamp-2">{awayTeam?.name}</span>
+                                      <span className="text-sm sm:text-base font-bold text-center text-text-primary line-clamp-2 leading-tight">{awayTeam?.name}</span>
                                     </div>
                                   </div>
                                 </div>
                                 
                                 {/* Card Footer */}
-                                <div className="bg-black/20 px-5 py-3 border-t border-white/5 text-xs flex justify-between items-center text-neutral-500">
-                                  <span className="truncate max-w-[70%]">{fixture.venue?.name || "TBD Stadium"}</span>
+                                <div className="bg-bg-primary/50 px-5 py-3 border-t border-border-color text-xs flex justify-between items-center text-text-secondary mt-auto">
+                                  <span className="truncate max-w-[70%] font-medium">{fixture.venue?.name || "TBD Stadium"}</span>
                                   <span className="whitespace-nowrap">{new Date(fixture.date).toLocaleDateString()}</span>
                                 </div>
                               </div>
@@ -312,9 +312,9 @@ function FootballHubContent() {
                         })}
                         
                         {!fixtures.length && !loadingLive && (
-                          <div className="col-span-full flex flex-col items-center justify-center h-64 border border-dashed border-white/10 rounded-2xl bg-black/20">
-                            <p className="text-neutral-400 text-lg font-medium mb-2">No matches scheduled right now.</p>
-                            <p className="text-sm text-neutral-500">Check back later for live updates.</p>
+                          <div className="col-span-full flex flex-col items-center justify-center h-64 border border-dashed border-border-color rounded-2xl bg-surface/50">
+                            <p className="text-text-secondary text-lg font-medium mb-2">No matches scheduled right now.</p>
+                            <p className="text-text-secondary/70 text-sm">Check back later for live updates.</p>
                           </div>
                         )}
                       </div>
@@ -325,23 +325,23 @@ function FootballHubContent() {
                 {/* STANDINGS COLUMN */}
                 {preset.showStandings && (
                   <div className="col-span-1">
-                    <h3 className="text-xl font-bold text-white mb-4">Current Standings</h3>
+                    <h3 className="text-xl font-bold text-text-primary mb-4">Current Standings</h3>
                     {loadingStandings ? (
                       <div className="flex justify-center p-8"><Spin /></div>
                     ) : standingsData && standingsData.groups && standingsData.groups.length > 0 ? (
-                      <div className="bg-[#111111] rounded-2xl border border-[#1f1f1f] p-4 max-h-[800px] overflow-y-auto custom-scrollbar">
+                      <div className="bg-surface rounded-2xl border border-border-color p-4 shadow-medium max-h-[800px] overflow-y-auto custom-scrollbar transition-colors">
                         <GroupStandingsCard 
                           groupData={standingsData.groups[0]} 
                           onTeamClick={(team) => setSelectedTeam(team)} 
                         />
                         {standingsData.groups.length > 1 && (
-                          <div className="mt-4 text-center text-xs text-neutral-500">
+                          <div className="mt-4 text-center text-xs text-text-secondary font-medium">
                             View Standings tab for all groups
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div className="text-neutral-500 p-4 bg-[#111111] border border-[#1f1f1f] rounded-xl text-sm">No standings data available</div>
+                      <div className="text-text-secondary p-4 bg-surface border border-border-color rounded-xl text-sm transition-colors">No standings data available</div>
                     )}
                   </div>
                 )}
@@ -349,8 +349,8 @@ function FootballHubContent() {
                 {/* STATS COLUMN */}
                 {preset.showStats && (
                   <div className="col-span-1">
-                    <h3 className="text-xl font-bold text-white mb-4">Top Scorers</h3>
-                    <div className="bg-[#111111] rounded-2xl border border-[#1f1f1f] p-4 h-[800px]">
+                    <h3 className="text-xl font-bold text-text-primary mb-4">Top Scorers</h3>
+                    <div className="bg-surface rounded-2xl border border-border-color p-4 h-[800px] shadow-medium transition-colors">
                        <TopScorersWidget 
                          scorers={getTopScorers(fixtures)} 
                          lastUpdated={standingsData?.lastUpdated || new Date().toISOString()} 

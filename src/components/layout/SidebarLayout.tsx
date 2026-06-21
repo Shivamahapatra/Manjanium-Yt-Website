@@ -17,27 +17,27 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
       label: "Home",
       href: "/",
       icon: (
-        <IconHome className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <IconHome className="text-text-secondary h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "F1 Telemetry",
       href: "/f1",
       icon: (
-        <IconCarCrash className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <IconCarCrash className="text-text-secondary h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "Football Center",
       href: "/football",
       icon: (
-        <IconBallFootball className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <IconBallFootball className="text-text-secondary h-5 w-5 flex-shrink-0" />
       ),
     },
   ];
 
   return (
-    <div className="flex h-screen w-full flex-col md:flex-row bg-neutral-100 dark:bg-[#0a0a0a] flex-1 mx-auto overflow-hidden">
+    <div className="flex h-screen w-full flex-col md:flex-row bg-bg-primary flex-1 mx-auto overflow-hidden">
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
@@ -48,16 +48,16 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div>
-            <div className="flex items-center gap-2 px-2 py-2 cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+            <div className="flex items-center gap-2 px-2 py-2 cursor-pointer hover:bg-surface rounded-md transition-colors" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
               {theme === "dark" ? (
-                <Sun className="h-5 w-5 text-neutral-200 flex-shrink-0" />
+                <Sun className="h-5 w-5 text-text-primary flex-shrink-0" />
               ) : (
-                <Moon className="h-5 w-5 text-neutral-700 flex-shrink-0" />
+                <Moon className="h-5 w-5 text-text-primary flex-shrink-0" />
               )}
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: open ? 1 : 0 }}
-                className="text-sm text-neutral-700 dark:text-neutral-200 whitespace-pre"
+                className="text-sm text-text-primary whitespace-pre"
               >
                 Toggle Theme
               </motion.span>
@@ -65,7 +65,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
           </div>
         </SidebarBody>
       </Sidebar>
-      <main className="flex-1 overflow-y-auto bg-white dark:bg-black pb-16 md:pb-0">
+      <main className="flex-1 overflow-y-auto bg-bg-primary pb-16 md:pb-0">
         {children}
       </main>
     </div>

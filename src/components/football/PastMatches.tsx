@@ -95,7 +95,7 @@ export function PastMatches({ matches, onMatchClick, isLoading }: PastMatchesPro
   return (
     <div className="flex flex-col gap-6">
       {/* Filters & Search Header */}
-      <div className="bg-white dark:bg-neutral-900 p-4 md:p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col gap-4">
+      <div className="bg-surface p-4 md:p-6 rounded-2xl shadow-medium border border-border-color flex flex-col gap-4 transition-colors">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
           <input 
@@ -103,48 +103,48 @@ export function PastMatches({ matches, onMatchClick, isLoading }: PastMatchesPro
             placeholder="Search by team name..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"
+            className="w-full pl-10 pr-4 py-3 bg-bg-primary border-none rounded-xl text-sm focus:ring-2 focus:ring-accent outline-none transition-all text-text-primary"
           />
         </div>
 
         <div className="flex flex-col md:flex-row gap-3">
-          <div className="flex-1 flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 px-3 py-2 rounded-xl">
+          <div className="flex-1 flex items-center gap-2 bg-bg-primary px-3 py-2 rounded-xl border border-border-color">
             <Filter className="w-4 h-4 text-neutral-500 shrink-0" />
             <select 
               value={selectedGroup} 
               onChange={(e) => setSelectedGroup(e.target.value)}
               className="w-full bg-transparent border-none text-sm outline-none cursor-pointer dark:text-neutral-200"
             >
-              <option value="All" className="dark:bg-neutral-800">All Stages</option>
+              <option value="All" className="bg-bg-primary">All Stages</option>
               {uniqueGroups.filter(g => g !== 'All').map(g => (
-                <option key={g} value={g} className="dark:bg-neutral-800">{g}</option>
+                <option key={g} value={g} className="bg-bg-primary">{g}</option>
               ))}
             </select>
           </div>
 
-          <div className="flex-1 flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 px-3 py-2 rounded-xl">
+          <div className="flex-1 flex items-center gap-2 bg-bg-primary px-3 py-2 rounded-xl border border-border-color">
             <Trophy className="w-4 h-4 text-neutral-500 shrink-0" />
             <select 
               value={selectedTeam} 
               onChange={(e) => setSelectedTeam(e.target.value)}
-              className="w-full bg-transparent border-none text-sm outline-none cursor-pointer dark:text-neutral-200"
+              className="w-full bg-transparent border-none text-sm outline-none cursor-pointer text-text-primary"
             >
-              <option value="All" className="dark:bg-neutral-800">All Teams</option>
+              <option value="All" className="bg-bg-primary">All Teams</option>
               {uniqueTeams.filter(t => t !== 'All').map(t => (
-                <option key={t} value={t} className="dark:bg-neutral-800">{t}</option>
+                <option key={t} value={t} className="bg-bg-primary">{t}</option>
               ))}
             </select>
           </div>
 
-          <div className="flex-1 flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 px-3 py-2 rounded-xl">
+          <div className="flex-1 flex items-center gap-2 bg-bg-primary px-3 py-2 rounded-xl border border-border-color">
             <Calendar className="w-4 h-4 text-neutral-500 shrink-0" />
             <select 
               value={sortOrder} 
               onChange={(e) => setSortOrder(e.target.value as any)}
-              className="w-full bg-transparent border-none text-sm outline-none cursor-pointer dark:text-neutral-200"
+              className="w-full bg-transparent border-none text-sm outline-none cursor-pointer text-text-primary"
             >
-              <option value="newest" className="dark:bg-neutral-800">Newest First</option>
-              <option value="oldest" className="dark:bg-neutral-800">Oldest First</option>
+              <option value="newest" className="bg-bg-primary">Newest First</option>
+              <option value="oldest" className="bg-bg-primary">Oldest First</option>
             </select>
           </div>
         </div>
@@ -152,13 +152,13 @@ export function PastMatches({ matches, onMatchClick, isLoading }: PastMatchesPro
 
       {/* Matches List */}
       {filteredMatches.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 text-center">
-          <Search className="w-12 h-12 text-neutral-300 mb-4" />
-          <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-200 mb-2">No matches found</h3>
-          <p className="text-neutral-500 text-sm mb-6 max-w-md">We couldn't find any past matches matching your current filter criteria.</p>
+        <div className="flex flex-col items-center justify-center p-12 bg-surface rounded-2xl border border-border-color text-center shadow-medium transition-colors">
+          <Search className="w-12 h-12 text-text-secondary mb-4" />
+          <h3 className="text-lg font-bold text-text-primary mb-2">No matches found</h3>
+          <p className="text-text-secondary text-sm mb-6 max-w-md">We couldn't find any past matches matching your current filter criteria.</p>
           <button 
             onClick={clearFilters}
-            className="flex items-center gap-2 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+            className="flex items-center gap-2 bg-bg-primary hover:bg-bg-primary/80 px-4 py-2 rounded-lg font-medium transition-colors text-sm text-text-primary border border-border-color"
           >
             <X className="w-4 h-4" /> Clear Filters
           </button>
@@ -174,16 +174,16 @@ export function PastMatches({ matches, onMatchClick, isLoading }: PastMatchesPro
                 exit={{ opacity: 0, scale: 0.95 }}
                 key={match.id}
                 onClick={() => onMatchClick(match)}
-                className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all group"
+                className="bg-surface border border-border-color hover:border-accent rounded-2xl overflow-hidden cursor-pointer shadow-medium hover:shadow-[0_4px_20px_rgba(var(--accent-rgb),0.1)] transition-all group"
               >
                 {/* Match Header */}
-                <div className="bg-neutral-50 dark:bg-neutral-800/50 px-4 py-2.5 flex justify-between items-center text-xs font-semibold text-neutral-500 border-b border-neutral-200 dark:border-neutral-800">
+                <div className="bg-bg-primary/50 px-4 py-2.5 flex justify-between items-center text-xs font-semibold text-text-secondary border-b border-border-color">
                   <span className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5" />
                     {new Date(match.kickoffTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
                   </span>
-                  <span className="flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300 bg-neutral-200 dark:bg-neutral-700 px-2 py-0.5 rounded-sm">
-                    <CheckCircle2 className="w-3 h-3 text-green-500" />
+                  <span className="flex items-center gap-1.5 text-text-primary bg-bg-primary px-2 py-0.5 rounded-sm border border-border-color">
+                    <CheckCircle2 className="w-3 h-3 text-semantic-green" />
                     FULL TIME
                   </span>
                 </div>
@@ -193,29 +193,29 @@ export function PastMatches({ matches, onMatchClick, isLoading }: PastMatchesPro
                   {/* Home */}
                   <div className="flex items-center gap-4 flex-1">
                     <img src={match.homeTeam.logo || '/placeholder.png'} loading="lazy" alt="home" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
-                    <span className="text-lg md:text-xl font-bold flex-1">{match.homeTeam.name}</span>
-                    <span className={`text-3xl md:text-4xl font-black tabular-nums w-12 text-center ${match.homeTeam.score > match.awayTeam.score ? 'text-blue-600 dark:text-blue-500' : ''}`}>
+                    <span className="text-lg md:text-xl font-bold flex-1 text-text-primary">{match.homeTeam.name}</span>
+                    <span className={`text-3xl md:text-4xl font-black tabular-nums w-12 text-center ${match.homeTeam.score > match.awayTeam.score ? 'text-accent' : 'text-text-primary'}`}>
                       {match.homeTeam.score}
                     </span>
                   </div>
 
-                  <div className="hidden md:flex text-neutral-300 dark:text-neutral-700 font-black px-4">
+                  <div className="hidden md:flex text-text-secondary font-black px-4">
                     -
                   </div>
 
                   {/* Away */}
                   <div className="flex items-center gap-4 flex-1 flex-row-reverse md:flex-row">
-                    <span className={`text-3xl md:text-4xl font-black tabular-nums w-12 text-center ${match.awayTeam.score > match.homeTeam.score ? 'text-blue-600 dark:text-blue-500' : ''}`}>
+                    <span className={`text-3xl md:text-4xl font-black tabular-nums w-12 text-center ${match.awayTeam.score > match.homeTeam.score ? 'text-accent' : 'text-text-primary'}`}>
                       {match.awayTeam.score}
                     </span>
-                    <span className="text-lg md:text-xl font-bold flex-1 text-right md:text-left">{match.awayTeam.name}</span>
+                    <span className="text-lg md:text-xl font-bold flex-1 text-right md:text-left text-text-primary">{match.awayTeam.name}</span>
                     <img src={match.awayTeam.logo || '/placeholder.png'} loading="lazy" alt="away" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
                   </div>
                 </div>
 
                 {/* Goal Scorers (If any) */}
                 {match.goalScorers && match.goalScorers.length > 0 && (
-                  <div className="px-5 md:px-6 pb-4 flex flex-col md:flex-row justify-between text-xs text-neutral-500 gap-2">
+                  <div className="px-5 md:px-6 pb-4 flex flex-col md:flex-row justify-between text-xs text-text-secondary gap-2">
                     <div className="flex-1 flex flex-wrap gap-x-2">
                       {match.goalScorers.filter(g => g.team === match.homeTeam.name).map((g, i) => (
                         <span key={i} className="flex items-center gap-1">
@@ -234,12 +234,12 @@ export function PastMatches({ matches, onMatchClick, isLoading }: PastMatchesPro
                 )}
 
                 {/* Footer Info */}
-                <div className="bg-neutral-50 dark:bg-black/20 px-5 md:px-6 py-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-xs text-neutral-400">
+                <div className="bg-bg-primary/50 px-5 md:px-6 py-3 border-t border-border-color flex justify-between items-center text-xs text-text-secondary">
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5" /> {match.group}</span>
                     <span className="hidden md:flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {match.venue}</span>
                   </div>
-                  <span className="group-hover:text-blue-500 font-bold flex items-center gap-1 transition-colors">
+                  <span className="group-hover:text-accent font-bold flex items-center gap-1 transition-colors">
                     View Match <ChevronRight className="w-3 h-3" />
                   </span>
                 </div>
@@ -250,7 +250,7 @@ export function PastMatches({ matches, onMatchClick, isLoading }: PastMatchesPro
           {visibleCount < filteredMatches.length && (
             <button 
               onClick={handleLoadMore}
-              className="mt-4 py-3 w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl font-bold text-sm text-blue-600 dark:text-blue-500 transition-colors shadow-sm"
+              className="mt-4 py-3 w-full bg-surface border border-border-color hover:bg-bg-primary rounded-xl font-bold text-sm text-accent transition-colors shadow-medium"
             >
               Load More Matches ({filteredMatches.length - visibleCount} remaining)
             </button>

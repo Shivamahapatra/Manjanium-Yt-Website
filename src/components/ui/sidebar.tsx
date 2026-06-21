@@ -83,13 +83,10 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col flex-shrink-0 z-40 border-r-[1px]",
+        "h-full px-4 py-4 hidden md:flex md:flex-col flex-shrink-0 z-40 border-r border-border-color bg-surface shadow-subtle",
         className
       )}
       style={{
-        background: "linear-gradient(to bottom, var(--color-primary), #050b14)",
-        borderColor: "var(--color-accent)",
-        boxShadow: "var(--shadow-subtle)",
         transition: "width var(--transition-standard) cubic-bezier(0.4, 0, 0.2, 1)"
       }}
       animate={{
@@ -127,12 +124,7 @@ export const MobileSidebar = ({
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="fixed inset-y-0 left-0 w-[240px] z-[3010] flex flex-col h-full overflow-y-auto border-r-[1px]"
-              style={{
-                background: "linear-gradient(to bottom, var(--color-primary), #050b14)",
-                borderColor: "var(--color-accent)",
-                boxShadow: "var(--shadow-deep)"
-              }}
+              className="fixed inset-y-0 left-0 w-[240px] z-[3010] flex flex-col h-full overflow-y-auto border-r border-border-color bg-surface shadow-deep"
             >
               {children}
             </motion.div>
@@ -161,15 +153,12 @@ export const SidebarLink = ({
     <Link
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2 px-2 rounded-lg transition-all duration-300",
+        "flex items-center justify-start gap-2 group/sidebar py-2 px-2 rounded-lg transition-all duration-200 text-text-secondary hover:text-text-primary hover:bg-bg-primary hover:scale-[1.02]",
         className
       )}
-      style={{
-        color: "var(--color-text-muted)"
-      }}
       {...props}
     >
-      <div className="group-hover/sidebar:text-[var(--color-accent)] transition-colors">
+      <div className="group-hover/sidebar:text-accent transition-colors">
         {link.icon}
       </div>
 
@@ -178,7 +167,7 @@ export const SidebarLink = ({
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-sm group-hover/sidebar:text-white transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        className="text-sm font-medium transition duration-150 whitespace-pre inline-block !p-0 !m-0"
       >
         {link.label}
       </motion.span>

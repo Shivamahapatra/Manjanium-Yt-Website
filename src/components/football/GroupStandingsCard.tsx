@@ -54,18 +54,18 @@ export function GroupStandingsCard({
   };
 
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden flex flex-col w-full shadow-lg">
+    <div className="bg-surface border border-border-color rounded-xl overflow-hidden flex flex-col w-full shadow-medium transition-colors">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex justify-between items-center px-4 py-3 bg-neutral-800/40 hover:bg-neutral-800/80 transition-colors"
+        className="w-full flex justify-between items-center px-4 py-3 bg-bg-primary/40 hover:bg-bg-primary/80 transition-colors"
       >
-        <h3 className="text-lg font-bold text-neutral-100 uppercase tracking-wider">
+        <h3 className="text-lg font-bold text-text-primary uppercase tracking-wider">
           {groupData.groupName}
         </h3>
         {isExpanded ? (
-          <ChevronUp className="w-5 h-5 text-neutral-400" />
+          <ChevronUp className="w-5 h-5 text-text-secondary" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-neutral-400" />
+          <ChevronDown className="w-5 h-5 text-text-secondary" />
         )}
       </button>
 
@@ -79,8 +79,8 @@ export function GroupStandingsCard({
             className="overflow-hidden"
           >
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left text-neutral-300">
-                <thead className="text-[11px] text-neutral-400 uppercase bg-neutral-950/50 border-b border-neutral-800">
+              <table className="w-full text-sm text-left text-text-secondary">
+                <thead className="text-[11px] text-text-secondary uppercase bg-bg-primary/50 border-b border-border-color">
                   <tr>
                     <th scope="col" className="px-3 py-2 w-8 text-center font-semibold tracking-wider">#</th>
                     <th scope="col" className="px-3 py-2 font-semibold tracking-wider">Team</th>
@@ -91,10 +91,10 @@ export function GroupStandingsCard({
                     <th scope="col" className="px-2 py-2 text-center font-semibold tracking-wider hidden sm:table-cell">GF</th>
                     <th scope="col" className="px-2 py-2 text-center font-semibold tracking-wider hidden sm:table-cell">GA</th>
                     <th scope="col" className="px-2 py-2 text-center font-semibold tracking-wider">GD</th>
-                    <th scope="col" className="px-3 py-2 text-center font-bold tracking-wider text-neutral-200">Pts</th>
+                    <th scope="col" className="px-3 py-2 text-center font-bold tracking-wider text-text-primary">Pts</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-800/30">
+                <tbody className="divide-y divide-border-color">
                   {groupData?.teams && groupData.teams.length > 0 ? (
                     groupData.teams.map((team, index) => (
                       <motion.tr
@@ -103,10 +103,10 @@ export function GroupStandingsCard({
                         onClick={() => onTeamClick && onTeamClick(team)}
                         className={`cursor-pointer transition-colors ${getStatusColor(team?.qualification || 'contending', index)}`}
                       >
-                        <td className="px-3 py-3 text-center text-xs font-semibold text-neutral-400">
+                        <td className="px-3 py-3 text-center text-xs font-semibold text-text-secondary">
                           {index + 1}
                         </td>
-                        <td className="px-3 py-3 font-medium text-neutral-100 flex items-center gap-2">
+                        <td className="px-3 py-3 font-medium text-text-primary flex items-center gap-2">
                           {team?.logo && (
                             <img 
                               src={team.logo} 
@@ -120,21 +120,21 @@ export function GroupStandingsCard({
                           )}
                           <span className="truncate max-w-[110px] sm:max-w-none">{team?.name || 'Unknown Team'}</span>
                         </td>
-                        <td className="px-2 py-3 text-center text-neutral-300">{team?.played || 0}</td>
-                        <td className="px-2 py-3 text-center text-neutral-300">{team?.wins || 0}</td>
-                        <td className="px-2 py-3 text-center text-neutral-300">{team?.draws || 0}</td>
-                        <td className="px-2 py-3 text-center text-neutral-300">{team?.losses || 0}</td>
-                        <td className="px-2 py-3 text-center text-neutral-300 hidden sm:table-cell">{team?.goalsFor || 0}</td>
-                        <td className="px-2 py-3 text-center text-neutral-300 hidden sm:table-cell">{team?.goalsAgainst || 0}</td>
-                        <td className="px-2 py-3 text-center text-neutral-300">
+                        <td className="px-2 py-3 text-center text-text-secondary">{team?.played || 0}</td>
+                        <td className="px-2 py-3 text-center text-text-secondary">{team?.wins || 0}</td>
+                        <td className="px-2 py-3 text-center text-text-secondary">{team?.draws || 0}</td>
+                        <td className="px-2 py-3 text-center text-text-secondary">{team?.losses || 0}</td>
+                        <td className="px-2 py-3 text-center text-text-secondary hidden sm:table-cell">{team?.goalsFor || 0}</td>
+                        <td className="px-2 py-3 text-center text-text-secondary hidden sm:table-cell">{team?.goalsAgainst || 0}</td>
+                        <td className="px-2 py-3 text-center text-text-secondary">
                           {team?.goalDifference > 0 ? `+${team.goalDifference}` : (team?.goalDifference || 0)}
                         </td>
-                        <td className="px-3 py-3 text-center font-bold text-white bg-neutral-900/20">{team?.points || 0}</td>
+                        <td className="px-3 py-3 text-center font-bold text-text-primary bg-bg-primary/20">{team?.points || 0}</td>
                       </motion.tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={10} className="px-3 py-6 text-center text-neutral-500">
+                      <td colSpan={10} className="px-3 py-6 text-center text-text-secondary">
                         No teams available in this group.
                       </td>
                     </tr>

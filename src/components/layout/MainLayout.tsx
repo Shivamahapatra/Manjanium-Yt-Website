@@ -80,7 +80,18 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       <div className="flex-1 pt-16 relative z-10 w-full h-[100dvh]">
         <SportsSidebar>
           <main id="main-content" className="w-full h-full pb-24 md:pb-6 relative z-10 overflow-x-hidden">
-            {children}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={pathname}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="w-full h-full"
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
           </main>
         </SportsSidebar>
       </div>

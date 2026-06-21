@@ -52,18 +52,17 @@ export function MainNavbar({
       transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
       className={cn(
         "fixed top-0 left-0 right-0 z-[5000] w-full h-16",
-        "bg-gradient-to-r from-background via-primary to-background",
-        "border-b border-manjanium-gold/20 backdrop-blur-md shadow-md",
+        "bg-bg-primary/80 backdrop-blur-lg border-b border-border-color shadow-sm transition-colors duration-200",
         "flex items-center justify-between px-4 md:px-8"
       )}
     >
       {/* LEFT SECTION: Logo & Sports Selector */}
       <div className="flex items-center gap-6">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 bg-manjanium-navy rounded flex items-center justify-center border border-white/10 group-hover:border-manjanium-gold/50 transition-colors">
-            <span className="text-white font-bold text-lg leading-none">M</span>
+          <div className="w-8 h-8 bg-surface rounded-lg flex items-center justify-center border border-border-color group-hover:border-accent transition-colors shadow-sm">
+            <span className="text-text-primary font-bold text-lg leading-none">M</span>
           </div>
-          <span className="hidden sm:block text-white font-heading font-bold tracking-widest text-lg">
+          <span className="hidden sm:block text-text-primary font-heading font-bold tracking-widest text-lg">
             MANJANIUM
           </span>
         </Link>
@@ -72,12 +71,12 @@ export function MainNavbar({
         <div className="relative">
           <button
             onClick={() => setIsSportDropdownOpen(!isSportDropdownOpen)}
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-sm font-medium"
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface hover:bg-surface/80 border border-border-color transition-colors text-sm font-medium shadow-sm"
           >
-            <span className={cn(currentSport === "f1" ? "text-manjanium-gold" : "text-neutral-300")}>
+            <span className={cn(currentSport === "f1" ? "text-semantic-red" : currentSport === "football" ? "text-semantic-green" : "text-text-secondary")}>
               {currentSport === "f1" ? "F1" : currentSport === "football" ? "FOOTBALL" : "OTHER"}
             </span>
-            <IconChevronDown className={cn("w-4 h-4 text-neutral-400 transition-transform", isSportDropdownOpen && "rotate-180")} />
+            <IconChevronDown className={cn("w-4 h-4 text-text-secondary transition-transform", isSportDropdownOpen && "rotate-180")} />
           </button>
 
           <AnimatePresence>
@@ -87,7 +86,7 @@ export function MainNavbar({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                className="absolute top-full left-0 mt-2 w-40 bg-primary border border-white/10 rounded-xl shadow-xl overflow-hidden flex flex-col py-1"
+                className="absolute top-full left-0 mt-2 w-40 bg-surface border border-border-color rounded-xl shadow-md overflow-hidden flex flex-col py-1"
               >
                 {["f1", "football", "other"].map((sport) => (
                   <button
@@ -97,8 +96,8 @@ export function MainNavbar({
                       setIsSportDropdownOpen(false);
                     }}
                     className={cn(
-                      "px-4 py-2 text-left text-sm hover:bg-white/5 transition-colors font-medium",
-                      currentSport === sport ? "text-manjanium-gold bg-manjanium-gold/5" : "text-neutral-300"
+                      "px-4 py-2 text-left text-sm hover:bg-bg-primary transition-colors font-medium",
+                      currentSport === sport ? "text-accent" : "text-text-secondary hover:text-text-primary"
                     )}
                   >
                     {sport.toUpperCase()}
@@ -122,7 +121,7 @@ export function MainNavbar({
                 transition={{ delay: idx * 0.1, duration: 0.3 }}
                 className={cn(
                   "text-sm font-semibold transition-colors duration-150 z-10 relative",
-                  isActive ? "text-white" : "text-neutral-400 group-hover:text-neutral-200"
+                  isActive ? "text-text-primary" : "text-text-secondary group-hover:text-text-primary"
                 )}
               >
                 {link.name}
@@ -132,12 +131,12 @@ export function MainNavbar({
               {isActive && (
                 <motion.div
                   layoutId="activeNavIndicator"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-manjanium-gold shadow-[0_0_10px_rgba(251,191,36,0.8)]"
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent shadow-[0_0_8px_var(--accent)]"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
               {!isActive && (
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-manjanium-gold/50 transition-all duration-300 group-hover:w-full opacity-0 group-hover:opacity-100" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-accent/50 transition-all duration-300 group-hover:w-full opacity-0 group-hover:opacity-100" />
               )}
             </Link>
           );
@@ -150,13 +149,13 @@ export function MainNavbar({
         {liveMatchCount > 0 && (
           <button 
             onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-semantic-red/10 border border-semantic-red/20 hover:bg-semantic-red/20 transition-colors group"
           >
-            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
-            <span className="text-xs font-bold text-red-400 tracking-wider hidden sm:block">
+            <div className="w-2 h-2 rounded-full bg-semantic-red animate-pulse shadow-[0_0_8px_var(--semantic-red)]" />
+            <span className="text-xs font-bold text-semantic-red tracking-wider hidden sm:block">
               {liveMatchCount} LIVE MATCHES
             </span>
-            <span className="text-xs font-bold text-red-400 tracking-wider sm:hidden">
+            <span className="text-xs font-bold text-semantic-red tracking-wider sm:hidden">
               LIVE
             </span>
           </button>
@@ -165,21 +164,21 @@ export function MainNavbar({
         {/* Settings Icon */}
         <button 
           onClick={onSettingsClick}
-          className="p-2 text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-white/5 hidden sm:block"
+          className="p-2 text-text-secondary hover:text-text-primary transition-colors rounded-full hover:bg-surface hidden sm:block"
         >
-          <IconSettings className="w-5 h-5" />
+          <IconSettings className="w-5 h-5 transition-transform hover:rotate-45" />
         </button>
 
         {/* User Avatar */}
         {!isSignedIn ? (
           <div className="flex items-center gap-2">
             <SignInButton mode="modal">
-              <button className="hidden sm:block px-4 py-1.5 rounded-lg text-sm font-medium text-white hover:bg-white/10 transition-colors border border-white/20">
+              <button className="hidden sm:block px-4 py-1.5 rounded-lg text-sm font-medium text-text-primary hover:bg-surface transition-colors border border-border-color shadow-sm">
                 Sign In
               </button>
             </SignInButton>
             <SignUpButton mode="modal">
-              <button className="hidden sm:block px-4 py-1.5 rounded-lg text-sm font-medium bg-manjanium-gold text-black hover:bg-manjanium-gold/90 transition-colors">
+              <button className="hidden sm:block px-4 py-1.5 rounded-lg text-sm font-medium bg-accent text-white hover:opacity-90 transition-opacity shadow-sm">
                 Sign Up
               </button>
             </SignUpButton>
@@ -190,7 +189,7 @@ export function MainNavbar({
               elements: {
                 avatarBox: "w-8 h-8 rounded-full",
                 userButtonBox: "flex-row-reverse",
-                userButtonPopoverCard: "rounded-xl shadow-xl border border-white/10"
+                userButtonPopoverCard: "rounded-xl shadow-md border border-border-color bg-surface"
               }
             }}
           />
@@ -198,7 +197,7 @@ export function MainNavbar({
 
         {/* Mobile Hamburger (only visible when < lg) */}
         <button 
-          className="lg:hidden p-2 text-neutral-400 hover:text-white"
+          className="lg:hidden p-2 text-text-secondary hover:text-text-primary hover:bg-surface rounded-full transition-colors"
           onClick={() => setOpenSidebar?.(!isSidebarOpen)}
         >
           <IconMenu2 className="w-6 h-6" />

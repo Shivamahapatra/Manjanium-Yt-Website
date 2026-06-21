@@ -79,7 +79,7 @@
   }
 }
 
-:root {
+:root, :root[data-theme="light"] {
   /* Global Appearance Variables */
   --font-size-sm: 12px;
   --font-size-md: 14px;
@@ -91,12 +91,17 @@
   --animation-duration-fast: 0.15s;
   --animation-duration: var(--animation-duration-normal);
 
-  /* Manjanium Design System Variables */
-  --color-primary: #0f172a;
-  --color-accent: #fbbf24;
-  --color-secondary: #0ea5e9;
-  --color-text: #f1f5f9;
-  --color-text-muted: #94a3b8;
+  /* Manjanium Design System Variables - Light Mode */
+  --bg-primary: #f8f9fa;
+  --bg-surface: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --border-color: #e5e7eb;
+  --accent: #d97706;
+  --semantic-red: #dc2626;
+  --semantic-blue: #2563eb;
+  --semantic-green: #059669;
+
   --transition-quick: 150ms;
   --transition-standard: 300ms;
   --shadow-subtle: 0 1px 3px rgba(0,0,0,0.12);
@@ -135,7 +140,6 @@
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
@@ -157,7 +161,18 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-.dark {
+.dark, :root[data-theme="dark"] {
+  /* Manjanium Design System Variables - Dark Mode */
+  --bg-primary: #0a0a0a;
+  --bg-surface: #111111;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --border-color: #2a2a2a;
+  --accent: #fbbf24;
+  --semantic-red: #ef4444;
+  --semantic-blue: #3b82f6;
+  --semantic-green: #10b981;
+
   /* F1 Accent */
   --f1-red: #E10600;
   --f1-red-hover: #ff3333;
@@ -190,7 +205,6 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -216,7 +230,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-bg-primary text-text-primary transition-colors duration-200 ease-in-out;
     font-size: var(--font-size);
   }
   html {
