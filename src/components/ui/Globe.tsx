@@ -15,6 +15,8 @@ import { ArcData, PointData, GeoJsonFeature, GeoJsonData, GlobeConfig } from "@/
 import { findVenueByCoords, VenueDetailInfo } from "@/lib/globe-interactions";
 import { VenueTooltip } from "@/components/globe/VenueTooltip";
 import { getCountryFlag } from "@/lib/f1-helpers";
+import { useSettings } from "@/lib/settings-context";
+import { GLOBE_THEMES, getThemeArcColor } from "@/lib/globe-themes";
 
 extend({ ThreeGlobe });
 
@@ -125,6 +127,7 @@ interface GlobeComponentProps extends WorldProps {
   onClickPoint: (point: PointData) => void;
   onClickArc: (arc: ArcData) => void;
   hoveredArc: ArcData | null;
+  theme: "dark" | "light";
 }
 
 export const GlobeComponent = React.memo(function GlobeComponent({
@@ -138,6 +141,7 @@ export const GlobeComponent = React.memo(function GlobeComponent({
   onClickPoint,
   onClickArc,
   hoveredArc,
+  theme,
 }: GlobeComponentProps): React.JSX.Element {
   const globeRef = useRef<ThreeGlobe>(null);
 
@@ -186,10 +190,13 @@ export const GlobeComponent = React.memo(function GlobeComponent({
               Math.abs(arc.startLng - hoveredArc.startLng) < 0.01 &&
               Math.abs(arc.endLat - hoveredArc.endLat) < 0.01 &&
               Math.abs(arc.endLng - hoveredArc.endLng) < 0.01;
-            if (isHovered) return "#00f0ff"; // neon cyan glow on hover
-            return "rgba(14, 165, 233, 0.15)"; // dim others
+            if (isHovered) {
+              return theme === "light" ? "#0284c7" : "#00f0ff";
+            }
+            return theme === "light" ? "rgba(14, 165, 233, 0.2)" : "rgba(14, 165, 233, 0.15)";
           }
-          return arc.color || "#0ea5e9";
+          const baseColor = arc.color || "#0ea5e9";
+          return getThemeArcColor(baseColor, theme);
         })
         .arcAltitude((d: object) => (d as ArcData).arcAlt || 0.3)
         .arcStroke((d: object) => {
@@ -200,7 +207,7 @@ export const GlobeComponent = React.memo(function GlobeComponent({
               Math.abs(arc.startLng - hoveredArc.startLng) < 0.01 &&
               Math.abs(arc.endLat - hoveredArc.endLat) < 0.01 &&
               Math.abs(arc.endLng - hoveredArc.endLng) < 0.01;
-            if (isHovered) return 1.6; // thick stroke
+            if (isHovered) return 1.6;
           }
           return arc.stroke || 0.6;
         })
@@ -213,7 +220,11 @@ export const GlobeComponent = React.memo(function GlobeComponent({
         .pointsData(points)
         .pointLat((d: object) => (d as PointData).lat)
         .pointLng((d: object) => (d as PointData).lng)
-        .pointColor((d: object) => (d as PointData).color || "#ef4444")
+        .pointColor((d: object) => {
+          const pt = d as PointData;
+          const baseColor = pt.color || "#ef4444";
+          return getThemeArcColor(baseColor, theme);
+        })
         .pointAltitude(0.01)
         .pointRadius(0.8);
 
@@ -232,7 +243,7 @@ export const GlobeComponent = React.memo(function GlobeComponent({
           onClickArc(clicked as ArcData);
         });
     }
-  }, [globeConfig, data, points, isMobile, hoveredArc, onHoverArc, onHoverPoint, onClickPoint, onClickArc]);
+  }, [globeConfig, data, points, isMobile, hoveredArc, onHoverArc, onHoverPoint, onClickPoint, onClickArc, theme]);
 
   // Hex Polygons representing Earth continents
   useEffect(() => {
@@ -281,10 +292,77 @@ export const GlobeComponent = React.memo(function GlobeComponent({
 });
 
 export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps): React.JSX.Element {
-  const ambientColor = globeConfig.ambientLight || "#faf0e6";
-  const directionalLeftColor = globeConfig.directionalLeftLight || "#ffffff";
-  const directionalTopColor = globeConfig.directionalTopLight || "#ffffff";
-  const pointColor = globeConfig.pointLight || "#ffffff";
+  const { settings } = useSettings();
+  const themeSetting = settings?.appearance?.theme || "dark";
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("dark");
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Helper to determine active theme based on user settings and system preference
+  const getActiveTheme = useCallback((): "light" | "dark" => {
+    if (themeSetting === "auto") {
+      if (typeof window !== "undefined") {
+        return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      return "dark";
+    }
+    return themeSetting as "light" | "dark";
+  }, [themeSetting]);
+
+  // Sync resolved theme on mount or when settings theme changes
+  useEffect(() => {
+    const active = getActiveTheme();
+    if (active !== resolvedTheme) {
+      setIsTransitioning(true);
+      const timer = setTimeout(() => {
+        setResolvedTheme(active);
+        setIsTransitioning(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [getActiveTheme, resolvedTheme]);
+
+  // Listen to OS color scheme changes if "auto" is active
+  useEffect(() => {
+    if (themeSetting !== "auto") return;
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => {
+      const active = mediaQuery.matches ? "dark" : "light";
+      if (active !== resolvedTheme) {
+        setIsTransitioning(true);
+        const timer = setTimeout(() => {
+          setResolvedTheme(active);
+          setIsTransitioning(false);
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    };
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [themeSetting, resolvedTheme]);
+
+  const activeThemeConfig = GLOBE_THEMES[resolvedTheme];
+
+  const mergedGlobeConfig = useMemo<GlobeConfig>(() => {
+    return {
+      ...globeConfig,
+      ambientLight: globeConfig.ambientLight || activeThemeConfig.ambientLight,
+      directionalLeftLight: globeConfig.directionalLeftLight || activeThemeConfig.directionalLeftLight,
+      directionalTopLight: globeConfig.directionalTopLight || activeThemeConfig.directionalTopLight,
+      pointLight: globeConfig.pointLight || activeThemeConfig.pointLight,
+      globeColor: globeConfig.globeColor || activeThemeConfig.globeColor,
+      polygonColor: globeConfig.polygonColor || activeThemeConfig.polygonColor,
+      showAtmosphere: globeConfig.showAtmosphere ?? activeThemeConfig.showAtmosphere,
+      atmosphereColor: globeConfig.atmosphereColor || activeThemeConfig.atmosphereColor,
+      atmosphereAltitude: globeConfig.atmosphereAltitude ?? activeThemeConfig.atmosphereAltitude,
+      autoRotate: globeConfig.autoRotate ?? activeThemeConfig.autoRotate,
+      autoRotateSpeed: globeConfig.autoRotateSpeed ?? activeThemeConfig.autoRotateSpeed,
+    };
+  }, [globeConfig, activeThemeConfig]);
+
+  const ambientColor = mergedGlobeConfig.ambientLight || "#faf0e6";
+  const directionalLeftColor = mergedGlobeConfig.directionalLeftLight || "#ffffff";
+  const directionalTopColor = mergedGlobeConfig.directionalTopLight || "#ffffff";
+  const pointColor = mergedGlobeConfig.pointLight || "#ffffff";
 
   const { size, polygonResolution, cameraZ, autoRotateSpeed, isMobile, isTiny } = useResponsiveGlobe();
 
@@ -341,8 +419,8 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
 
   // Update auto rotation based on prefers-reduced-motion configuration
   useEffect(() => {
-    setIsAutoRotating(!prefersReducedMotion && (globeConfig.autoRotate ?? true));
-  }, [prefersReducedMotion, globeConfig.autoRotate]);
+    setIsAutoRotating(!prefersReducedMotion && (mergedGlobeConfig.autoRotate ?? true));
+  }, [prefersReducedMotion, mergedGlobeConfig.autoRotate]);
 
   // Screen Reader live announcer helper
   const announceToScreenReader = useCallback((msg: string) => {
@@ -629,9 +707,15 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
   // Viewports under 320px render a static/animated SVG representation to save resources and look better
   if (isTiny) {
     return (
-      <div className="flex flex-col items-center justify-center p-4 border border-neutral-850 rounded-xl bg-neutral-900/20 text-center w-[200px] h-[200px] mx-auto aspect-square">
+      <div className={`flex flex-col items-center justify-center p-4 border rounded-xl text-center w-[200px] h-[200px] mx-auto aspect-square ${
+        resolvedTheme === "light"
+          ? "bg-neutral-50/20 border-neutral-200"
+          : "bg-neutral-900/20 border-neutral-850"
+      }`}>
         <svg 
-          className="w-10 h-10 text-blue-400/70 mb-2 animate-pulse" 
+          className={`w-10 h-10 mb-2 animate-pulse ${
+            resolvedTheme === "light" ? "text-blue-600/70" : "text-blue-400/70"
+          }`} 
           viewBox="0 0 24 24" 
           fill="none" 
           stroke="currentColor" 
@@ -640,7 +724,9 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
           <circle cx="12" cy="12" r="10" />
           <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
         </svg>
-        <span className="text-[9px] text-neutral-400 font-semibold tracking-wider uppercase">3D Globe Standby</span>
+        <span className={`text-[9px] font-semibold tracking-wider uppercase ${
+          resolvedTheme === "light" ? "text-neutral-700" : "text-neutral-400"
+        }`}>3D Globe Standby</span>
         <span className="text-[8px] text-neutral-500 font-mono mt-0.5">Screen too narrow</span>
       </div>
     );
@@ -676,12 +762,21 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
             onRetry={handleRetry}
             retryAttempt={retryAttempt}
             maxRetries={3}
+            theme={resolvedTheme}
           />
         ) : !isInViewport || isLoading || !worldData ? (
-          <div className="absolute inset-0 rounded-full bg-neutral-900/40 animate-pulse border border-neutral-850 flex flex-col items-center justify-center gap-2">
-            <span className="text-neutral-500 text-xs font-mono">Initializing 3D viewport...</span>
+          <div className={`absolute inset-0 rounded-full animate-pulse border flex flex-col items-center justify-center gap-2 ${
+            resolvedTheme === "light"
+              ? "bg-neutral-50/60 border-neutral-200"
+              : "bg-neutral-900/40 border-neutral-850"
+          }`}>
+            <span className={`text-xs font-mono ${resolvedTheme === "light" ? "text-neutral-600" : "text-neutral-500"}`}>
+              Initializing 3D viewport...
+            </span>
             {isLoading && (
-              <span className="text-[10px] text-neutral-600 font-mono">Loading satellite telemetry...</span>
+              <span className={`text-[10px] font-mono ${resolvedTheme === "light" ? "text-neutral-400" : "text-neutral-600"}`}>
+                Loading satellite telemetry...
+              </span>
             )}
           </div>
         ) : (
@@ -691,57 +786,65 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
                 errorType="render_failed"
                 errorMessage={err.message}
                 onRetry={handleRetry}
+                theme={resolvedTheme}
               />
             )}
           >
-            <CameraFocusController
-              focusCoords={focusCoords}
-              cameraZ={cameraZ}
-              controlsRef={controlsRef}
-              onFocusComplete={() => setFocusCoords(null)}
-            />
-            <Canvas 
-              camera={{ position: [0, 0, cameraZ], fov: 60 }}
-              role="img"
-              aria-label="Interactive 3D globe showing F1 racing venues"
-              aria-describedby="globe-description"
+            <motion.div
+              animate={{ opacity: isTransitioning ? 0 : 1 }}
+              transition={{ duration: 0.1 }}
+              className="w-full h-full"
             >
-              <ambientLight color={ambientColor} intensity={1.5} />
-              <directionalLight
-                color={directionalLeftColor}
-                position={new Vector3(-400, 100, 400)}
-                intensity={1.2}
-              />
-              <directionalLight
-                color={directionalTopColor}
-                position={new Vector3(-200, 500, 200)}
-                intensity={1.0}
-              />
-              <pointLight
-                color={pointColor}
-                position={new Vector3(-200, 500, 200)}
-                intensity={0.8}
-              />
-              <GlobeComponent
-                globeConfig={globeConfig}
-                data={data}
-                polygonResolution={polygonResolution}
-                isMobile={isMobile}
-                worldData={worldData}
-                onHoverArc={handleHoverArc}
-                onHoverPoint={handleHoverPoint}
-                onClickPoint={handleClickPoint}
-                onClickArc={handleClickArc}
-                hoveredArc={hoveredArc}
-              />
-              <OrbitControls
-                ref={controlsRef}
-                enablePan={false}
-                enableZoom={globeConfig.enableZoom ?? false}
-                autoRotate={isAutoRotating}
-                autoRotateSpeed={globeConfig.autoRotateSpeed ?? autoRotateSpeed}
-              />
-            </Canvas>
+              <Canvas 
+                camera={{ position: [0, 0, cameraZ], fov: 60 }}
+                role="img"
+                aria-label="Interactive 3D globe showing F1 racing venues"
+                aria-describedby="globe-description"
+              >
+                <CameraFocusController
+                  focusCoords={focusCoords}
+                  cameraZ={cameraZ}
+                  controlsRef={controlsRef}
+                  onFocusComplete={() => setFocusCoords(null)}
+                />
+                <ambientLight color={ambientColor} intensity={1.5} />
+                <directionalLight
+                  color={directionalLeftColor}
+                  position={new Vector3(-400, 100, 400)}
+                  intensity={1.2}
+                />
+                <directionalLight
+                  color={directionalTopColor}
+                  position={new Vector3(-200, 500, 200)}
+                  intensity={1.0}
+                />
+                <pointLight
+                  color={pointColor}
+                  position={new Vector3(-200, 500, 200)}
+                  intensity={0.8}
+                />
+                <GlobeComponent
+                  globeConfig={mergedGlobeConfig}
+                  data={data}
+                  polygonResolution={polygonResolution}
+                  isMobile={isMobile}
+                  worldData={worldData}
+                  onHoverArc={handleHoverArc}
+                  onHoverPoint={handleHoverPoint}
+                  onClickPoint={handleClickPoint}
+                  onClickArc={handleClickArc}
+                  hoveredArc={hoveredArc}
+                  theme={resolvedTheme}
+                />
+                <OrbitControls
+                  ref={controlsRef}
+                  enablePan={false}
+                  enableZoom={mergedGlobeConfig.enableZoom ?? false}
+                  autoRotate={isAutoRotating}
+                  autoRotateSpeed={mergedGlobeConfig.autoRotateSpeed ?? autoRotateSpeed}
+                />
+              </Canvas>
+            </motion.div>
           </CanvasErrorBoundary>
         )}
 
@@ -752,6 +855,7 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
               venue={tooltipVenue}
               mousePos={mousePos}
               active={isTooltipActive}
+              theme={resolvedTheme}
             />
           )}
         </AnimatePresence>
@@ -772,24 +876,36 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 220 }}
-              className="absolute right-0 top-0 bottom-0 w-[240px] sm:w-[280px] bg-[#070913]/98 border-l border-[#1f2937]/80 shadow-2xl backdrop-blur-md z-50 p-4 flex flex-col text-left overflow-y-auto rounded-r-2xl"
+              className={`absolute right-0 top-0 bottom-0 w-[240px] sm:w-[280px] border-l shadow-2xl backdrop-blur-md z-50 p-4 flex flex-col text-left overflow-y-auto rounded-r-2xl ${
+                resolvedTheme === "light"
+                  ? "bg-white/95 border-neutral-200 text-neutral-900"
+                  : "bg-[#070913]/98 border-[#1f2937]/80 text-white"
+              }`}
             >
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-[#1f2937]/50 pb-3 mb-4">
+              <div className={`flex items-center justify-between border-b pb-3 mb-4 ${
+                resolvedTheme === "light" ? "border-neutral-200" : "border-[#1f2937]/50"
+              }`}>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl leading-none">{getCountryFlag(selectedVenue.country)}</span>
                   <div>
                     <span className="text-[9px] text-neutral-500 font-mono font-bold uppercase tracking-wider block">
                       Round {selectedVenue.round} Details
                     </span>
-                    <h4 className="text-white font-bold text-xs leading-tight line-clamp-1">
+                    <h4 className={`font-bold text-xs leading-tight line-clamp-1 ${
+                      resolvedTheme === "light" ? "text-neutral-900" : "text-white"
+                    }`}>
                       {selectedVenue.name}
                     </h4>
                   </div>
                 </div>
                 <button 
                   onClick={() => setSelectedVenue(null)}
-                  className="p-1 hover:bg-[#1f2937]/50 text-neutral-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  className={`p-1 rounded-lg transition-colors cursor-pointer ${
+                    resolvedTheme === "light" 
+                      ? "hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900" 
+                      : "hover:bg-[#1f2937]/50 text-neutral-400 hover:text-white"
+                  }`}
                   aria-label="Close details"
                 >
                   <X className="w-4 h-4" />
@@ -801,30 +917,42 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
                 {/* Circuit Info */}
                 <div className="space-y-1">
                   <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block">Circuit Name</span>
-                  <div className="flex items-start gap-1.5 text-neutral-200">
-                    <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+                  <div className={`flex items-start gap-1.5 ${
+                    resolvedTheme === "light" ? "text-neutral-800" : "text-neutral-200"
+                  }`}>
+                    <MapPin className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />
                     <span>{selectedVenue.circuit}</span>
                   </div>
                   {selectedVenue.locality && (
-                    <span className="text-[10px] text-neutral-400 font-mono block pl-5">{selectedVenue.locality}</span>
+                    <span className={`text-[10px] font-mono block pl-5 ${
+                      resolvedTheme === "light" ? "text-neutral-500" : "text-neutral-400"
+                    }`}>{selectedVenue.locality}</span>
                   )}
                 </div>
 
                 {/* Track configurations */}
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#1f2937]/30">
+                <div className={`grid grid-cols-2 gap-3 pt-2 border-t ${
+                  resolvedTheme === "light" ? "border-neutral-200" : "border-[#1f2937]/30"
+                }`}>
                   <div>
                     <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block mb-1">Layout</span>
                     <span className={`px-2 py-0.5 rounded text-[8px] font-black tracking-wider uppercase inline-block ${
                       selectedVenue.circuitType === "street" 
-                        ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" 
-                        : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                        ? resolvedTheme === "light"
+                          ? "bg-amber-500/10 text-amber-600 border border-amber-500/20"
+                          : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                        : resolvedTheme === "light"
+                          ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
+                          : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                     }`}>
                       {selectedVenue.circuitType === "street" ? "Street" : "Permanent"}
                     </span>
                   </div>
                   <div>
                     <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block mb-1">Distance</span>
-                    <div className="flex items-center gap-1 text-neutral-200 font-mono">
+                    <div className={`flex items-center gap-1 font-mono ${
+                      resolvedTheme === "light" ? "text-neutral-800" : "text-neutral-200"
+                    }`}>
                       <Milestone className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
                       <span>{selectedVenue.trackLength}</span>
                     </div>
@@ -834,7 +962,9 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <div>
                     <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block mb-1">Turns</span>
-                    <div className="flex items-center gap-1 text-neutral-200 font-mono">
+                    <div className={`flex items-center gap-1 font-mono ${
+                      resolvedTheme === "light" ? "text-neutral-800" : "text-neutral-200"
+                    }`}>
                       <Compass className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
                       <span>{selectedVenue.turns} turns</span>
                     </div>
@@ -842,7 +972,11 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
                   {selectedVenue.sprint && (
                     <div>
                       <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block mb-1">Sprint</span>
-                      <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-400 text-[8px] font-black rounded uppercase tracking-wider inline-block">
+                      <span className={`px-1.5 py-0.5 text-[8px] font-black rounded uppercase tracking-wider inline-block ${
+                        resolvedTheme === "light"
+                          ? "bg-orange-500/10 text-orange-600 border border-orange-500/20"
+                          : "bg-orange-500/20 text-orange-400"
+                      }`}>
                         Active
                       </span>
                     </div>
@@ -850,22 +984,34 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
                 </div>
 
                 {/* Historic Results */}
-                <div className="pt-3 border-t border-[#1f2937]/30 space-y-1.5">
+                <div className={`pt-3 border-t space-y-1.5 ${
+                  resolvedTheme === "light" ? "border-neutral-200" : "border-[#1f2937]/30"
+                }`}>
                   <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block flex items-center gap-1">
                     <Trophy className="w-3.5 h-3.5 text-yellow-500" /> Previous Podium
                   </span>
-                  <p className="text-[10px] text-neutral-300 font-mono bg-black/40 p-2 rounded border border-[#1f2937]/20 leading-relaxed">
+                  <p className={`text-[10px] font-mono p-2 rounded border leading-relaxed ${
+                    resolvedTheme === "light"
+                      ? "bg-neutral-50 border-neutral-200 text-neutral-800"
+                      : "bg-black/40 border-[#1f2937]/20 text-neutral-300"
+                  }`}>
                     {selectedVenue.podiumHistory}
                   </p>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="border-t border-[#1f2937]/50 pt-4 mt-6 text-center">
+              <div className={`border-t pt-4 mt-6 text-center ${
+                resolvedTheme === "light" ? "border-neutral-200" : "border-[#1f2937]/50"
+              }`}>
                 <a 
                   href={`#round-${selectedVenue.round}`} 
                   onClick={() => setSelectedVenue(null)}
-                  className="inline-block w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[10px] font-black uppercase tracking-wider shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all"
+                  className={`inline-block w-full py-2 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-md active:scale-98 transition-all ${
+                    resolvedTheme === "light"
+                      ? "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/10"
+                      : "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/10"
+                  }`}
                 >
                   Focus Calendar Card
                 </a>
