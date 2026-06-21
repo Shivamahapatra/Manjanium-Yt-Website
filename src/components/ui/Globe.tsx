@@ -119,6 +119,10 @@ interface WorldProps {
   polygonResolution?: number;
   isMobile?: boolean;
   worldData?: GeoJsonData | null;
+  highlightedRound?: number;
+  onPointClick?: (point: PointData) => void;
+  onArcClick?: (arc: ArcData) => void;
+  onHoverRoundChange?: (round: number | null) => void;
 }
 
 interface GlobeComponentProps extends WorldProps {
@@ -128,6 +132,7 @@ interface GlobeComponentProps extends WorldProps {
   onClickArc: (arc: ArcData) => void;
   hoveredArc: ArcData | null;
   theme: "dark" | "light";
+  highlightedRound?: number;
 }
 
 export const GlobeComponent = React.memo(function GlobeComponent({
@@ -142,14 +147,15 @@ export const GlobeComponent = React.memo(function GlobeComponent({
   onClickArc,
   hoveredArc,
   theme,
+  highlightedRound,
 }: GlobeComponentProps): React.JSX.Element {
   const globeRef = useRef<ThreeGlobe>(null);
 
   // Memoize point data processing to avoid recalculations on every render
   const points = useMemo<PointData[]>(() => {
     return data.flatMap((d: ArcData) => [
-      { lat: d.startLat, lng: d.startLng, color: d.color },
-      { lat: d.endLat, lng: d.endLng, color: d.color }
+      { lat: d.startLat, lng: d.startLng, color: d.color, round: d.round, venueId: d.venueId },
+      { lat: d.endLat, lng: d.endLng, color: d.color, round: d.round, venueId: d.venueId }
     ]);
   }, [data]);
 
@@ -195,6 +201,9 @@ export const GlobeComponent = React.memo(function GlobeComponent({
             }
             return theme === "light" ? "rgba(14, 165, 233, 0.2)" : "rgba(14, 165, 233, 0.15)";
           }
+          if (highlightedRound && arc.round === highlightedRound) {
+            return "#fbbf24";
+          }
           const baseColor = arc.color || "#0ea5e9";
           return getThemeArcColor(baseColor, theme);
         })
@@ -209,6 +218,9 @@ export const GlobeComponent = React.memo(function GlobeComponent({
               Math.abs(arc.endLng - hoveredArc.endLng) < 0.01;
             if (isHovered) return 1.6;
           }
+          if (highlightedRound && arc.round === highlightedRound) {
+            return 1.4;
+          }
           return arc.stroke || 0.6;
         })
         .arcDashLength(0.9)
@@ -222,11 +234,26 @@ export const GlobeComponent = React.memo(function GlobeComponent({
         .pointLng((d: object) => (d as PointData).lng)
         .pointColor((d: object) => {
           const pt = d as PointData;
+          if (highlightedRound && pt.round === highlightedRound) {
+            return "#fbbf24";
+          }
           const baseColor = pt.color || "#ef4444";
           return getThemeArcColor(baseColor, theme);
         })
-        .pointAltitude(0.01)
-        .pointRadius(0.8);
+        .pointAltitude((d: object) => {
+          const pt = d as PointData;
+          if (highlightedRound && pt.round === highlightedRound) {
+            return 0.03;
+          }
+          return 0.01;
+        })
+        .pointRadius((d: object) => {
+          const pt = d as PointData;
+          if (highlightedRound && pt.round === highlightedRound) {
+            return 1.4;
+          }
+          return 0.8;
+        });
 
       // Register interactive events
       globe
@@ -243,7 +270,7 @@ export const GlobeComponent = React.memo(function GlobeComponent({
           onClickArc(clicked as ArcData);
         });
     }
-  }, [globeConfig, data, points, isMobile, hoveredArc, onHoverArc, onHoverPoint, onClickPoint, onClickArc, theme]);
+  }, [globeConfig, data, points, isMobile, hoveredArc, onHoverArc, onHoverPoint, onClickPoint, onClickArc, theme, highlightedRound]);
 
   // Hex Polygons representing Earth continents
   useEffect(() => {
@@ -291,7 +318,14 @@ export const GlobeComponent = React.memo(function GlobeComponent({
   return <threeGlobe ref={globeRef} />;
 });
 
-export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps): React.JSX.Element {
+export const Globe = React.memo(function Globe({
+  globeConfig,
+  data,
+  highlightedRound,
+  onPointClick,
+  onArcClick,
+  onHoverRoundChange,
+}: WorldProps): React.JSX.Element {
   const { settings } = useSettings();
   const themeSetting = settings?.appearance?.theme || "dark";
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("dark");
@@ -384,7 +418,16 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
   const [isTooltipActive, setIsTooltipActive] = useState(false);
 
   const [selectedVenue, setSelectedVenue] = useState<VenueDetailInfo | null>(null);
-  const [focusCoords, setFocusCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [focusCoords, setFocusCoords] = useState<{ lat: number; lng: number } | null>(
+    globeConfig.initialPosition || null
+  );
+
+  useEffect(() => {
+    if (globeConfig.initialPosition) {
+      setFocusCoords(globeConfig.initialPosition);
+      setIsAutoRotating(false);
+    }
+  }, [globeConfig.initialPosition]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<any>(null);
@@ -577,11 +620,13 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
       if (venue) {
         setTooltipVenue(venue);
         setIsTooltipActive(true);
+        if (onHoverRoundChange) onHoverRoundChange(venue.round);
       }
     } else if (!hoveredPoint) {
       setIsTooltipActive(false);
+      if (onHoverRoundChange) onHoverRoundChange(null);
     }
-  }, [hoveredPoint]);
+  }, [hoveredPoint, onHoverRoundChange]);
 
   const handleHoverPoint = useCallback((point: PointData | null) => {
     setHoveredPoint(point);
@@ -590,32 +635,42 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
       if (venue) {
         setTooltipVenue(venue);
         setIsTooltipActive(true);
+        if (onHoverRoundChange) onHoverRoundChange(venue.round);
       }
     } else if (!hoveredArc) {
       setIsTooltipActive(false);
+      if (onHoverRoundChange) onHoverRoundChange(null);
     }
-  }, [hoveredArc]);
+  }, [hoveredArc, onHoverRoundChange]);
 
   // Click handlers pivoting camera and displaying info modal
   const handleClickPoint = useCallback((point: PointData) => {
     const venue = findVenueByCoords(point.lat, point.lng);
     if (venue) {
-      setSelectedVenue(venue);
-      setFocusCoords({ lat: point.lat, lng: point.lng });
-      setIsAutoRotating(false);
-      announceToScreenReader(`Viewing ${venue.name} circuit specs`);
+      if (onPointClick) {
+        onPointClick(point);
+      } else {
+        setSelectedVenue(venue);
+        setFocusCoords({ lat: point.lat, lng: point.lng });
+        setIsAutoRotating(false);
+        announceToScreenReader(`Viewing ${venue.name} circuit specs`);
+      }
     }
-  }, [announceToScreenReader]);
+  }, [announceToScreenReader, onPointClick]);
 
   const handleClickArc = useCallback((arc: ArcData) => {
     const venue = findVenueByCoords(arc.startLat, arc.startLng) || findVenueByCoords(arc.endLat, arc.endLng);
     if (venue) {
-      setSelectedVenue(venue);
-      setFocusCoords({ lat: arc.startLat, lng: arc.startLng });
-      setIsAutoRotating(false);
-      announceToScreenReader(`Viewing ${venue.name} circuit specs`);
+      if (onArcClick) {
+        onArcClick(arc);
+      } else {
+        setSelectedVenue(venue);
+        setFocusCoords({ lat: arc.startLat, lng: arc.startLng });
+        setIsAutoRotating(false);
+        announceToScreenReader(`Viewing ${venue.name} circuit specs`);
+      }
     }
-  }, [announceToScreenReader]);
+  }, [announceToScreenReader, onArcClick]);
 
   // Keyboard navigation & jumping control shortcuts
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -835,6 +890,7 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
                   onClickArc={handleClickArc}
                   hoveredArc={hoveredArc}
                   theme={resolvedTheme}
+                  highlightedRound={highlightedRound}
                 />
                 <OrbitControls
                   ref={controlsRef}

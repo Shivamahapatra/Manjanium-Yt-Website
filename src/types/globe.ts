@@ -6,12 +6,16 @@ export interface ArcData {
   arcAlt?: number;
   color?: string;
   stroke?: number;
+  venueId?: string;
+  round?: number;
 }
 
 export interface PointData {
   lat: number;
   lng: number;
   color?: string;
+  round?: number;
+  venueId?: string;
 }
 
 export interface GeoJsonFeature {
