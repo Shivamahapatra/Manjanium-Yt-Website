@@ -9,7 +9,7 @@ import { getCountryFlag, F1_CANCELED_2026, F1_VENUES_2026 } from '@/lib/f1-helpe
 
 // Dynamic import for the 3D Globe with loading placeholder
 const Globe = dynamic(
-  () => import('@/components/ui/globe').then((m) => m.Globe),
+  () => import('@/components/ui/Globe').then((m) => m.Globe),
   { 
     ssr: false, 
     loading: () => (

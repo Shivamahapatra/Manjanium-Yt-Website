@@ -9,7 +9,7 @@ import { F1_VENUES_2026, getCountryFlag, getTimezoneForVenue } from "@/lib/f1-he
 
 // Dynamic import for the 3D Live focus Globe
 const Globe = dynamic(
-  () => import("@/components/ui/globe").then((m) => m.Globe),
+  () => import("@/components/ui/Globe").then((m) => m.Globe),
   {
     ssr: false,
     loading: () => (
