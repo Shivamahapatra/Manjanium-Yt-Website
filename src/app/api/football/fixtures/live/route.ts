@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server';
 
+let cachedLiveResponse: any = null;
+let lastLiveFetched = 0;
+const LIVE_CACHE_TTL = 15000; // 15 seconds cache
+
 export async function GET() {
   try {
+    const now = Date.now();
+    if (cachedLiveResponse && (now - lastLiveFetched < LIVE_CACHE_TTL)) {
+      return NextResponse.json(cachedLiveResponse);
+    }
+
     const [liveRes, standingsRes] = await Promise.all([
       fetch(
         'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard',
@@ -74,7 +83,7 @@ export async function GET() {
       }))
     }));
 
-    return NextResponse.json({
+    const finalResponse = {
       response: matches,
       standings: groups,
       debug: {
@@ -83,7 +92,12 @@ export async function GET() {
         upcomingCount: matches.filter((m: any) => m.isUpcoming).length,
         groupCount: groups.length
       }
-    });
+    };
+
+    cachedLiveResponse = finalResponse;
+    lastLiveFetched = now;
+
+    return NextResponse.json(finalResponse);
 
   } catch (error) {
     return NextResponse.json(

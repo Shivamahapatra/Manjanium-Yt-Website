@@ -31,11 +31,24 @@ function extractGoalScorers(details: any[], homeTeamName: string, awayTeamName: 
   return goals;
 }
 
+let cachedPastMatches: any = null;
+let lastPastFetched = 0;
+const PAST_CACHE_TTL = 3600000; // 1 hour cache for static past matches
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '20', 10);
     // const groupId = searchParams.get('groupId'); // Could be used later to filter by 'Group A'
+
+    const now = Date.now();
+    if (cachedPastMatches && (now - lastPastFetched < PAST_CACHE_TTL)) {
+      return NextResponse.json({
+        matches: cachedPastMatches.slice(0, limit),
+        totalMatches: cachedPastMatches.length,
+        fromCache: true
+      });
+    }
 
     // Fetch past matches (Hardcoded 2022 WC dates to guarantee real past data until 2026 starts)
     const res = await fetch(`${SCOREBOARD_URL}?dates=${FALLBACK_DATES}`, { next: { revalidate: 86400 } });
@@ -89,6 +102,9 @@ export async function GET(request: Request) {
 
     // Optionally sort by date descending (most recent past match first)
     matches.sort((a: any, b: any) => new Date(b.kickoffTime).getTime() - new Date(a.kickoffTime).getTime());
+
+    cachedPastMatches = matches;
+    lastPastFetched = now;
 
     return NextResponse.json({
       matches: matches.slice(0, limit),

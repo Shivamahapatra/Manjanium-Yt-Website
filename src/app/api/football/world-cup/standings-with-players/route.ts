@@ -27,6 +27,10 @@ const mapPosition = (espnPos: string) => {
 // Simple in-memory cache for rosters to optimize API load
 const rostersCache: Record<string, any[]> = {};
 
+let cachedFinalStandings: any = null;
+let lastStandingsFetched = 0;
+const STANDINGS_CACHE_TTL = 300000; // 5 minutes cache for standings
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -34,6 +38,11 @@ export async function GET(request: Request) {
     const fetchOptions: RequestInit = useCache 
       ? { next: { revalidate: 3600 } } 
       : { cache: 'no-store' };
+
+    const now = Date.now();
+    if (useCache && cachedFinalStandings && (now - lastStandingsFetched < STANDINGS_CACHE_TTL)) {
+      return NextResponse.json(cachedFinalStandings);
+    }
 
     // Fetch standings
     const standingsRes = await fetch(STANDINGS_URL, fetchOptions);
@@ -148,10 +157,17 @@ export async function GET(request: Request) {
       };
     });
 
-    return NextResponse.json({
+    const finalResponse = {
       groups: formattedGroups,
       lastUpdated: new Date().toISOString()
-    });
+    };
+
+    if (useCache) {
+      cachedFinalStandings = finalResponse;
+      lastStandingsFetched = now;
+    }
+
+    return NextResponse.json(finalResponse);
 
   } catch (error) {
     console.error('Error fetching World Cup data:', error);
