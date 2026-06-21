@@ -29,7 +29,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { SettingsProvider } from "@/lib/settings-context";
 import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { ClerkProvider } from "@clerk/nextjs";
-import { GlobalPreferencesProvider } from "@/components/providers/GlobalPreferencesProvider";
+import { AppearanceProvider } from "@/components/providers/AppearanceProvider";
 
 export default function RootLayout({
   children,
@@ -52,11 +52,11 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <SettingsProvider>
-              <GlobalPreferencesProvider>
+              <AppearanceProvider>
                 <AntdRegistry>
                   <MainLayout>{children}</MainLayout>
                 </AntdRegistry>
-              </GlobalPreferencesProvider>
+              </AppearanceProvider>
             </SettingsProvider>
           </ThemeProvider>
         </body>

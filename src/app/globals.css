@@ -59,6 +59,17 @@
 }
 
 :root {
+  /* Global Appearance Variables */
+  --font-size-sm: 12px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size: var(--font-size-md);
+  
+  --animation-duration-normal: 0.3s;
+  --animation-duration-reduced: 0.1s;
+  --animation-duration-fast: 0.15s;
+  --animation-duration: var(--animation-duration-normal);
+
   /* Manjanium Design System Variables */
   --color-primary: #0f172a;
   --color-accent: #fbbf24;
@@ -146,10 +157,14 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-size: var(--font-size);
   }
   html {
     @apply font-sans;
   }
+  h1 { font-size: calc(var(--font-size) * 2.5); }
+  h2 { font-size: calc(var(--font-size) * 2); }
+  h3 { font-size: calc(var(--font-size) * 1.5); }
 }
 
 /* Custom Table Styles */
@@ -171,20 +186,4 @@
 
 .manjanium-table .ant-table-cell-row-hover {
   background: transparent !important;
-}
-
-/* Global User Preferences Overrides */
-html.font-size-sm { font-size: 14px; }
-html.font-size-md { font-size: 16px; }
-html.font-size-lg { font-size: 18px; }
-
-html.animation-speed-fast * {
-  animation-duration: 0.2s !important;
-  transition-duration: 0.15s !important;
-}
-
-html.animation-speed-reduced * {
-  animation-duration: 0s !important;
-  transition-duration: 0s !important;
-  scroll-behavior: auto !important;
 }
