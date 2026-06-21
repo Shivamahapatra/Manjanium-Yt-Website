@@ -225,8 +225,14 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
   const [retryAttempt, setRetryAttempt] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
+  
+  // Accessibility states
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isAutoRotating, setIsAutoRotating] = useState(true);
+  const [srAnnouncement, setSrAnnouncement] = useState("");
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<any>(null);
   const [isInViewport, setIsInViewport] = useState(false);
 
   // WebGL compatibility check on mount
@@ -236,6 +242,46 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
       setIsLoading(false);
     }
   }, []);
+
+  // Track prefers-reduced-motion media query
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", handleMediaChange);
+      return () => mediaQuery.removeEventListener("change", handleMediaChange);
+    } else {
+      mediaQuery.addListener(handleMediaChange);
+      return () => mediaQuery.removeListener(handleMediaChange);
+    }
+  }, []);
+
+  // Update auto rotation based on prefers-reduced-motion configuration
+  useEffect(() => {
+    setIsAutoRotating(!prefersReducedMotion && (globeConfig.autoRotate ?? true));
+  }, [prefersReducedMotion, globeConfig.autoRotate]);
+
+  // Screen Reader live announcer helper
+  const announceToScreenReader = useCallback((msg: string) => {
+    setSrAnnouncement(msg);
+    // Clear announcement after brief timeout so consecutive triggers speak correctly
+    setTimeout(() => {
+      setSrAnnouncement((prev) => (prev === msg ? "" : prev));
+    }, 1000);
+  }, []);
+
+  // Announce load state to screen reader
+  useEffect(() => {
+    if (worldData && !isLoading && !error) {
+      announceToScreenReader("F1 venues globe loaded successfully. Interactive 3D map is active.");
+    }
+  }, [worldData, isLoading, error, announceToScreenReader]);
 
   // Track network online/offline state
   useEffect(() => {
@@ -359,6 +405,61 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
     }
   }, [isOnline, error?.type, isInViewport, handleRetry]);
 
+  // Keyboard navigation interactions
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!controlsRef.current) return;
+    let handled = false;
+    const rotateStep = 0.05; // radians per key stroke
+
+    switch (e.key) {
+      case "ArrowLeft":
+        setIsAutoRotating(false); // Pause auto-rotation during manual control
+        controlsRef.current.rotateLeft(rotateStep);
+        controlsRef.current.update();
+        announceToScreenReader("Rotated globe left");
+        handled = true;
+        break;
+      case "ArrowRight":
+        setIsAutoRotating(false);
+        controlsRef.current.rotateLeft(-rotateStep);
+        controlsRef.current.update();
+        announceToScreenReader("Rotated globe right");
+        handled = true;
+        break;
+      case "ArrowUp":
+        setIsAutoRotating(false);
+        controlsRef.current.rotateUp(rotateStep);
+        controlsRef.current.update();
+        announceToScreenReader("Rotated globe up");
+        handled = true;
+        break;
+      case "ArrowDown":
+        setIsAutoRotating(false);
+        controlsRef.current.rotateUp(-rotateStep);
+        controlsRef.current.update();
+        announceToScreenReader("Rotated globe down");
+        handled = true;
+        break;
+      case " ": // Spacebar
+        e.preventDefault(); // Stop browser page-down scrolling
+        setIsAutoRotating((prev) => !prev);
+        announceToScreenReader(!isAutoRotating ? "Globe auto-rotation resumed" : "Globe auto-rotation paused");
+        handled = true;
+        break;
+      case "Escape":
+        setIsAutoRotating(false);
+        announceToScreenReader("Globe rotation stopped");
+        handled = true;
+        break;
+      default:
+        break;
+    }
+
+    if (handled) {
+      e.stopPropagation();
+    }
+  }, [isAutoRotating, announceToScreenReader]);
+
   // Viewports under 320px render a static/animated SVG representation to save resources and look better
   if (isTiny) {
     return (
@@ -389,65 +490,95 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
   } max-w-full`;
 
   return (
-    <div ref={containerRef} className={containerClasses}>
-      {error ? (
-        <GlobeFallback
-          errorType={error.type}
-          errorMessage={error.message}
-          onRetry={handleRetry}
-          retryAttempt={retryAttempt}
-          maxRetries={3}
-        />
-      ) : !isInViewport || isLoading || !worldData ? (
-        <div className="absolute inset-0 rounded-full bg-neutral-900/40 animate-pulse border border-neutral-850 flex flex-col items-center justify-center gap-2">
-          <span className="text-neutral-500 text-xs font-mono">Initializing 3D viewport...</span>
-          {isLoading && (
-            <span className="text-[10px] text-neutral-600 font-mono">Loading satellite telemetry...</span>
-          )}
-        </div>
-      ) : (
-        <CanvasErrorBoundary
-          fallback={(err) => (
-            <GlobeFallback
-              errorType="render_failed"
-              errorMessage={err.message}
-              onRetry={handleRetry}
-            />
-          )}
-        >
-          <Canvas camera={{ position: [0, 0, cameraZ], fov: 60 }}>
-            <ambientLight color={ambientColor} intensity={1.5} />
-            <directionalLight
-              color={directionalLeftColor}
-              position={new Vector3(-400, 100, 400)}
-              intensity={1.2}
-            />
-            <directionalLight
-              color={directionalTopColor}
-              position={new Vector3(-200, 500, 200)}
-              intensity={1.0}
-            />
-            <pointLight
-              color={pointColor}
-              position={new Vector3(-200, 500, 200)}
-              intensity={0.8}
-            />
-            <GlobeComponent
-              globeConfig={globeConfig}
-              data={data}
-              polygonResolution={polygonResolution}
-              isMobile={isMobile}
-              worldData={worldData}
-            />
-            <OrbitControls
-              enablePan={false}
-              enableZoom={globeConfig.enableZoom ?? false}
-              autoRotate={globeConfig.autoRotate ?? (autoRotateSpeed > 0)}
-              autoRotateSpeed={globeConfig.autoRotateSpeed ?? autoRotateSpeed}
-            />
-          </Canvas>
-        </CanvasErrorBoundary>
-      )}
-    </div>
+    <figure
+      role="figure"
+      aria-label="F1 Racing Venues Interactive Globe"
+      aria-describedby="globe-description"
+      className="relative w-full h-full flex flex-col items-center justify-center"
+    >
+      <div 
+        ref={containerRef} 
+        className={`${containerClasses} focus-visible:outline focus-visible:outline-3 focus-visible:outline-[#fbbf24] focus-visible:outline-offset-2 rounded-2xl outline-none`}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+      >
+        {error ? (
+          <GlobeFallback
+            errorType={error.type}
+            errorMessage={error.message}
+            onRetry={handleRetry}
+            retryAttempt={retryAttempt}
+            maxRetries={3}
+          />
+        ) : !isInViewport || isLoading || !worldData ? (
+          <div className="absolute inset-0 rounded-full bg-neutral-900/40 animate-pulse border border-neutral-850 flex flex-col items-center justify-center gap-2">
+            <span className="text-neutral-500 text-xs font-mono">Initializing 3D viewport...</span>
+            {isLoading && (
+              <span className="text-[10px] text-neutral-600 font-mono">Loading satellite telemetry...</span>
+            )}
+          </div>
+        ) : (
+          <CanvasErrorBoundary
+            fallback={(err) => (
+              <GlobeFallback
+                errorType="render_failed"
+                errorMessage={err.message}
+                onRetry={handleRetry}
+              />
+            )}
+          >
+            <Canvas 
+              camera={{ position: [0, 0, cameraZ], fov: 60 }}
+              role="img"
+              aria-label="Interactive 3D globe showing F1 racing venues"
+              aria-describedby="globe-description"
+            >
+              <ambientLight color={ambientColor} intensity={1.5} />
+              <directionalLight
+                color={directionalLeftColor}
+                position={new Vector3(-400, 100, 400)}
+                intensity={1.2}
+              />
+              <directionalLight
+                color={directionalTopColor}
+                position={new Vector3(-200, 500, 200)}
+                intensity={1.0}
+              />
+              <pointLight
+                color={pointColor}
+                position={new Vector3(-200, 500, 200)}
+                intensity={0.8}
+              />
+              <GlobeComponent
+                globeConfig={globeConfig}
+                data={data}
+                polygonResolution={polygonResolution}
+                isMobile={isMobile}
+                worldData={worldData}
+              />
+              <OrbitControls
+                ref={controlsRef}
+                enablePan={false}
+                enableZoom={globeConfig.enableZoom ?? false}
+                autoRotate={isAutoRotating}
+                autoRotateSpeed={globeConfig.autoRotateSpeed ?? autoRotateSpeed}
+              />
+            </Canvas>
+          </CanvasErrorBoundary>
+        )}
+      </div>
+
+      {/* Screen Reader Polite Live Region Announcements */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {srAnnouncement}
+      </div>
+
+      {/* Semantic Accessible Caption Description */}
+      <figcaption id="globe-description" className="sr-only">
+        Interactive 3D globe showing Formula One racing venues connected by arcs.
+        Use Tab to focus the globe viewer. Keyboard controls: Arrow keys to rotate the globe manually, 
+        Space to pause or resume auto-rotation, and Escape to stop rotation.
+      </figcaption>
+    </figure>
   );
 });
