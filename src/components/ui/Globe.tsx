@@ -8,7 +8,7 @@ import { Color, Vector3, Mesh, Object3D, MeshPhongMaterial } from "three";
 import { message } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, MapPin, Compass, Info, Trophy, Milestone } from "lucide-react";
-import worldData from "../../../public/globe.json";
+import localWorldData from "../../../public/globe.json";
 import { useResponsiveGlobe } from "@/hooks/useResponsiveGlobe";
 import { GlobeFallback, GlobeErrorType } from "@/components/ui/GlobeFallback";
 import { ArcData, PointData, GeoJsonFeature, GeoJsonData, GlobeConfig } from "@/types/globe";
@@ -529,7 +529,7 @@ export const Globe = React.memo(function Globe({
     setIsLoading(true);
     setError(null);
     try {
-      setWorldData(worldData as GeoJsonData);
+      setWorldData(localWorldData as GeoJsonData);
       setIsLoading(false);
     } catch (err: any) {
       console.error("[Globe Sync Error]", {
