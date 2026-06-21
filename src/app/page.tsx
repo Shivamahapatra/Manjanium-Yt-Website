@@ -276,53 +276,70 @@ export default function HomePage() {
       <div className="relative">
         <AuroraBackground showRadialGradient className="min-h-screen w-full relative pb-20 pt-10 lg:pt-0 bg-transparent">
           
-          <div className="relative z-10 flex flex-col gap-8 items-center text-center max-w-3xl mx-auto px-4 mt-20 lg:mt-32">
-            {/* Hero Text Group */}
-            <div className="flex flex-col gap-4 items-center">
-              {/* Headline */}
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.7 }}
-                className="text-5xl md:text-7xl font-serif font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-[1.1] mb-2"
-              >
-                Manjanium <br className="hidden lg:block"/> 
-                <span className="text-zinc-900 dark:text-zinc-50 drop-shadow-sm">On Softs</span>
-              </motion.h1>
+          <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-16 min-h-screen w-full relative z-10 pt-20 lg:pt-0">
+            {/* Hero Left Text Column */}
+            <div className="flex flex-col gap-8 items-center lg:items-start text-center lg:text-left max-w-2xl">
+              <div className="flex flex-col gap-4 items-center lg:items-start">
+                {/* Headline */}
+                <motion.h1
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.7 }}
+                  className="text-5xl md:text-7xl font-serif font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-[1.1] mb-2"
+                >
+                  Manjanium <br className="hidden lg:block"/> 
+                  <span className="text-zinc-900 dark:text-zinc-50 drop-shadow-sm">On Softs</span>
+                </motion.h1>
 
-              {/* Subheadline */}
-              <motion.p
+                {/* Subheadline */}
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, duration: 0.7 }}
+                  className="text-lg md:text-xl text-zinc-900 dark:text-zinc-50 font-medium"
+                >
+                  The Ultimate F1 & Football Hub. Track every session and match in real-time.
+                </motion.p>
+              </div>
+
+              {/* Buttons */}
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.7 }}
-                className="text-lg md:text-xl text-zinc-900 dark:text-zinc-50 font-medium"
+                transition={{ delay: 0.8, duration: 0.7 }}
+                className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full"
               >
-                The Ultimate F1 & Football Hub. Track every session and match in real-time.
-              </motion.p>
+                <Link href="/f1" className="w-full sm:w-auto">
+                  <button
+                    className="bg-stitch-secondary hover:bg-stitch-secondary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full cursor-pointer"
+                  >
+                    Enter F1 Hub <IconArrowRight className="w-5 h-5" />
+                  </button>
+                </Link>
+
+                <Link href="/football" className="w-full sm:w-auto">
+                  <button
+                    className="bg-stitch-primary hover:bg-stitch-primary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full cursor-pointer"
+                  >
+                    Enter Football Center <IconArrowRight className="w-5 h-5" />
+                  </button>
+                </Link>
+              </motion.div>
             </div>
 
-            {/* Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.7 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full lg:w-auto"
+            {/* Hero Right Terminal Column */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+              className="flex-1 w-full max-w-xl hidden lg:block"
             >
-              <Link href="/f1" className="w-full sm:w-auto">
-                <button
-                  className="bg-stitch-secondary hover:bg-stitch-secondary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full cursor-pointer"
-                >
-                  Enter F1 Hub <IconArrowRight className="w-5 h-5" />
-                </button>
-              </Link>
-
-              <Link href="/football" className="w-full sm:w-auto">
-                <button
-                  className="bg-stitch-primary hover:bg-stitch-primary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full cursor-pointer"
-                >
-                  Enter Football Center <IconArrowRight className="w-5 h-5" />
-                </button>
-              </Link>
+              <Terminal 
+                commands={telemetryCommands} 
+                outputs={telemetryOutputs} 
+                username="manjanium-core" 
+                enableSound={false}
+              />
             </motion.div>
           </div>
         </AuroraBackground>
