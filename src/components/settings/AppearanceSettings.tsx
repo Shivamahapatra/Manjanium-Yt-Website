@@ -7,7 +7,7 @@ type Theme = 'dark' | 'light' | 'auto'
 type FontSize = 'sm' | 'md' | 'lg'
 type AnimationSpeed = 'reduced' | 'normal' | 'fast'
 
-export default function AppearanceSettings() {
+export function AppearanceSettings() {
   const { preferences, updatePreferences } = useUserPreferences()
   const [saveMessage, setSaveMessage] = useState('')
 

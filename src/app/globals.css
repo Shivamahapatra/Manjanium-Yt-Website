@@ -230,7 +230,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-bg-primary text-text-primary transition-colors duration-200 ease-in-out;
+    @apply bg-background text-text-primary transition-colors duration-200 ease-in-out;
     font-size: var(--font-size);
   }
   html {
