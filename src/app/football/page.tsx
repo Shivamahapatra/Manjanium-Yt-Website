@@ -83,7 +83,7 @@ function FootballHubContent() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
           <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 space-y-4 z-20">
             <div className="flex items-center gap-2">
-              {fixtures[0].status.short === "1H" || fixtures[0].status.short === "2H" ? (
+              {fixtures[0].fixture?.status?.short === "1H" || fixtures[0].fixture?.status?.short === "2H" ? (
                 <span className="px-2 py-1 bg-error text-white font-bold text-xs rounded flex items-center gap-2 animate-pulse">
                   <span className="w-2 h-2 rounded-full bg-white"></span> LIVE
                 </span>
@@ -112,7 +112,7 @@ function FootballHubContent() {
                 <span className="font-mono text-4xl md:text-6xl text-primary font-bold drop-shadow-[0_0_12px_rgba(var(--color-primary),0.6)]">
                   {fixtures[0].goals.home ?? 0} : {fixtures[0].goals.away ?? 0}
                 </span>
-                <span className="text-xs font-bold text-text-primary">{fixtures[0].status.elapsed ? `${fixtures[0].status.elapsed}'` : 'TBD'}</span>
+                <span className="text-xs font-bold text-text-primary">{fixtures[0].fixture?.status?.elapsed ? `${fixtures[0].fixture.status.elapsed}'` : 'TBD'}</span>
               </div>
               
               <div className="flex-1 flex items-center justify-end gap-6">
