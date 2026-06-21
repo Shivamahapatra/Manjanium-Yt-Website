@@ -351,7 +351,10 @@ function FootballHubContent() {
                   <div className="col-span-1">
                     <h3 className="text-xl font-bold text-white mb-4">Top Scorers</h3>
                     <div className="bg-[#111111] rounded-2xl border border-[#1f1f1f] p-4 h-[800px]">
-                       <TopScorersWidget scorers={getTopScorers(fixtures)} />
+                       <TopScorersWidget 
+                         scorers={getTopScorers(fixtures)} 
+                         lastUpdated={standingsData?.lastUpdated || new Date().toISOString()} 
+                       />
                     </div>
                   </div>
                 )}
