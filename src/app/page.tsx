@@ -17,7 +17,6 @@ import {
 import Link from "next/link";
 import { ChannelsGrid } from "@/components/social/ChannelsGrid";
 import { Activity, BarChart2, Trophy, Calendar, Rss, MapPin } from "lucide-react";
-
 import { Terminal } from "@/components/ui/terminal";
 
 // --- HOVER EFFECT COMPONENT ---
@@ -44,10 +43,10 @@ const FeaturesHoverEffect = ({ items }: { items: any[] }) => {
               />
             )}
           </AnimatePresence>
-          <div className="rounded-2xl h-full w-full p-6 bg-primary/80 backdrop-blur-md border border-border relative z-20 flex flex-col overflow-hidden group-hover:border-manjanium-gold transition-colors shadow-2xl">
+          <div className="rounded-2xl h-full w-full p-6 bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm dark:shadow-2xl relative z-20 flex flex-col overflow-hidden transition-colors">
             <div className={`mb-4 ${item.textColor}`}>{item.icon}</div>
-            <h4 className="text-white font-bold tracking-wide mt-4">{item.title}</h4>
-            <p className="mt-4 text-neutral-400 tracking-wide leading-relaxed text-sm flex-1">{item.description}</p>
+            <h4 className="text-zinc-900 dark:text-zinc-50 font-bold tracking-wide mt-4">{item.title}</h4>
+            <p className="mt-4 text-zinc-600 dark:text-zinc-400 tracking-wide leading-relaxed text-sm flex-1">{item.description}</p>
             <div className={`mt-6 text-sm font-bold ${item.textColor} flex items-center gap-1`}>
               Explore <IconArrowRight className="w-4 h-4" />
             </div>
@@ -90,11 +89,11 @@ const MockTimingTower = () => {
   }, []);
 
   return (
-    <div className="bg-primary/80 backdrop-blur-xl border border-border rounded-2xl overflow-hidden relative shadow-2xl font-mono text-sm h-full flex flex-col w-full max-w-sm mx-auto">
-      <div className="absolute top-2 right-2 px-2 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded text-[10px] font-sans font-bold text-blue-400 z-10">
+    <div className="bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden relative font-mono text-sm h-full flex flex-col w-full max-w-sm mx-auto">
+      <div className="absolute top-2 right-2 px-2 py-0.5 bg-zinc-200/50 dark:bg-zinc-800/50 rounded text-[10px] font-sans font-bold text-zinc-600 dark:text-zinc-400 z-10">
         SIMULATED DATA
       </div>
-      <div className="flex bg-primary p-3 text-xs text-neutral-500 font-bold border-b border-border">
+      <div className="flex bg-zinc-100 dark:bg-zinc-900 p-3 text-xs text-zinc-600 dark:text-zinc-400 font-bold border-b border-zinc-200 dark:border-zinc-800">
         <div className="w-8">POS</div>
         <div className="flex-1">DRIVER</div>
         <div className="w-20 text-right">GAP</div>
@@ -107,14 +106,14 @@ const MockTimingTower = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ delay: i * 0.08 }}
-            className="flex items-center px-3 py-2 bg-background/50 rounded border border-transparent hover:border-border transition-colors"
+            className="flex items-center px-3 py-2 bg-zinc-50 dark:bg-zinc-800/50 rounded border border-transparent transition-colors"
           >
-            <div className="w-8 text-neutral-500 font-bold">{d.pos}</div>
+            <div className="w-8 text-zinc-500 font-bold">{d.pos}</div>
             <div className="flex-1 flex items-center gap-3">
               <div className="w-1.5 h-4 rounded-full shadow-sm" style={{ backgroundColor: d.color }} />
-              <span className="font-bold text-white tracking-wider">{d.acronym}</span>
+              <span className="font-bold text-zinc-900 dark:text-zinc-100 tracking-wider">{d.acronym}</span>
             </div>
-            <div className={`w-20 text-right font-bold ${i === 0 ? "text-blue-400" : "text-neutral-300"}`}>
+            <div className={`w-20 text-right font-bold ${i === 0 ? "text-blue-500 dark:text-blue-400" : "text-zinc-600 dark:text-zinc-300"}`}>
               {d.gap}
             </div>
           </motion.div>
@@ -185,7 +184,7 @@ export default function HomePage() {
       description: "Latest car upgrades and regulation news aggregated from top sources.",
       icon: <Rss className="w-8 h-8" />,
       accent: "neutral",
-      textColor: "text-neutral-400",
+      textColor: "text-neutral-500 dark:text-neutral-400",
       hoverBg: "bg-neutral-500/[0.1]",
     },
   ];
@@ -225,7 +224,7 @@ export default function HomePage() {
       followers: "25K",
       buttonText: "Follow",
       url: "#",
-      accentColor: "text-neutral-200 border-neutral-200/20 group-hover:border-neutral-200/50",
+      accentColor: "text-zinc-600 dark:text-zinc-200 border-zinc-200/20 group-hover:border-zinc-400/50",
     },
     {
       name: "Instagram",
@@ -243,7 +242,7 @@ export default function HomePage() {
       followers: "150K",
       buttonText: "Follow",
       url: "#",
-      accentColor: "text-teal-400 border-teal-400/20 group-hover:border-teal-400/50",
+      accentColor: "text-teal-500 border-teal-500/20 group-hover:border-teal-500/50",
     },
     {
       name: "Reddit",
@@ -265,7 +264,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-background overflow-hidden selection:bg-blue-500/30 relative">
+    <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 overflow-hidden selection:bg-blue-500/30 relative">
       
       {/* NOISE BACKGROUND */}
       <div 
@@ -275,166 +274,97 @@ export default function HomePage() {
 
       {/* SECTION 1 — HERO */}
       <div className="relative">
-        <AuroraBackground showRadialGradient className="min-h-screen w-full relative pb-20 pt-10 lg:pt-0">
+        <AuroraBackground showRadialGradient className="min-h-screen w-full relative pb-20 pt-10 lg:pt-0 bg-transparent">
           
-          {/* Custom Static Grid Background inside Hero */}
-          <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
-               style={{ backgroundImage: 'radial-gradient(circle at center, #1f1f1f 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-          
-          {/* Custom Spotlights */}
-          <div className="absolute top-[0%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/20 blur-[120px] pointer-events-none z-0" />
-          <div className="absolute top-[0%] right-[-10%] w-[50%] h-[50%] rounded-full bg-red-600/10 blur-[120px] pointer-events-none z-0" />
-
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 w-full max-w-7xl mx-auto h-full gap-12 lg:gap-8 mt-16 lg:mt-0">
-            
-            {/* Left Content Column */}
-            <motion.div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left mt-8 lg:mt-0">
-              {/* Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/80 backdrop-blur-sm border border-border mb-8"
-              >
-                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
-                <span className="text-xs font-bold text-white tracking-widest uppercase">LIVE NOW — F1 & Football Data Hub</span>
-              </motion.div>
-
-              {/* Headline */}
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.7 }}
-                className="text-6xl md:text-8xl font-serif font-bold text-white tracking-tight leading-[1.1] mb-6"
-              >
-                Manjanium <br className="hidden lg:block"/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 drop-shadow-sm">On Softs</span>
-              </motion.h1>
-
-              {/* Subheadline */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.7 }}
-                className="text-xl md:text-2xl text-neutral-400 max-w-xl font-light mb-10"
-              >
-                The Ultimate F1 & Football Hub. Track every session and match in real-time.
-              </motion.p>
-
-              {/* Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.7 }}
-                className="flex flex-col sm:flex-row items-center gap-4 mb-10 w-full lg:w-auto"
-              >
-                <Link href="/f1" className="w-full sm:w-auto">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="bg-blue-600 hover:bg-blue-500 hover:shadow-[0_0_20px_rgba(251,191,36,0.4)] text-white font-bold px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all text-lg w-full shadow-lg shadow-blue-500/20"
-                  >
-                    Enter F1 Hub <IconArrowRight className="w-5 h-5" />
-                  </motion.button>
-                </Link>
-
-                <Link href="/football" className="w-full sm:w-auto">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="bg-green-600 hover:bg-green-500 hover:shadow-[0_0_20px_rgba(251,191,36,0.4)] text-white font-bold px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all text-lg w-full shadow-lg shadow-green-500/20"
-                  >
-                    Enter Football Center <IconArrowRight className="w-5 h-5" />
-                  </motion.button>
-                </Link>
-                
-                <Link href="https://www.youtube.com/@manjaniumonsofts67" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="bg-white/10 hover:bg-white/20 hover:shadow-[0_0_20px_rgba(251,191,36,0.2)] backdrop-blur-md border border-white/10 text-white font-bold px-6 py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all text-base w-full"
-                  >
-                    <IconBrandYoutube className="w-5 h-5 text-red-500" />
-                    Subscribe
-                  </motion.button>
-                </Link>
-              </motion.div>
-
-              {/* Stats */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1, duration: 0.7 }}
-                className="flex flex-wrap justify-center lg:justify-start items-center gap-3 sm:gap-4 text-[10px] sm:text-xs font-semibold text-neutral-500 uppercase tracking-widest"
-              >
-                <span>20 F1 Drivers</span>
-                <span className="w-1 h-1 bg-neutral-700 rounded-full" />
-                <span>Real-time Telemetry</span>
-                <span className="w-1 h-1 bg-neutral-700 rounded-full" />
-                <span>Global Football Coverage</span>
-                <span className="w-1 h-1 bg-neutral-700 rounded-full hidden sm:block" />
-                <span className="hidden sm:block">0 Ads</span>
-              </motion.div>
-            </motion.div>
-
-            {/* Right Content Column — Terminal */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.6, duration: 0.8 }}
-              className="flex-1 w-full max-w-xl hidden md:block"
+          <div className="relative z-10 flex flex-col gap-6 items-center text-center max-w-3xl mx-auto px-4 mt-20 lg:mt-32">
+            {/* Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.7 }}
+              className="text-5xl md:text-7xl font-serif font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-[1.1] mb-2"
             >
-              <Terminal 
-                commands={telemetryCommands} 
-                outputs={telemetryOutputs} 
-                username="manjanium-core" 
-                enableSound={false}
-              />
-            </motion.div>
+              Manjanium <br className="hidden lg:block"/> 
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-800 to-zinc-500 dark:from-zinc-100 dark:to-zinc-400 drop-shadow-sm">On Softs</span>
+            </motion.h1>
 
+            {/* Subheadline */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.7 }}
+              className="text-lg md:text-xl text-zinc-600 dark:text-zinc-400 font-medium"
+            >
+              The Ultimate F1 & Football Hub. Track every session and match in real-time.
+            </motion.p>
+
+            {/* Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.7 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 w-full lg:w-auto"
+            >
+              <Link href="/f1" className="w-full sm:w-auto">
+                <button
+                  className="bg-[#E10600] text-white hover:bg-[#c20500] font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full"
+                >
+                  Enter F1 Hub <IconArrowRight className="w-5 h-5" />
+                </button>
+              </Link>
+
+              <Link href="/football" className="w-full sm:w-auto">
+                <button
+                  className="bg-transparent border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 px-6 py-3 rounded-full transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center gap-2 w-full font-semibold"
+                >
+                  Enter Football Center <IconArrowRight className="w-5 h-5" />
+                </button>
+              </Link>
+            </motion.div>
           </div>
         </AuroraBackground>
       </div>
 
-      {/* SECTION 2 — LIVE TELEMETRY PREVIEW */}
-      <div className="w-full bg-background py-24 border-y border-border relative z-10">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          
-          <motion.div 
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="text-blue-500 text-xs font-bold tracking-widest uppercase mb-4">F1 HUB</div>
-            <h2 className="text-4xl md:text-6xl font-serif font-bold text-white leading-tight mb-2">
-              Live Sports Telemetry<br/>
-              <span className="text-blue-500 italic">Uninterrupted.</span>
-            </h2>
-            <p className="text-lg text-neutral-400 my-8 leading-relaxed max-w-lg">
-              Track every gap, interval, and sector time as it happens. Built for fans who want more than a broadcast.
-            </p>
-            <Link href="/f1" className="text-blue-500 hover:text-blue-400 font-bold flex items-center gap-2 group transition-colors">
-              Go to F1 Hub 
-              <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </motion.div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* SECTION 2 — LIVE TELEMETRY PREVIEW */}
+        <div className="w-full relative z-10 py-12 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            
+            <motion.div 
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="text-blue-600 dark:text-blue-500 text-xs font-bold tracking-widest uppercase mb-4">F1 HUB</div>
+              <h2 className="text-4xl md:text-5xl font-serif font-black text-zinc-900 dark:text-zinc-50 leading-tight mb-2">
+                Live Sports Telemetry<br/>
+                <span className="text-blue-600 dark:text-blue-500 italic">Uninterrupted.</span>
+              </h2>
+              <p className="text-lg text-zinc-600 dark:text-zinc-400 my-8 leading-relaxed max-w-lg font-medium">
+                Track every gap, interval, and sector time as it happens. Built for fans who want more than a broadcast.
+              </p>
+              <Link href="/f1" className="text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 font-bold flex items-center gap-2 group transition-colors">
+                Go to F1 Hub 
+                <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
-            className="w-full h-full"
-          >
-             <MockTimingTower />
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8 }}
+              className="w-full h-full"
+            >
+               <MockTimingTower />
+            </motion.div>
 
+          </div>
         </div>
-      </div>
 
-      {/* SECTION 3 — FEATURES GRID */}
-      <div className="w-full bg-background py-24 relative z-10">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
+        {/* SECTION 3 — FEATURES GRID */}
+        <div className="w-full relative z-10 py-12 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -442,8 +372,8 @@ export default function HomePage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Platform Features</h2>
-            <p className="text-neutral-400 text-lg max-w-2xl mx-auto">Everything you need to track the sport, completely engineered from scratch.</p>
+            <h2 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-zinc-50 mb-6">Platform Features</h2>
+            <p className="text-zinc-600 dark:text-zinc-400 text-lg max-w-2xl mx-auto font-medium">Everything you need to track the sport, completely engineered from scratch.</p>
           </motion.div>
 
           <motion.div
@@ -455,11 +385,9 @@ export default function HomePage() {
              <FeaturesHoverEffect items={features} />
           </motion.div>
         </div>
-      </div>
 
-      {/* SECTION 4 — SOCIAL CHANNELS */}
-      <div className="w-full bg-background py-24 border-t border-border relative z-10">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
+        {/* SECTION 4 — SOCIAL CHANNELS */}
+        <div className="w-full relative z-10 py-12 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -467,72 +395,71 @@ export default function HomePage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <div className="inline-block px-4 py-1.5 rounded-full bg-primary border border-border mb-4">
-              <span className="text-xs font-bold text-manjanium-gold tracking-widest uppercase">Community</span>
+            <div className="inline-block px-4 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 mb-4">
+              <span className="text-xs font-bold text-blue-600 dark:text-blue-500 tracking-widest uppercase">Community</span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Follow Us on Social Media</h2>
-            <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-zinc-50 mb-6">Follow Us on Social Media</h2>
+            <p className="text-zinc-600 dark:text-zinc-400 text-lg max-w-2xl mx-auto font-medium">
               Join thousands of fans across our platforms. Live streams, updates, and community discussions.
             </p>
           </motion.div>
 
           <ChannelsGrid channels={socialChannels} />
         </div>
+
+        {/* SECTION 5 — FOOTBALL STRIP */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8 }}
+          className="w-full bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm dark:shadow-2xl rounded-3xl p-8 md:p-12 relative z-10 mb-12"
+        >
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="text-center md:text-left">
+              <h2 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-zinc-50 mb-3 flex items-center justify-center md:justify-start gap-3">
+                <span className="text-2xl">⚽</span> FIFA World Cup 2026
+              </h2>
+              <p className="text-zinc-600 dark:text-zinc-400 text-lg font-medium">Live scores and group standings — updated in real time.</p>
+            </div>
+            <Link href="/football">
+              <button
+                className="bg-green-600 text-white hover:bg-green-700 font-semibold px-8 py-3.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                Enter Football Center <IconArrowRight className="w-5 h-5" />
+              </button>
+            </Link>
+          </div>
+        </motion.div>
+
       </div>
 
-      {/* SECTION 5 — WORLD CUP STRIP */}
-      <motion.div 
-        initial={{ opacity: 0, x: 100 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8 }}
-        className="w-full bg-gradient-to-r from-primary to-background py-16 border-y border-border relative z-10"
-      >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
-              <span className="text-2xl">⚽</span> FIFA World Cup 2026
-            </h2>
-            <p className="text-neutral-400 text-lg">Live scores and group standings — updated in real time.</p>
-          </div>
-          <Link href="/football">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.97 }}
-              className="bg-green-600 hover:bg-green-500 hover:shadow-[0_0_20px_rgba(251,191,36,0.4)] text-white font-bold px-8 py-3.5 rounded-xl flex items-center gap-2 transition-all whitespace-nowrap shadow-lg shadow-green-500/20"
-            >
-              Enter Football Center <IconArrowRight className="w-5 h-5" />
-            </motion.button>
-          </Link>
-        </div>
-      </motion.div>
-
-      {/* SECTION 5 — FOOTER */}
-      <footer className="w-full bg-background py-12 border-t border-border relative z-10">
+      {/* SECTION 6 — FOOTER */}
+      <footer className="w-full bg-white dark:bg-zinc-950 py-12 border-t border-zinc-200 dark:border-zinc-800 relative z-10">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
             <div className="text-center md:text-left">
-              <div className="text-white font-serif font-bold text-xl mb-1">Manjanium On Softs</div>
-              <div className="text-neutral-500 text-sm">Built for fans, by fans.</div>
+              <div className="text-zinc-900 dark:text-zinc-50 font-serif font-black text-xl mb-1">Manjanium On Softs</div>
+              <div className="text-zinc-500 text-sm font-medium">Built for fans, by fans.</div>
             </div>
             
-            <div className="flex items-center gap-6 text-sm font-semibold text-neutral-400">
-              <Link href="/f1" className="hover:text-white transition-colors">F1 Hub</Link>
-              <Link href="/football" className="hover:text-white transition-colors">Football</Link>
-              <Link href="/f1?tab=calendar" className="hover:text-white transition-colors">Calendar</Link>
-              <Link href="/f1?tab=standings" className="hover:text-white transition-colors">Standings</Link>
+            <div className="flex items-center gap-6 text-sm font-semibold text-zinc-600 dark:text-zinc-400">
+              <Link href="/f1" className="hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors">F1 Hub</Link>
+              <Link href="/football" className="hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors">Football</Link>
+              <Link href="/f1?tab=calendar" className="hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors">Calendar</Link>
+              <Link href="/f1?tab=standings" className="hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors">Standings</Link>
             </div>
 
             <div>
               <Link href="https://www.youtube.com/@manjaniumonsofts67" target="_blank" rel="noopener noreferrer">
-                <button className="bg-primary hover:bg-primary/80 border border-border text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all hover:shadow-[0_0_15px_rgba(251,191,36,0.2)] text-xs font-bold">
-                  <IconBrandYoutube className="w-4 h-4 text-red-500" /> Subscribe
+                <button className="bg-transparent border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-4 py-2 rounded-lg flex items-center gap-2 transition-all text-xs font-bold">
+                  <IconBrandYoutube className="w-4 h-4 text-[#E10600]" /> Subscribe
                 </button>
               </Link>
             </div>
           </div>
           
-          <div className="text-center text-xs text-neutral-600 pt-8 border-t border-border">
+          <div className="text-center text-xs text-zinc-500 pt-8 border-t border-zinc-200 dark:border-zinc-800 font-medium">
             Data sourced from OpenF1, Jolpica & ESPN. Not affiliated with Formula 1 or FIFA.
           </div>
         </div>
