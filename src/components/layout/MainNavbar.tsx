@@ -4,47 +4,53 @@ import { SignInButton, SignUpButton, UserButton, useAuth } from '@clerk/nextjs'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+const navItems = [
+  { label: 'F1 Hub', href: '/f1' },
+  { label: 'Football', href: '/football' },
+  { label: 'Settings', href: '/settings' }
+]
+
 export default function MainNavbar() {
   const { isSignedIn } = useAuth()
   const pathname = usePathname()
 
-  const navItems = [
-    { label: 'F1 HUB', href: '/f1' },
-    { label: 'FOOTBALL', href: '/football' },
-    { label: 'SETTINGS', href: '/settings' }
-  ]
+  const isActive = (href: string) => {
+    if (href === '/f1') return pathname === '/f1' || pathname.startsWith('/f1/')
+    return pathname === href || pathname.startsWith(href + '/')
+  }
 
   return (
-    <header 
+    <header
       style={{
         backgroundColor: 'var(--color-surface)',
         borderBottomColor: 'var(--color-border)',
-        backdropFilter: 'blur(12px)'
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
       }}
-      className="fixed top-0 w-full z-50 flex justify-between items-center h-16 px-6 shadow-sm"
+      className="fixed top-0 w-full z-50 flex justify-between items-center h-16 px-6 border-b shadow-sm"
     >
       <div className="flex items-center gap-4">
-        <div 
-          style={{ backgroundColor: 'var(--color-primary)' }}
-          className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
+        <div
+          style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-background)' }}
+          className="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm shrink-0"
         >
           MN
         </div>
-        <h1 style={{ color: 'var(--color-text-primary)' }} className="font-bold text-lg">
+        <h1 style={{ color: 'var(--color-text-primary)' }} className="font-bold text-base hidden sm:block">
           Manjanium On Softs
         </h1>
       </div>
 
-      <nav className="hidden md:flex gap-6">
+      <nav className="hidden md:flex gap-1">
         {navItems.map(item => (
           <Link
             key={item.href}
             href={item.href}
             style={{
-              color: pathname.startsWith(item.href) ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-              borderBottomColor: pathname.startsWith(item.href) ? 'var(--color-primary)' : 'transparent'
+              color: isActive(item.href) ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              borderBottomColor: isActive(item.href) ? 'var(--color-primary)' : 'transparent',
             }}
-            className="font-bold text-xs uppercase tracking-wider border-b-2 pb-1 hover:text-primary transition-colors"
+            className="font-bold text-xs uppercase tracking-wider border-b-2 pb-0.5 px-3 py-1 hover:opacity-90 transition-all rounded-sm"
           >
             {item.label}
           </Link>

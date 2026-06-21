@@ -33,11 +33,11 @@ const config: Config = {
           "outline-variant": "var(--stitch-outline-variant, #bbcbb9)",
           error: "var(--stitch-error, #ba1a1a)",
         },
-        // Manjanium Design System Colors
         primary: "var(--color-primary, #fbbf24)",
         secondary: "var(--color-secondary, #ffb95f)",
         error: "var(--color-error, #ffb4ab)",
         background: "var(--color-background, #131313)",
+        "bg-primary": "var(--color-background, #131313)",
         surface: "var(--color-surface, #201f1f)",
         "surface-container": "var(--color-surface-container, #2a2a2a)",
         "surface-container-low": "var(--color-surface-container-low, #1c1b1b)",
@@ -46,6 +46,7 @@ const config: Config = {
         "text-secondary": "var(--color-text-secondary, #d3c5ac)",
         "border-default": "var(--color-border, #2a2a2a)",
         "border-variant": "var(--color-border-variant, #4f4633)",
+        "border-color": "var(--color-border, #2a2a2a)",
         outline: "var(--color-outline, #9c8f79)",
       },
       fontFamily: {

@@ -24,6 +24,9 @@ const mapPosition = (espnPos: string) => {
   return posMap[espnPos] || espnPos || 'Unknown';
 };
 
+// Simple in-memory cache for rosters to optimize API load
+const rostersCache: Record<string, any[]> = {};
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -47,50 +50,62 @@ export async function GET(request: Request) {
     groupsData.forEach((group: any) => {
       const entries = group.standings?.entries || [];
       entries.forEach((entry: any) => {
-        if (entry.team?.id) {
+        if (entry.team?.id && !rostersCache[entry.team.id]) {
           teamsToFetch.push({ id: entry.team.id, groupId: group.id });
         }
       });
     });
 
-    // Batch fetch rosters (limit concurrency in a real large app, but 32 teams is fine for Promise.all here)
-    const rosterPromises = teamsToFetch.map(team => 
-      fetch(`${ROSTER_URL_BASE}/${team.id}/roster`, fetchOptions)
-        .then(res => res.ok ? res.json() : null)
-        .catch(() => null)
-    );
+    if (teamsToFetch.length > 0) {
+      // Batch fetch rosters (limit concurrency in a real large app, but 32 teams is fine for Promise.all here)
+      const rosterPromises = teamsToFetch.map(team => 
+        fetch(`${ROSTER_URL_BASE}/${team.id}/roster`, fetchOptions)
+          .then(res => res.ok ? res.json() : null)
+          .catch(() => null)
+      );
 
-    const rostersData = await Promise.all(rosterPromises);
-    
-    // Map rosters by team ID
+      const rostersData = await Promise.all(rosterPromises);
+      
+      // Map rosters by team ID
+      rostersData.forEach((rosterResp, index) => {
+        const teamId = teamsToFetch[index].id;
+        if (rosterResp && rosterResp.athletes) {
+          rostersCache[teamId] = rosterResp.athletes.map((athlete: any) => {
+            const statsCats = athlete.statistics?.splits?.categories || [];
+            
+            return {
+              id: athlete.id,
+              name: athlete.displayName || athlete.fullName,
+              number: athlete.jersey || 0,
+              position: mapPosition(athlete.position?.name),
+              photo: athlete.headshot?.href || '',
+              gamesPlayed: extractStat(statsCats, 'general', 'appearances'),
+              goals: extractStat(statsCats, 'offensive', 'totalGoals'),
+              assists: extractStat(statsCats, 'offensive', 'goalAssists'),
+              yellowCards: extractStat(statsCats, 'general', 'yellowCards'),
+              redCards: extractStat(statsCats, 'general', 'redCards'),
+              minutesPlayed: extractStat(statsCats, 'general', 'minutesPlayed') || 0, // Sometimes missing
+              passCompletion: extractStat(statsCats, 'passing', 'passCompletionPercentage') || 0,
+              shotsOnTarget: extractStat(statsCats, 'offensive', 'shotsOnTarget'),
+              tackles: extractStat(statsCats, 'defensive', 'totalTackles') || 0,
+              dribbles: extractStat(statsCats, 'offensive', 'dribbles') || 0
+            };
+          });
+        } else {
+          rostersCache[teamId] = [];
+        }
+      });
+    }
+
+    // Map rosters by team ID for the final response
     const rostersMap: Record<string, any[]> = {};
-    rostersData.forEach((rosterResp, index) => {
-      const teamId = teamsToFetch[index].id;
-      if (rosterResp && rosterResp.athletes) {
-        rostersMap[teamId] = rosterResp.athletes.map((athlete: any) => {
-          const statsCats = athlete.statistics?.splits?.categories || [];
-          
-          return {
-            id: athlete.id,
-            name: athlete.displayName || athlete.fullName,
-            number: athlete.jersey || 0,
-            position: mapPosition(athlete.position?.name),
-            photo: athlete.headshot?.href || '',
-            gamesPlayed: extractStat(statsCats, 'general', 'appearances'),
-            goals: extractStat(statsCats, 'offensive', 'totalGoals'),
-            assists: extractStat(statsCats, 'offensive', 'goalAssists'),
-            yellowCards: extractStat(statsCats, 'general', 'yellowCards'),
-            redCards: extractStat(statsCats, 'general', 'redCards'),
-            minutesPlayed: extractStat(statsCats, 'general', 'minutesPlayed') || 0, // Sometimes missing
-            passCompletion: extractStat(statsCats, 'passing', 'passCompletionPercentage') || 0,
-            shotsOnTarget: extractStat(statsCats, 'offensive', 'shotsOnTarget'),
-            tackles: extractStat(statsCats, 'defensive', 'totalTackles') || 0,
-            dribbles: extractStat(statsCats, 'offensive', 'dribbles') || 0
-          };
-        });
-      } else {
-        rostersMap[teamId] = [];
-      }
+    groupsData.forEach((group: any) => {
+      const entries = group.standings?.entries || [];
+      entries.forEach((entry: any) => {
+        if (entry.team?.id) {
+          rostersMap[entry.team.id] = rostersCache[entry.team.id] || [];
+        }
+      });
     });
 
     // Build final response
