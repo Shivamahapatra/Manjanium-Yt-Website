@@ -5,11 +5,11 @@ import dynamic from "next/dynamic";
 import { Spin } from "antd";
 import { CloudRain, Radio, Flag, Wind, Thermometer, Volume2, AlertCircle } from "lucide-react";
 import { LiveTimingTower } from "@/components/f1/LiveTimingTower";
-import { F1_VENUES_2026 } from "@/lib/f1-helpers";
+import { F1_VENUES_2026, getCountryFlag, getTimezoneForVenue } from "@/lib/f1-helpers";
 
 // Dynamic import for the 3D Live focus Globe
-const F1LiveGlobe = dynamic(
-  () => import("@/components/f1/F1LiveGlobe"),
+const Globe = dynamic(
+  () => import("@/components/ui/globe").then((m) => m.Globe),
   {
     ssr: false,
     loading: () => (
@@ -17,6 +17,32 @@ const F1LiveGlobe = dynamic(
     ),
   }
 );
+
+// F1 Racing venues coordinate arcs for Globe visualization
+const globeArcs = [
+  { startLat: 52.0786, startLng: -1.0169, endLat: 45.6156, endLng: 9.2811, arcAlt: 0.2, color: "#3b82f6" },
+  { startLat: 45.6156, startLng: 9.2811, endLat: 43.7347, endLng: 7.4205, arcAlt: 0.15, color: "#ef4444" },
+  { startLat: 43.7347, startLng: 7.4205, endLat: 50.4372, endLng: 5.9714, arcAlt: 0.2, color: "#10b981" },
+  { startLat: 50.4372, startLng: 5.9714, endLat: 24.4672, endLng: 54.6031, arcAlt: 0.3, color: "#f59e0b" },
+  { startLat: 24.4672, startLng: 54.6031, endLat: -37.8497, endLng: 144.9680, arcAlt: 0.4, color: "#8b5cf6" },
+  { startLat: -37.8497, startLng: 144.9680, endLat: 30.1328, endLng: -97.6411, arcAlt: 0.5, color: "#ec4899" },
+  { startLat: 30.1328, startLng: -97.6411, endLat: -23.7036, endLng: -46.6997, arcAlt: 0.35, color: "#06b6d4" },
+  { startLat: -23.7036, startLng: -46.6997, endLat: 34.8431, endLng: 136.5407, arcAlt: 0.5, color: "#14b8a6" }
+];
+
+const globeConfig = {
+  ambientLight: "#ffffff",
+  directionalLeftLight: "#3b82f6",
+  directionalTopLight: "#ffffff",
+  pointLight: "#ffffff",
+  globeColor: "#0b1329",
+  polygonColor: "rgba(14, 165, 233, 0.45)",
+  showAtmosphere: true,
+  atmosphereColor: "#2563eb",
+  atmosphereAltitude: 0.15,
+  autoRotate: true,
+  autoRotateSpeed: 0.6,
+};
 
 // --- Subcomponents for live panels ---
 
@@ -215,6 +241,7 @@ export function F1LiveTab() {
   const [session, setSession] = useState<any>(null);
   const [sessionKey, setSessionKey] = useState<string>("latest");
   const [loading, setLoading] = useState(true);
+  const [localTime, setLocalTime] = useState<string>("");
 
   // Poll for active session key and details
   useEffect(() => {
@@ -272,6 +299,52 @@ export function F1LiveTab() {
     };
   }, [session]);
 
+  // Update circuit local time clock every second
+  useEffect(() => {
+    if (!currentVenue) return;
+    const tz = getTimezoneForVenue(currentVenue.circuitName);
+
+    const updateTime = () => {
+      try {
+        const formatted = new Intl.DateTimeFormat("en-GB", {
+          timeZone: tz,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }).format(new Date());
+        setLocalTime(formatted);
+      } catch {
+        setLocalTime("--:--:--");
+      }
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, [currentVenue]);
+
+  // Determine theme colors based on session type
+  let isRaceOrSprint = false;
+  let isQuali = false;
+  let statusText = "";
+  let statusBadgeClass = "";
+
+  if (currentVenue) {
+    isRaceOrSprint = currentVenue.sessionType === "Race" || currentVenue.sessionType === "Sprint";
+    isQuali = currentVenue.sessionType === "Qualifying";
+
+    if (isRaceOrSprint) {
+      statusText = "● RACE LIVE";
+      statusBadgeClass = "bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse";
+    } else if (isQuali) {
+      statusText = "● QUALIFYING";
+      statusBadgeClass = "bg-amber-500/20 text-amber-400 border border-amber-500/30";
+    } else {
+      statusText = `● ${currentVenue.sessionName}`;
+      statusBadgeClass = "bg-blue-500/20 text-blue-400 border border-blue-500/30";
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a]">
@@ -296,11 +369,50 @@ export function F1LiveTab() {
           {/* RIGHT COLUMN: Live Globe Focus + Weather + Race Control */}
           <div className="lg:col-span-1 space-y-6">
             {/* Live Globe container */}
-            <div className="bg-[#111111]/30 border border-[#1f1f1f] rounded-2xl p-4 flex flex-col items-center justify-center shadow-xl">
+            <div className="bg-[#111111]/30 border border-[#1f1f1f] rounded-2xl p-4 flex flex-col items-center justify-center shadow-xl w-full">
               <span className="text-xs text-neutral-500 font-mono uppercase tracking-wider block mb-4">
                 Live Circuit Focus
               </span>
-              <F1LiveGlobe sessionVenue={currentVenue} />
+              <div className="relative w-full aspect-square md:h-[320px] overflow-hidden rounded-full border border-neutral-800/30 bg-[#070714] flex items-center justify-center mb-4">
+                <Globe globeConfig={globeConfig} data={globeArcs} />
+              </div>
+
+              {/* Info Card Below Globe */}
+              <div className="w-full mt-2 bg-neutral-900 border border-neutral-800 rounded-xl p-4 text-center shadow-xl">
+                {currentVenue ? (
+                  <>
+                    <div className="text-5xl mb-2">{getCountryFlag(currentVenue.country)}</div>
+                    <div className="text-neutral-400 text-xs font-bold uppercase tracking-wider mb-1">
+                      {currentVenue.country}
+                    </div>
+                    <h4 className="text-white font-bold text-base leading-tight mb-3">
+                      {currentVenue.circuitName}
+                    </h4>
+
+                    <div className="flex flex-col items-center gap-3">
+                      <span className={`px-2.5 py-0.5 text-[10px] font-black tracking-widest rounded uppercase ${statusBadgeClass}`}>
+                        {statusText}
+                      </span>
+                      <div className="border-t border-neutral-800 pt-2 w-full mt-1">
+                        <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest block mb-1">
+                          Circuit Local Time
+                        </span>
+                        <span className="text-xl font-mono font-bold text-white tracking-widest">
+                          {localTime}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="py-2">
+                    <div className="text-4xl mb-2">🏁</div>
+                    <h4 className="text-white font-bold text-base mb-1">No Active Session</h4>
+                    <p className="text-neutral-400 text-xs font-mono">
+                      22 Rounds, 20 Countries
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Weather condition status details */}

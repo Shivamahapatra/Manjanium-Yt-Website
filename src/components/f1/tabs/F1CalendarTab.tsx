@@ -8,8 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getCountryFlag, F1_CANCELED_2026, F1_VENUES_2026 } from '@/lib/f1-helpers';
 
 // Dynamic import for the 3D Globe with loading placeholder
-const F1CalendarGlobe = dynamic(
-  () => import('@/components/f1/F1CalendarGlobe'),
+const Globe = dynamic(
+  () => import('@/components/ui/globe').then((m) => m.Globe),
   { 
     ssr: false, 
     loading: () => (
@@ -19,6 +19,32 @@ const F1CalendarGlobe = dynamic(
     )
   }
 );
+
+// F1 Racing venues coordinate arcs for Globe visualization
+const globeArcs = [
+  { startLat: 52.0786, startLng: -1.0169, endLat: 45.6156, endLng: 9.2811, arcAlt: 0.2, color: "#3b82f6" },
+  { startLat: 45.6156, startLng: 9.2811, endLat: 43.7347, endLng: 7.4205, arcAlt: 0.15, color: "#ef4444" },
+  { startLat: 43.7347, startLng: 7.4205, endLat: 50.4372, endLng: 5.9714, arcAlt: 0.2, color: "#10b981" },
+  { startLat: 50.4372, startLng: 5.9714, endLat: 24.4672, endLng: 54.6031, arcAlt: 0.3, color: "#f59e0b" },
+  { startLat: 24.4672, startLng: 54.6031, endLat: -37.8497, endLng: 144.9680, arcAlt: 0.4, color: "#8b5cf6" },
+  { startLat: -37.8497, startLng: 144.9680, endLat: 30.1328, endLng: -97.6411, arcAlt: 0.5, color: "#ec4899" },
+  { startLat: 30.1328, startLng: -97.6411, endLat: -23.7036, endLng: -46.6997, arcAlt: 0.35, color: "#06b6d4" },
+  { startLat: -23.7036, startLng: -46.6997, endLat: 34.8431, endLng: 136.5407, arcAlt: 0.5, color: "#14b8a6" }
+];
+
+const globeConfig = {
+  ambientLight: "#ffffff",
+  directionalLeftLight: "#3b82f6",
+  directionalTopLight: "#ffffff",
+  pointLight: "#ffffff",
+  globeColor: "#0b1329",
+  polygonColor: "rgba(14, 165, 233, 0.45)",
+  showAtmosphere: true,
+  atmosphereColor: "#2563eb",
+  atmosphereAltitude: 0.15,
+  autoRotate: true,
+  autoRotateSpeed: 0.6,
+};
 
 export function F1CalendarTab() {
   const [races, setRaces] = useState<any[]>([]);
@@ -143,12 +169,10 @@ export function F1CalendarTab() {
         </header>
 
         {/* ===== 3D GLOBE DISPLAY ===== */}
-        <div className="w-full mb-6 bg-[#111111]/30 border border-[#1f1f1f] rounded-2xl p-4">
-          <F1CalendarGlobe
-            completedRounds={completedRounds}
-            nextRound={Number(nextRace?.round || 1)}
-            activeRound={hoveredRound}
-          />
+        <div className="w-full mb-6 bg-[#111111]/30 border border-[#1f1f1f] rounded-2xl p-4 flex justify-center">
+          <div className="relative w-full aspect-square md:h-[600px] overflow-hidden">
+            <Globe globeConfig={globeConfig} data={globeArcs} />
+          </div>
         </div>
 
         {/* ===== CANCELED GP BANNER ===== */}
