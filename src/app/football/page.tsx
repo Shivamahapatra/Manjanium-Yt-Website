@@ -210,13 +210,13 @@ function FootballHubContent() {
                           </tr>
                         </thead>
                         <tbody>
-                          {standingsData.groups[0].standings[0].slice(0, 5).map((team, idx) => (
-                            <tr key={team.team.id} className="hover:bg-primary/5 transition-colors border-b border-border-variant last:border-0 min-h-[44px]">
+                          {standingsData.groups[0].teams.slice(0, 5).map((team, idx) => (
+                            <tr key={team.id} className="hover:bg-primary/5 transition-colors border-b border-border-variant last:border-0 min-h-[44px]">
                               <td className="p-3 font-mono text-primary font-bold">0{idx + 1}</td>
                               <td className="p-3">
                                 <div className="flex items-center gap-2">
-                                  <img src={team.team.logo} className="w-5 h-5 object-contain" />
-                                  <span className="font-bold text-text-primary">{team.team.name}</span>
+                                  <img src={team.logo} className="w-5 h-5 object-contain" />
+                                  <span className="font-bold text-text-primary">{team.name}</span>
                                 </div>
                               </td>
                               <td className="p-3 font-mono text-center font-bold">{team.points}</td>
@@ -235,8 +235,8 @@ function FootballHubContent() {
                   <div className="space-y-2">
                     {topScorers.slice(0, 3).map((scorer, idx) => (
                       <div key={idx} className="flex items-center justify-between px-2 py-1 hover:bg-surface-container rounded cursor-pointer">
-                        <span className="text-sm font-medium text-text-primary">{scorer.player.name}</span>
-                        <span className="font-mono text-primary font-bold text-base">{scorer.statistics[0].goals.total}</span>
+                        <span className="text-sm font-medium text-text-primary">{scorer.name}</span>
+                        <span className="font-mono text-primary font-bold text-base">{scorer.goals}</span>
                       </div>
                     ))}
                   </div>
@@ -252,7 +252,7 @@ function FootballHubContent() {
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {standingsData?.groups?.map((group) => (
-                    <GroupStandingsCard key={group.groupName} groupData={group} isExpanded={true} />
+                    <GroupStandingsCard key={group.groupName} groupData={group} isExpanded={true} onTeamClick={() => {}} />
                   ))}
                 </div>
               )}
