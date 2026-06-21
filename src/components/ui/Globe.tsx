@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import { Canvas, extend, Object3DNode } from "@react-three/fiber";
+import { Canvas, extend } from "@react-three/fiber";
 import ThreeGlobe from "three-globe";
 import { OrbitControls } from "@react-three/drei";
 import { Color, Vector3, Mesh, Object3D, MeshPhongMaterial } from "three";
@@ -15,7 +15,7 @@ extend({ ThreeGlobe });
 
 declare module "@react-three/fiber" {
   interface ThreeElements {
-    threeGlobe: Object3DNode<ThreeGlobe, typeof ThreeGlobe>;
+    threeGlobe: { ref?: React.Ref<ThreeGlobe> };
   }
 }
 
