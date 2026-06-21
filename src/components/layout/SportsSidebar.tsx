@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const navItems = [
+  { label: 'Home', href: '/', icon: '🏠' },
   { label: 'F1 Hub', href: '/f1', icon: '⚡' },
   { label: 'Football', href: '/football', icon: '⚽' },
   { label: 'Settings', href: '/settings', icon: '⚙️' }
@@ -13,6 +14,7 @@ export default function SportsSidebar({ children }: { children?: React.ReactNode
   const pathname = usePathname()
 
   const isActive = (href: string) => {
+    if (href === '/') return pathname === '/'
     if (href === '/f1') return pathname === '/f1' || pathname.startsWith('/f1/')
     if (href === '/football') return pathname === '/football' || pathname.startsWith('/football/')
     return pathname === href || pathname.startsWith(href + '/')

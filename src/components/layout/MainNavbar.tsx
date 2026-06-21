@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const navItems = [
+  { label: 'Home', href: '/' },
   { label: 'F1 Hub', href: '/f1' },
   { label: 'Football', href: '/football' },
   { label: 'Settings', href: '/settings' }
@@ -15,6 +16,7 @@ export default function MainNavbar() {
   const pathname = usePathname()
 
   const isActive = (href: string) => {
+    if (href === '/') return pathname === '/'
     if (href === '/f1') return pathname === '/f1' || pathname.startsWith('/f1/')
     return pathname === href || pathname.startsWith(href + '/')
   }
@@ -29,7 +31,7 @@ export default function MainNavbar() {
       }}
       className="fixed top-0 w-full z-50 flex justify-between items-center h-16 px-6 border-b shadow-sm"
     >
-      <div className="flex items-center gap-4">
+      <Link href="/" className="flex items-center gap-4 hover:opacity-90 transition-opacity">
         <div
           style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-background)' }}
           className="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm shrink-0"
@@ -39,7 +41,7 @@ export default function MainNavbar() {
         <h1 style={{ color: 'var(--color-text-primary)' }} className="font-bold text-base hidden sm:block">
           Manjanium On Softs
         </h1>
-      </div>
+      </Link>
 
       <nav className="hidden md:flex gap-1">
         {navItems.map(item => (
