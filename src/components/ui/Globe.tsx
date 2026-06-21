@@ -8,7 +8,7 @@ import { Color, Vector3, Mesh, Object3D, MeshPhongMaterial } from "three";
 import { message } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, MapPin, Compass, Info, Trophy, Milestone } from "lucide-react";
-import { getGlobeData } from "@/lib/globe-cache";
+import worldData from "../../../public/globe.json";
 import { useResponsiveGlobe } from "@/hooks/useResponsiveGlobe";
 import { GlobeFallback, GlobeErrorType } from "@/components/ui/GlobeFallback";
 import { ArcData, PointData, GeoJsonFeature, GeoJsonData, GlobeConfig } from "@/types/globe";
@@ -524,59 +524,25 @@ export const Globe = React.memo(function Globe({
     return () => observer.disconnect();
   }, []);
 
-  // Data fetching logic with retries and timeout
-  const loadGlobeData = useCallback((signal?: AbortSignal) => {
-    if (typeof window !== "undefined" && !navigator.onLine) {
-      setError({ type: "offline" });
-      setIsLoading(false);
-      return;
-    }
-
+  // Data loading logic with static import
+  const loadGlobeData = useCallback((_signal?: AbortSignal) => {
     setIsLoading(true);
     setError(null);
-
-    const timeoutId = setTimeout(() => {
-      setError((prev) => {
-        if (!prev && !worldData) {
-          return { type: "timeout" };
-        }
-        return prev;
-      });
+    try {
+      setWorldData(worldData as GeoJsonData);
       setIsLoading(false);
-    }, 5000);
-
-    getGlobeData(
-      signal,
-      3,
-      1000,
-      (attempt: number, max: number) => {
-        setRetryAttempt(attempt);
-        message.loading(`Globe synchronising... (attempt ${attempt}/${max})`, 1.5);
-      }
-    )
-      .then((data: GeoJsonData) => {
-        clearTimeout(timeoutId);
-        setWorldData(data);
-        setError(null);
-        setIsLoading(false);
-        message.success("Interactive globe loaded successfully", 2);
-      })
-      .catch((err: Error) => {
-        clearTimeout(timeoutId);
-        if (err.name === "AbortError") return;
-
-        console.error("[Globe Sync Error]", {
-          error: err.message,
-          stack: err.stack,
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-          webglSupport: checkWebGLSupport(),
-        });
-
-        setError({ type: "fetch_failed", message: err.message });
-        setIsLoading(false);
+    } catch (err: any) {
+      console.error("[Globe Sync Error]", {
+        error: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        webglSupport: checkWebGLSupport(),
       });
-  }, [worldData]);
+      setError({ type: "fetch_failed", message: err.message });
+      setIsLoading(false);
+    }
+  }, []);
 
   // Trigger loading when component becomes visible
   useEffect(() => {
