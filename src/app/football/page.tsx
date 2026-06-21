@@ -328,14 +328,13 @@ function FootballHubContent() {
                     <h3 className="text-xl font-bold text-white mb-4">Current Standings</h3>
                     {loadingStandings ? (
                       <div className="flex justify-center p-8"><Spin /></div>
-                    ) : standingsData && standingsData.standings.length > 0 ? (
+                    ) : standingsData && standingsData.groups && standingsData.groups.length > 0 ? (
                       <div className="bg-[#111111] rounded-2xl border border-[#1f1f1f] p-4 max-h-[800px] overflow-y-auto custom-scrollbar">
                         <GroupStandingsCard 
-                          group={standingsData.standings[0].group} 
-                          standings={standingsData.standings[0].standings} 
-                          onPlayerClick={() => {}} 
+                          groupData={standingsData.groups[0]} 
+                          onTeamClick={(team) => setSelectedTeam(team)} 
                         />
-                        {standingsData.standings.length > 1 && (
+                        {standingsData.groups.length > 1 && (
                           <div className="mt-4 text-center text-xs text-neutral-500">
                             View Standings tab for all groups
                           </div>
