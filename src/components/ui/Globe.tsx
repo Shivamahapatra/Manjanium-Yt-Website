@@ -1,15 +1,20 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import { Canvas, extend } from "@react-three/fiber";
+import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
 import ThreeGlobe from "three-globe";
 import { OrbitControls } from "@react-three/drei";
 import { Color, Vector3, Mesh, Object3D, MeshPhongMaterial } from "three";
 import { message } from "antd";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, MapPin, Compass, Info, Trophy, Milestone } from "lucide-react";
 import { getGlobeData } from "@/lib/globe-cache";
 import { useResponsiveGlobe } from "@/hooks/useResponsiveGlobe";
 import { GlobeFallback, GlobeErrorType } from "@/components/ui/GlobeFallback";
 import { ArcData, PointData, GeoJsonFeature, GeoJsonData, GlobeConfig } from "@/types/globe";
+import { findVenueByCoords, VenueDetailInfo } from "@/lib/globe-interactions";
+import { VenueTooltip } from "@/components/globe/VenueTooltip";
+import { getCountryFlag } from "@/lib/f1-helpers";
 
 extend({ ThreeGlobe });
 
@@ -65,6 +70,47 @@ class CanvasErrorBoundary extends React.Component<
   }
 }
 
+// R3F Component to smoothly interpolate/lerp camera view to focused F1 venue coordinates
+interface CameraFocusControllerProps {
+  focusCoords: { lat: number; lng: number } | null;
+  cameraZ: number;
+  onFocusComplete: () => void;
+  controlsRef: React.RefObject<any>;
+}
+
+function CameraFocusController({
+  focusCoords,
+  cameraZ,
+  onFocusComplete,
+  controlsRef,
+}: CameraFocusControllerProps) {
+  const { camera } = useThree();
+
+  useFrame(() => {
+    if (!focusCoords || !controlsRef.current) return;
+
+    const latRad = (focusCoords.lat * Math.PI) / 180;
+    const lngRad = (focusCoords.lng * Math.PI) / 180;
+
+    // Convert coordinates: X/Y/Z mapping to three-globe standard orientation
+    const targetX = cameraZ * Math.cos(latRad) * Math.sin(lngRad);
+    const targetY = cameraZ * Math.sin(latRad);
+    const targetZ = cameraZ * Math.cos(latRad) * Math.cos(lngRad);
+
+    const targetPos = new Vector3(targetX, targetY, targetZ);
+
+    // Smoothly lerp camera position
+    camera.position.lerp(targetPos, 0.05);
+    controlsRef.current.update();
+
+    if (camera.position.distanceTo(targetPos) < 1.5) {
+      onFocusComplete();
+    }
+  });
+
+  return null;
+}
+
 interface WorldProps {
   globeConfig: GlobeConfig;
   data: ArcData[];
@@ -73,13 +119,26 @@ interface WorldProps {
   worldData?: GeoJsonData | null;
 }
 
+interface GlobeComponentProps extends WorldProps {
+  onHoverArc: (arc: ArcData | null) => void;
+  onHoverPoint: (point: PointData | null) => void;
+  onClickPoint: (point: PointData) => void;
+  onClickArc: (arc: ArcData) => void;
+  hoveredArc: ArcData | null;
+}
+
 export const GlobeComponent = React.memo(function GlobeComponent({
   globeConfig,
   data,
   polygonResolution = 2,
   isMobile = false,
   worldData,
-}: WorldProps): React.JSX.Element {
+  onHoverArc,
+  onHoverPoint,
+  onClickPoint,
+  onClickArc,
+  hoveredArc,
+}: GlobeComponentProps): React.JSX.Element {
   const globeRef = useRef<ThreeGlobe>(null);
 
   // Memoize point data processing to avoid recalculations on every render
@@ -90,10 +149,10 @@ export const GlobeComponent = React.memo(function GlobeComponent({
     ]);
   }, [data]);
 
-  // Handle globe geometry, arcs, and markers configuration
+  // Handle globe geometry, arcs, points and callback interactions
   useEffect(() => {
     if (globeRef.current) {
-      const globe = globeRef.current;
+      const globe = globeRef.current as any;
 
       // Atmosphere settings
       globe.showAtmosphere(globeConfig.showAtmosphere ?? true);
@@ -119,9 +178,32 @@ export const GlobeComponent = React.memo(function GlobeComponent({
         .arcStartLng((d: object) => (d as ArcData).startLng)
         .arcEndLat((d: object) => (d as ArcData).endLat)
         .arcEndLng((d: object) => (d as ArcData).endLng)
-        .arcColor((d: object) => (d as ArcData).color || "#0ea5e9")
+        .arcColor((d: object) => {
+          const arc = d as ArcData;
+          if (hoveredArc) {
+            const isHovered =
+              Math.abs(arc.startLat - hoveredArc.startLat) < 0.01 &&
+              Math.abs(arc.startLng - hoveredArc.startLng) < 0.01 &&
+              Math.abs(arc.endLat - hoveredArc.endLat) < 0.01 &&
+              Math.abs(arc.endLng - hoveredArc.endLng) < 0.01;
+            if (isHovered) return "#00f0ff"; // neon cyan glow on hover
+            return "rgba(14, 165, 233, 0.15)"; // dim others
+          }
+          return arc.color || "#0ea5e9";
+        })
         .arcAltitude((d: object) => (d as ArcData).arcAlt || 0.3)
-        .arcStroke((d: object) => (d as ArcData).stroke || 0.6)
+        .arcStroke((d: object) => {
+          const arc = d as ArcData;
+          if (hoveredArc) {
+            const isHovered =
+              Math.abs(arc.startLat - hoveredArc.startLat) < 0.01 &&
+              Math.abs(arc.startLng - hoveredArc.startLng) < 0.01 &&
+              Math.abs(arc.endLat - hoveredArc.endLat) < 0.01 &&
+              Math.abs(arc.endLng - hoveredArc.endLng) < 0.01;
+            if (isHovered) return 1.6; // thick stroke
+          }
+          return arc.stroke || 0.6;
+        })
         .arcDashLength(0.9)
         .arcDashGap(3)
         .arcDashAnimateTime(isMobile ? 600 : 1200);
@@ -134,8 +216,23 @@ export const GlobeComponent = React.memo(function GlobeComponent({
         .pointColor((d: object) => (d as PointData).color || "#ef4444")
         .pointAltitude(0.01)
         .pointRadius(0.8);
+
+      // Register interactive events
+      globe
+        .onArcHover((hovered: object | null) => {
+          onHoverArc(hovered as ArcData | null);
+        })
+        .onPointHover((hovered: object | null) => {
+          onHoverPoint(hovered as PointData | null);
+        })
+        .onPointClick((clicked: object) => {
+          onClickPoint(clicked as PointData);
+        })
+        .onArcClick((clicked: object) => {
+          onClickArc(clicked as ArcData);
+        });
     }
-  }, [globeConfig, data, points, isMobile]);
+  }, [globeConfig, data, points, isMobile, hoveredArc, onHoverArc, onHoverPoint, onClickPoint, onClickArc]);
 
   // Hex Polygons representing Earth continents
   useEffect(() => {
@@ -197,10 +294,19 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
   const [isLoading, setIsLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
   
-  // Accessibility states
+  // Accessibility & interaction states
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isAutoRotating, setIsAutoRotating] = useState(true);
   const [srAnnouncement, setSrAnnouncement] = useState("");
+
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [hoveredArc, setHoveredArc] = useState<ArcData | null>(null);
+  const [hoveredPoint, setHoveredPoint] = useState<PointData | null>(null);
+  const [tooltipVenue, setTooltipVenue] = useState<VenueDetailInfo | null>(null);
+  const [isTooltipActive, setIsTooltipActive] = useState(false);
+
+  const [selectedVenue, setSelectedVenue] = useState<VenueDetailInfo | null>(null);
+  const [focusCoords, setFocusCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<any>(null);
@@ -241,7 +347,6 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
   // Screen Reader live announcer helper
   const announceToScreenReader = useCallback((msg: string) => {
     setSrAnnouncement(msg);
-    // Clear announcement after brief timeout so consecutive triggers speak correctly
     setTimeout(() => {
       setSrAnnouncement((prev) => (prev === msg ? "" : prev));
     }, 1000);
@@ -277,7 +382,7 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
     };
   }, []);
 
-  // Lazy viewport intersection tracking
+  // Lazy viewport tracking
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -285,12 +390,12 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsInViewport(true);
-          observer.disconnect(); // Keep it rendered once it becomes visible
+          observer.disconnect();
         }
       },
       {
         threshold: 0.05,
-        rootMargin: "100px", // Load 100px before entering screen
+        rootMargin: "100px",
       }
     );
 
@@ -309,7 +414,6 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
     setIsLoading(true);
     setError(null);
 
-    // Set 5-second initial load timeout threshold
     const timeoutId = setTimeout(() => {
       setError((prev) => {
         if (!prev && !worldData) {
@@ -376,7 +480,66 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
     }
   }, [isOnline, error?.type, isInViewport, handleRetry]);
 
-  // Keyboard navigation interactions
+  // Track absolute cursor offsets inside container wrapper
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setMousePos({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      });
+    }
+  }, []);
+
+  // Hover handlers linking to the overlay tooltip venue search
+  const handleHoverArc = useCallback((arc: ArcData | null) => {
+    setHoveredArc(arc);
+    if (arc) {
+      const venue = findVenueByCoords(arc.startLat, arc.startLng) || findVenueByCoords(arc.endLat, arc.endLng);
+      if (venue) {
+        setTooltipVenue(venue);
+        setIsTooltipActive(true);
+      }
+    } else if (!hoveredPoint) {
+      setIsTooltipActive(false);
+    }
+  }, [hoveredPoint]);
+
+  const handleHoverPoint = useCallback((point: PointData | null) => {
+    setHoveredPoint(point);
+    if (point) {
+      const venue = findVenueByCoords(point.lat, point.lng);
+      if (venue) {
+        setTooltipVenue(venue);
+        setIsTooltipActive(true);
+      }
+    } else if (!hoveredArc) {
+      setIsTooltipActive(false);
+    }
+  }, [hoveredArc]);
+
+  // Click handlers pivoting camera and displaying info modal
+  const handleClickPoint = useCallback((point: PointData) => {
+    const venue = findVenueByCoords(point.lat, point.lng);
+    if (venue) {
+      setSelectedVenue(venue);
+      setFocusCoords({ lat: point.lat, lng: point.lng });
+      setIsAutoRotating(false);
+      announceToScreenReader(`Viewing ${venue.name} circuit specs`);
+    }
+  }, [announceToScreenReader]);
+
+  const handleClickArc = useCallback((arc: ArcData) => {
+    const venue = findVenueByCoords(arc.startLat, arc.startLng) || findVenueByCoords(arc.endLat, arc.endLng);
+    if (venue) {
+      setSelectedVenue(venue);
+      setFocusCoords({ lat: arc.startLat, lng: arc.startLng });
+      setIsAutoRotating(false);
+      announceToScreenReader(`Viewing ${venue.name} circuit specs`);
+    }
+  }, [announceToScreenReader]);
+
+  // Keyboard navigation & jumping control shortcuts
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!controlsRef.current) return;
     let handled = false;
@@ -384,7 +547,7 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
 
     switch (e.key) {
       case "ArrowLeft":
-        setIsAutoRotating(false); // Pause auto-rotation during manual control
+        setIsAutoRotating(false);
         controlsRef.current.rotateLeft(rotateStep);
         controlsRef.current.update();
         announceToScreenReader("Rotated globe left");
@@ -412,24 +575,56 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
         handled = true;
         break;
       case " ": // Spacebar
-        e.preventDefault(); // Stop browser page-down scrolling
+        e.preventDefault();
         setIsAutoRotating((prev) => !prev);
         announceToScreenReader(!isAutoRotating ? "Globe auto-rotation resumed" : "Globe auto-rotation paused");
         handled = true;
         break;
       case "Escape":
-        setIsAutoRotating(false);
-        announceToScreenReader("Globe rotation stopped");
+        if (selectedVenue) {
+          setSelectedVenue(null);
+          announceToScreenReader("Closed details panel");
+        } else if (isTooltipActive) {
+          setIsTooltipActive(false);
+        } else {
+          setIsAutoRotating(false);
+          announceToScreenReader("Globe rotation stopped");
+        }
         handled = true;
         break;
+      case "Enter":
+        if (tooltipVenue) {
+          setSelectedVenue(tooltipVenue);
+          setFocusCoords({ lat: tooltipVenue.lat, lng: tooltipVenue.lng });
+          setIsAutoRotating(false);
+          announceToScreenReader(`Opened details panel for ${tooltipVenue.name}`);
+          handled = true;
+        }
+        break;
       default:
+        // Focus jump coordinates via number keys (1-8)
+        if (e.key >= "1" && e.key <= "8") {
+          const index = parseInt(e.key, 10) - 1;
+          if (data[index]) {
+            const arc = data[index];
+            setFocusCoords({ lat: arc.startLat, lng: arc.startLng });
+            setIsAutoRotating(false);
+            const venue = findVenueByCoords(arc.startLat, arc.startLng);
+            if (venue) {
+              setTooltipVenue(venue);
+              setIsTooltipActive(true);
+              announceToScreenReader(`Orbiting camera to focus on ${venue.name}`);
+            }
+            handled = true;
+          }
+        }
         break;
     }
 
     if (handled) {
       e.stopPropagation();
     }
-  }, [isAutoRotating, announceToScreenReader]);
+  }, [isAutoRotating, announceToScreenReader, data, selectedVenue, isTooltipActive, tooltipVenue]);
 
   // Viewports under 320px render a static/animated SVG representation to save resources and look better
   if (isTiny) {
@@ -472,6 +667,7 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
         className={`${containerClasses} focus-visible:outline focus-visible:outline-3 focus-visible:outline-[#fbbf24] focus-visible:outline-offset-2 rounded-2xl outline-none`}
         tabIndex={0}
         onKeyDown={handleKeyDown}
+        onMouseMove={handleMouseMove}
       >
         {error ? (
           <GlobeFallback
@@ -498,6 +694,12 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
               />
             )}
           >
+            <CameraFocusController
+              focusCoords={focusCoords}
+              cameraZ={cameraZ}
+              controlsRef={controlsRef}
+              onFocusComplete={() => setFocusCoords(null)}
+            />
             <Canvas 
               camera={{ position: [0, 0, cameraZ], fov: 60 }}
               role="img"
@@ -526,6 +728,11 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
                 polygonResolution={polygonResolution}
                 isMobile={isMobile}
                 worldData={worldData}
+                onHoverArc={handleHoverArc}
+                onHoverPoint={handleHoverPoint}
+                onClickPoint={handleClickPoint}
+                onClickArc={handleClickArc}
+                hoveredArc={hoveredArc}
               />
               <OrbitControls
                 ref={controlsRef}
@@ -537,6 +744,135 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
             </Canvas>
           </CanvasErrorBoundary>
         )}
+
+        {/* Dynamic floating cursor tooltip */}
+        <AnimatePresence>
+          {isTooltipActive && (
+            <VenueTooltip
+              venue={tooltipVenue}
+              mousePos={mousePos}
+              active={isTooltipActive}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Modal slide-in backdrop */}
+        {selectedVenue && (
+          <div 
+            className="absolute inset-0 bg-black/40 z-40 rounded-2xl cursor-pointer"
+            onClick={() => setSelectedVenue(null)}
+          />
+        )}
+
+        {/* Modal slide-in F1 track specs drawer */}
+        <AnimatePresence>
+          {selectedVenue && (
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 220 }}
+              className="absolute right-0 top-0 bottom-0 w-[240px] sm:w-[280px] bg-[#070913]/98 border-l border-[#1f2937]/80 shadow-2xl backdrop-blur-md z-50 p-4 flex flex-col text-left overflow-y-auto rounded-r-2xl"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-[#1f2937]/50 pb-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl leading-none">{getCountryFlag(selectedVenue.country)}</span>
+                  <div>
+                    <span className="text-[9px] text-neutral-500 font-mono font-bold uppercase tracking-wider block">
+                      Round {selectedVenue.round} Details
+                    </span>
+                    <h4 className="text-white font-bold text-xs leading-tight line-clamp-1">
+                      {selectedVenue.name}
+                    </h4>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setSelectedVenue(null)}
+                  className="p-1 hover:bg-[#1f2937]/50 text-neutral-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  aria-label="Close details"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Body details */}
+              <div className="flex-1 space-y-4 text-xs">
+                {/* Circuit Info */}
+                <div className="space-y-1">
+                  <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block">Circuit Name</span>
+                  <div className="flex items-start gap-1.5 text-neutral-200">
+                    <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+                    <span>{selectedVenue.circuit}</span>
+                  </div>
+                  {selectedVenue.locality && (
+                    <span className="text-[10px] text-neutral-400 font-mono block pl-5">{selectedVenue.locality}</span>
+                  )}
+                </div>
+
+                {/* Track configurations */}
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#1f2937]/30">
+                  <div>
+                    <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block mb-1">Layout</span>
+                    <span className={`px-2 py-0.5 rounded text-[8px] font-black tracking-wider uppercase inline-block ${
+                      selectedVenue.circuitType === "street" 
+                        ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" 
+                        : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                    }`}>
+                      {selectedVenue.circuitType === "street" ? "Street" : "Permanent"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block mb-1">Distance</span>
+                    <div className="flex items-center gap-1 text-neutral-200 font-mono">
+                      <Milestone className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                      <span>{selectedVenue.trackLength}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div>
+                    <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block mb-1">Turns</span>
+                    <div className="flex items-center gap-1 text-neutral-200 font-mono">
+                      <Compass className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                      <span>{selectedVenue.turns} turns</span>
+                    </div>
+                  </div>
+                  {selectedVenue.sprint && (
+                    <div>
+                      <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block mb-1">Sprint</span>
+                      <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-400 text-[8px] font-black rounded uppercase tracking-wider inline-block">
+                        Active
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Historic Results */}
+                <div className="pt-3 border-t border-[#1f2937]/30 space-y-1.5">
+                  <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block flex items-center gap-1">
+                    <Trophy className="w-3.5 h-3.5 text-yellow-500" /> Previous Podium
+                  </span>
+                  <p className="text-[10px] text-neutral-300 font-mono bg-black/40 p-2 rounded border border-[#1f2937]/20 leading-relaxed">
+                    {selectedVenue.podiumHistory}
+                  </p>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="border-t border-[#1f2937]/50 pt-4 mt-6 text-center">
+                <a 
+                  href={`#round-${selectedVenue.round}`} 
+                  onClick={() => setSelectedVenue(null)}
+                  className="inline-block w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[10px] font-black uppercase tracking-wider shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all"
+                >
+                  Focus Calendar Card
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Screen Reader Polite Live Region Announcements */}
@@ -548,7 +884,7 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
       <figcaption id="globe-description" className="sr-only">
         Interactive 3D globe showing Formula One racing venues connected by arcs.
         Use Tab to focus the globe viewer. Keyboard controls: Arrow keys to rotate the globe manually, 
-        Space to pause or resume auto-rotation, and Escape to stop rotation.
+        Space to pause or resume auto-rotation, and Escape to stop rotation. Number keys 1 to 8 focus specific venues.
       </figcaption>
     </figure>
   );
