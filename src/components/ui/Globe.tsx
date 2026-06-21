@@ -1,17 +1,66 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Canvas, extend } from "@react-three/fiber";
 import ThreeGlobe from "three-globe";
 import { OrbitControls } from "@react-three/drei";
 import { Color, Vector3 } from "three";
+import { message } from "antd";
 import { getGlobeData } from "@/lib/globe-cache";
+import { useResponsiveGlobe } from "@/hooks/useResponsiveGlobe";
+import { GlobeFallback, GlobeErrorType } from "@/components/ui/GlobeFallback";
 
 extend({ ThreeGlobe });
 
 declare module "@react-three/fiber" {
   interface ThreeElements {
     threeGlobe: any;
+  }
+}
+
+// WebGL Compatibility check
+function checkWebGLSupport(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+    );
+  } catch (e) {
+    return false;
+  }
+}
+
+// React Error Boundary class to trap rendering failures in the ThreeJS canvas tree
+class CanvasErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback: (error: Error) => React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error("[Globe Render Error]", {
+      error: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      webglSupport: checkWebGLSupport(),
+    });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback(this.state.error || new Error("Unknown rendering error"));
+    }
+    return this.props.children;
   }
 }
 
@@ -39,6 +88,7 @@ export type GlobeConfig = {
   };
   autoRotate?: boolean;
   autoRotateSpeed?: number;
+  enableZoom?: boolean;
 };
 
 interface WorldProps {
@@ -52,28 +102,19 @@ interface WorldProps {
     color?: string;
     stroke?: number;
   }>;
+  polygonResolution?: number;
+  isMobile?: boolean;
+  worldData?: any;
 }
 
-export const GlobeComponent = React.memo(function GlobeComponent({ globeConfig, data }: WorldProps) {
+export const GlobeComponent = React.memo(function GlobeComponent({
+  globeConfig,
+  data,
+  polygonResolution = 2,
+  isMobile = false,
+  worldData,
+}: WorldProps) {
   const globeRef = useRef<ThreeGlobe>(null);
-  const [worldData, setWorldData] = useState<any>(null);
-
-  // Load geojson data for earth land representation with caching and cancel on unmount
-  useEffect(() => {
-    const controller = new AbortController();
-    getGlobeData(controller.signal)
-      .then((data) => {
-        setWorldData(data);
-      })
-      .catch((err) => {
-        if (err.name !== "AbortError") {
-          console.error("Failed to load globe geojson:", err);
-        }
-      });
-    return () => {
-      controller.abort();
-    };
-  }, []);
 
   // Memoize point data processing to avoid recalculations on every render
   const points = useMemo(() => {
@@ -114,7 +155,7 @@ export const GlobeComponent = React.memo(function GlobeComponent({ globeConfig, 
         .arcStroke((d: any) => d.stroke || 0.6)
         .arcDashLength(0.9)
         .arcDashGap(3)
-        .arcDashAnimateTime(1200);
+        .arcDashAnimateTime(isMobile ? 600 : 1200); // Faster animation on mobile
 
       // Markers on arc start/end points using memoized points
       globe
@@ -125,7 +166,7 @@ export const GlobeComponent = React.memo(function GlobeComponent({ globeConfig, 
         .pointAltitude(0.01)
         .pointRadius(0.8);
     }
-  }, [globeConfig, data, points]);
+  }, [globeConfig, data, points, isMobile]);
 
   // Hex Polygons representing Earth continents
   useEffect(() => {
@@ -133,11 +174,11 @@ export const GlobeComponent = React.memo(function GlobeComponent({ globeConfig, 
       const globe = globeRef.current as any;
       globe
         .hexPolygonsData(worldData.features)
-        .hexPolygonResolution(2) // Reduced resolution from 3 to 2 for better performance
+        .hexPolygonResolution(polygonResolution) // Uses dynamic responsive resolution
         .hexPolygonMargin(0.7)
         .hexPolygonColor(() => globeConfig.polygonColor || "rgba(14, 165, 233, 0.45)");
     }
-  }, [worldData, globeConfig]);
+  }, [worldData, globeConfig, polygonResolution]);
 
   // Clean up and dispose of Three.js objects on unmount to prevent memory leaks
   useEffect(() => {
@@ -177,9 +218,49 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
   const directionalTopColor = globeConfig.directionalTopLight || "#ffffff";
   const pointColor = globeConfig.pointLight || "#ffffff";
 
+  const { size, polygonResolution, cameraZ, autoRotateSpeed, isMobile, isTiny } = useResponsiveGlobe();
+
+  const [worldData, setWorldData] = useState<any>(null);
+  const [error, setError] = useState<{ type: GlobeErrorType; message?: string } | null>(null);
+  const [retryAttempt, setRetryAttempt] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isOnline, setIsOnline] = useState(true);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const [isInViewport, setIsInViewport] = useState(false);
 
+  // WebGL compatibility check on mount
+  useEffect(() => {
+    if (typeof window !== "undefined" && !checkWebGLSupport()) {
+      setError({ type: "webgl_unsupported" });
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Track network online/offline state
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setIsOnline(navigator.onLine);
+
+    const handleOnline = () => {
+      setIsOnline(true);
+      message.success("Network connection restored", 2);
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      message.warning("Network connection lost. Globe offline.", 3);
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  // Lazy viewport intersection tracking
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -200,38 +281,172 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
     return () => observer.disconnect();
   }, []);
 
+  // Data fetching logic with retries and timeout
+  const loadGlobeData = useCallback((signal?: AbortSignal) => {
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setError({ type: "offline" });
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    // Set 5-second initial load timeout threshold
+    const timeoutId = setTimeout(() => {
+      setError((prev) => {
+        if (!prev && !worldData) {
+          return { type: "timeout" };
+        }
+        return prev;
+      });
+      setIsLoading(false);
+    }, 5000);
+
+    getGlobeData(
+      signal,
+      3,
+      1000,
+      (attempt, max) => {
+        setRetryAttempt(attempt);
+        message.loading(`Globe synchronising... (attempt ${attempt}/${max})`, 1.5);
+      }
+    )
+      .then((data) => {
+        clearTimeout(timeoutId);
+        setWorldData(data);
+        setError(null);
+        setIsLoading(false);
+        message.success("Interactive globe loaded successfully", 2);
+      })
+      .catch((err) => {
+        clearTimeout(timeoutId);
+        if (err.name === "AbortError") return;
+
+        console.error("[Globe Sync Error]", {
+          error: err.message,
+          stack: err.stack,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          webglSupport: checkWebGLSupport(),
+        });
+
+        setError({ type: "fetch_failed", message: err.message });
+        setIsLoading(false);
+      });
+  }, [worldData]);
+
+  // Trigger loading when component becomes visible
+  useEffect(() => {
+    if (isInViewport && !worldData && (!error || error.type !== "webgl_unsupported")) {
+      const controller = new AbortController();
+      loadGlobeData(controller.signal);
+      return () => {
+        controller.abort();
+      };
+    }
+  }, [isInViewport, loadGlobeData, worldData, error?.type]);
+
+  const handleRetry = useCallback(() => {
+    setRetryAttempt(0);
+    loadGlobeData();
+  }, [loadGlobeData]);
+
+  // Reactive network recovery retry trigger
+  useEffect(() => {
+    if (isOnline && error?.type === "offline" && isInViewport) {
+      handleRetry();
+    }
+  }, [isOnline, error?.type, isInViewport, handleRetry]);
+
+  // Viewports under 320px render a static/animated SVG representation to save resources and look better
+  if (isTiny) {
+    return (
+      <div className="flex flex-col items-center justify-center p-4 border border-neutral-850 rounded-xl bg-neutral-900/20 text-center w-[200px] h-[200px] mx-auto aspect-square">
+        <svg 
+          className="w-10 h-10 text-blue-400/70 mb-2 animate-pulse" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="1.5"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+        <span className="text-[9px] text-neutral-400 font-semibold tracking-wider uppercase">3D Globe Standby</span>
+        <span className="text-[8px] text-neutral-500 font-mono mt-0.5">Screen too narrow</span>
+      </div>
+    );
+  }
+
+  // Generate layout class styles based on responsive hook
+  const containerClasses = `relative mx-auto aspect-square flex items-center justify-center ${
+    isMobile 
+      ? "w-[260px] h-[260px]" 
+      : size === 320 
+        ? "w-[320px] h-[320px]" 
+        : "w-[400px] h-[400px]"
+  } max-w-full`;
+
   return (
-    <div ref={containerRef} className="w-full h-full min-h-[300px] flex items-center justify-center relative">
-      {isInViewport ? (
-        <Canvas camera={{ position: [0, 0, 280], fov: 60 }}>
-          <ambientLight color={ambientColor} intensity={1.5} />
-          <directionalLight
-            color={directionalLeftColor}
-            position={new Vector3(-400, 100, 400)}
-            intensity={1.2}
-          />
-          <directionalLight
-            color={directionalTopColor}
-            position={new Vector3(-200, 500, 200)}
-            intensity={1.0}
-          />
-          <pointLight
-            color={pointColor}
-            position={new Vector3(-200, 500, 200)}
-            intensity={0.8}
-          />
-          <GlobeComponent globeConfig={globeConfig} data={data} />
-          <OrbitControls
-            enablePan={false}
-            enableZoom={false}
-            autoRotate={globeConfig.autoRotate ?? true}
-            autoRotateSpeed={globeConfig.autoRotateSpeed ?? 0.8}
-          />
-        </Canvas>
-      ) : (
-        <div className="absolute inset-0 rounded-full bg-neutral-900/40 animate-pulse border border-neutral-850 flex items-center justify-center">
+    <div ref={containerRef} className={containerClasses}>
+      {error ? (
+        <GlobeFallback
+          errorType={error.type}
+          errorMessage={error.message}
+          onRetry={handleRetry}
+          retryAttempt={retryAttempt}
+          maxRetries={3}
+        />
+      ) : !isInViewport || isLoading || !worldData ? (
+        <div className="absolute inset-0 rounded-full bg-neutral-900/40 animate-pulse border border-neutral-850 flex flex-col items-center justify-center gap-2">
           <span className="text-neutral-500 text-xs font-mono">Initializing 3D viewport...</span>
+          {isLoading && (
+            <span className="text-[10px] text-neutral-600 font-mono">Loading satellite telemetry...</span>
+          )}
         </div>
+      ) : (
+        <CanvasErrorBoundary
+          fallback={(err) => (
+            <GlobeFallback
+              errorType="render_failed"
+              errorMessage={err.message}
+              onRetry={handleRetry}
+            />
+          )}
+        >
+          <Canvas camera={{ position: [0, 0, cameraZ], fov: 60 }}>
+            <ambientLight color={ambientColor} intensity={1.5} />
+            <directionalLight
+              color={directionalLeftColor}
+              position={new Vector3(-400, 100, 400)}
+              intensity={1.2}
+            />
+            <directionalLight
+              color={directionalTopColor}
+              position={new Vector3(-200, 500, 200)}
+              intensity={1.0}
+            />
+            <pointLight
+              color={pointColor}
+              position={new Vector3(-200, 500, 200)}
+              intensity={0.8}
+            />
+            <GlobeComponent
+              globeConfig={globeConfig}
+              data={data}
+              polygonResolution={polygonResolution}
+              isMobile={isMobile}
+              worldData={worldData}
+            />
+            <OrbitControls
+              enablePan={false}
+              enableZoom={globeConfig.enableZoom ?? false}
+              autoRotate={globeConfig.autoRotate ?? (autoRotateSpeed > 0)}
+              autoRotateSpeed={globeConfig.autoRotateSpeed ?? autoRotateSpeed}
+            />
+          </Canvas>
+        </CanvasErrorBoundary>
       )}
     </div>
   );
