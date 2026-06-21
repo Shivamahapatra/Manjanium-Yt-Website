@@ -10,6 +10,22 @@
   --color-manjanium-black: #09090b;
   --color-manjanium-text: #f1f5f9;
 
+  /* Stitch Theme Mappings */
+  --color-stitch-background: var(--stitch-background, #f8f9ff);
+  --color-stitch-foreground: var(--stitch-foreground, #0b1c30);
+  --color-stitch-primary: var(--stitch-primary, #006d32);
+  --color-stitch-primary-container: var(--stitch-primary-container, #00d166);
+  --color-stitch-secondary: var(--stitch-secondary, #0059bb);
+  --color-stitch-secondary-container: var(--stitch-secondary-container, #0070ea);
+  --color-stitch-surface: var(--stitch-surface, #f8f9ff);
+  --color-stitch-surface-container: var(--stitch-surface-container, #e5eeff);
+  --color-stitch-surface-container-low: var(--stitch-surface-container-low, #eff4ff);
+  --color-stitch-surface-container-highest: var(--stitch-surface-container-highest, #d3e4fe);
+  --color-stitch-surface-container-lowest: var(--stitch-surface-container-lowest, #ffffff);
+  --color-stitch-outline: var(--stitch-outline, #6c7b6c);
+  --color-stitch-outline-variant: var(--stitch-outline-variant, #bbcbb9);
+  --color-stitch-error: var(--stitch-error, #ba1a1a);
+
   /* Typography Fonts */
   --font-heading: var(--font-space-grotesk);
   --font-body: var(--font-inter);

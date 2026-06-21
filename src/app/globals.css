@@ -1,3 +1,4 @@
+@config "../../tailwind.config.ts";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -11,6 +12,26 @@
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
   --font-heading: var(--font-space-grotesk);
+
+  /* Standardizing F1 Red Accent */
+  --color-f1-red: var(--f1-red);
+  --color-f1-red-hover: var(--f1-red-hover);
+
+  /* Stitch Design System Theme Mappings */
+  --color-stitch-background: var(--stitch-background);
+  --color-stitch-foreground: var(--stitch-foreground);
+  --color-stitch-primary: var(--stitch-primary);
+  --color-stitch-primary-container: var(--stitch-primary-container);
+  --color-stitch-secondary: var(--stitch-secondary);
+  --color-stitch-secondary-container: var(--stitch-secondary-container);
+  --color-stitch-surface: var(--stitch-surface);
+  --color-stitch-surface-container: var(--stitch-surface-container);
+  --color-stitch-surface-container-low: var(--stitch-surface-container-low);
+  --color-stitch-surface-container-highest: var(--stitch-surface-container-highest);
+  --color-stitch-surface-container-lowest: var(--stitch-surface-container-lowest);
+  --color-stitch-outline: var(--stitch-outline);
+  --color-stitch-outline-variant: var(--stitch-outline-variant);
+  --color-stitch-error: var(--stitch-error);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -82,6 +103,25 @@
   --shadow-medium: 0 4px 12px rgba(0,0,0,0.15);
   --shadow-deep: 0 8px 24px rgba(0,0,0,0.2);
 
+  /* F1 Accent */
+  --f1-red: #E10600;
+  --f1-red-hover: #c20500;
+
+  /* Stitch Design Tokens - Light Mode scale */
+  --stitch-background: #f8f9ff;
+  --stitch-foreground: #0b1c30;
+  --stitch-primary: #006d32;
+  --stitch-primary-container: #00d166;
+  --stitch-secondary: #0059bb;
+  --stitch-secondary-container: #0070ea;
+  --stitch-surface: #f8f9ff;
+  --stitch-surface-container: #e5eeff;
+  --stitch-surface-container-low: #eff4ff;
+  --stitch-surface-container-highest: #d3e4fe;
+  --stitch-surface-container-lowest: #ffffff;
+  --stitch-outline: #6c7b6c;
+  --stitch-outline-variant: #bbcbb9;
+  --stitch-error: #ba1a1a;
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -118,6 +158,26 @@
 }
 
 .dark {
+  /* F1 Accent */
+  --f1-red: #E10600;
+  --f1-red-hover: #ff3333;
+
+  /* Stitch Design Tokens - Dark Mode scale */
+  --stitch-background: #09090b;
+  --stitch-foreground: #f8f9ff;
+  --stitch-primary: #30e375;
+  --stitch-primary-container: #006d32;
+  --stitch-secondary: #adc7ff;
+  --stitch-secondary-container: #0059bb;
+  --stitch-surface: #09090b;
+  --stitch-surface-container: #18181b;
+  --stitch-surface-container-low: #121214;
+  --stitch-surface-container-highest: #27272a;
+  --stitch-surface-container-lowest: #09090b;
+  --stitch-outline: #6c7b6c;
+  --stitch-outline-variant: #27272a;
+  --stitch-error: #ffdad6;
+
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);

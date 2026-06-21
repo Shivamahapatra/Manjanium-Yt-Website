@@ -276,38 +276,41 @@ export default function HomePage() {
       <div className="relative">
         <AuroraBackground showRadialGradient className="min-h-screen w-full relative pb-20 pt-10 lg:pt-0 bg-transparent">
           
-          <div className="relative z-10 flex flex-col gap-6 items-center text-center max-w-3xl mx-auto px-4 mt-20 lg:mt-32">
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.7 }}
-              className="text-5xl md:text-7xl font-serif font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-[1.1] mb-2"
-            >
-              Manjanium <br className="hidden lg:block"/> 
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-800 to-zinc-500 dark:from-zinc-100 dark:to-zinc-400 drop-shadow-sm">On Softs</span>
-            </motion.h1>
+          <div className="relative z-10 flex flex-col gap-8 items-center text-center max-w-3xl mx-auto px-4 mt-20 lg:mt-32">
+            {/* Hero Text Group */}
+            <div className="flex flex-col gap-4 items-center">
+              {/* Headline */}
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.7 }}
+                className="text-5xl md:text-7xl font-serif font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-[1.1] mb-2"
+              >
+                Manjanium <br className="hidden lg:block"/> 
+                <span className="text-zinc-900 dark:text-zinc-50 drop-shadow-sm">On Softs</span>
+              </motion.h1>
 
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.7 }}
-              className="text-lg md:text-xl text-zinc-600 dark:text-zinc-400 font-medium"
-            >
-              The Ultimate F1 & Football Hub. Track every session and match in real-time.
-            </motion.p>
+              {/* Subheadline */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.7 }}
+                className="text-lg md:text-xl text-zinc-900 dark:text-zinc-50 font-medium"
+              >
+                The Ultimate F1 & Football Hub. Track every session and match in real-time.
+              </motion.p>
+            </div>
 
             {/* Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.7 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 w-full lg:w-auto"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full lg:w-auto"
             >
               <Link href="/f1" className="w-full sm:w-auto">
                 <button
-                  className="bg-[#E10600] text-white hover:bg-[#c20500] font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full"
+                  className="bg-stitch-secondary hover:bg-stitch-secondary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full cursor-pointer"
                 >
                   Enter F1 Hub <IconArrowRight className="w-5 h-5" />
                 </button>
@@ -315,7 +318,7 @@ export default function HomePage() {
 
               <Link href="/football" className="w-full sm:w-auto">
                 <button
-                  className="bg-transparent border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 px-6 py-3 rounded-full transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center gap-2 w-full font-semibold"
+                  className="bg-stitch-primary hover:bg-stitch-primary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full cursor-pointer"
                 >
                   Enter Football Center <IconArrowRight className="w-5 h-5" />
                 </button>
