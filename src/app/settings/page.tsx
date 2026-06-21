@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Palette, User, Info, MessageSquare, Settings as SettingsIcon } from "lucide-react";
+import { Palette, User, Info, MessageSquare, Settings as SettingsIcon, Layout, Lock } from "lucide-react";
 import { AppearanceSettings } from "@/components/settings/AppearanceSettings";
 import { UserSettingsComponent } from "@/components/settings/UserSettings";
+import { DashboardPresets } from "@/components/settings/DashboardPresets";
 import { AboutApp } from "@/components/settings/AboutApp";
 import { SuggestionPage } from "@/components/settings/SuggestionPage";
-import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useAuth } from "@clerk/nextjs";
@@ -17,6 +17,7 @@ import { Spin } from "antd";
 const SETTINGS_CATEGORIES = [
   { id: "appearance", label: "APPEARANCE", icon: <Palette className="w-5 h-5" /> },
   { id: "user", label: "USER SETTINGS", icon: <User className="w-5 h-5" /> },
+  { id: "dashboard", label: "DASHBOARD PRESETS", icon: <Layout className="w-5 h-5" /> },
   { id: "about", label: "ABOUT APP", icon: <Info className="w-5 h-5" /> },
   { id: "suggestions", label: "SUGGESTIONS", icon: <MessageSquare className="w-5 h-5" /> },
 ];
@@ -62,6 +63,8 @@ export default function SettingsPage() {
         return <AppearanceSettings />;
       case "user":
         return <UserSettingsComponent />;
+      case "dashboard":
+        return <DashboardPresets />;
       case "about":
         return <AboutApp />;
       case "suggestions":

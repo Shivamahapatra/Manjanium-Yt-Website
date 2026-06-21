@@ -6,6 +6,10 @@ import { Spin } from "antd";
 import { CloudRain, Radio, Flag, Wind, Thermometer, Volume2, AlertCircle } from "lucide-react";
 import { LiveTimingTower } from "@/components/f1/LiveTimingTower";
 import { F1_VENUES_2026, getCountryFlag, getTimezoneForVenue } from "@/lib/f1-helpers";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { F1_PRESETS, F1PresetKey } from "@/lib/dashboard-presets";
+import { F1TelemetryTab } from "@/components/f1/tabs/F1TelemetryTab";
+import { F1StandingsTab } from "@/components/f1/tabs/F1StandingsTab";
 
 // Dynamic import for the 3D Live focus Globe
 const Globe = dynamic(
@@ -238,6 +242,10 @@ function TeamRadioPanel({ sessionKey }: { sessionKey: string }) {
 // --- Main Page Component ---
 
 export function F1LiveTab() {
+  const { preferences } = useUserPreferences();
+  const presetKey = (preferences?.f1DashboardPreset as F1PresetKey) || "live_focused";
+  const preset = F1_PRESETS[presetKey] || F1_PRESETS.live_focused;
+
   const [session, setSession] = useState<any>(null);
   const [sessionKey, setSessionKey] = useState<string>("latest");
   const [loading, setLoading] = useState(true);
@@ -358,71 +366,91 @@ export function F1LiveTab() {
       <div className="max-w-7xl mx-auto">
         
         {/* Dual column responsive sidebar layout (65% / 35%) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className={`grid grid-cols-1 ${preset.timingSize === 'large' ? 'lg:grid-cols-1' : preset.timingSize === 'medium' ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-6`}>
           
           {/* LEFT COLUMN: Timing Tower + Radio (col-span-2) */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className={`${preset.timingSize === 'medium' ? 'lg:col-span-2' : 'col-span-1'} space-y-6`}>
             <LiveTimingTower />
-            <TeamRadioPanel sessionKey={sessionKey} />
+            {preset.timingSize !== 'small' && <TeamRadioPanel sessionKey={sessionKey} />}
           </div>
 
           {/* RIGHT COLUMN: Live Globe Focus + Weather + Race Control */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Live Globe container */}
-            <div className="bg-[#111111]/30 border border-[#1f1f1f] rounded-2xl p-4 flex flex-col items-center justify-center shadow-xl w-full">
-              <span className="text-xs text-neutral-500 font-mono uppercase tracking-wider block mb-4">
-                Live Circuit Focus
-              </span>
-              <div className="relative w-full aspect-square md:h-[320px] overflow-hidden rounded-full border border-neutral-800/30 bg-[#070714] flex items-center justify-center mb-4">
-                <Globe globeConfig={globeConfig} data={globeArcs} />
-              </div>
+          {preset.layout !== 'compact' && preset.timingSize !== 'large' && (
+            <div className={`${preset.timingSize === 'medium' ? 'lg:col-span-1' : 'col-span-1'} space-y-6`}>
+              {/* Live Globe container */}
+              <div className="bg-[#111111]/30 border border-[#1f1f1f] rounded-2xl p-4 flex flex-col items-center justify-center shadow-xl w-full">
+                <span className="text-xs text-neutral-500 font-mono uppercase tracking-wider block mb-4">
+                  Live Circuit Focus
+                </span>
+                <div className="relative w-full aspect-square md:h-[320px] overflow-hidden rounded-full border border-neutral-800/30 bg-[#070714] flex items-center justify-center mb-4">
+                  <Globe globeConfig={globeConfig} data={globeArcs} />
+                </div>
 
-              {/* Info Card Below Globe */}
-              <div className="w-full mt-2 bg-neutral-900 border border-neutral-800 rounded-xl p-4 text-center shadow-xl">
-                {currentVenue ? (
-                  <>
-                    <div className="text-5xl mb-2">{getCountryFlag(currentVenue.country)}</div>
-                    <div className="text-neutral-400 text-xs font-bold uppercase tracking-wider mb-1">
-                      {currentVenue.country}
-                    </div>
-                    <h4 className="text-white font-bold text-base leading-tight mb-3">
-                      {currentVenue.circuitName}
-                    </h4>
-
-                    <div className="flex flex-col items-center gap-3">
-                      <span className={`px-2.5 py-0.5 text-[10px] font-black tracking-widest rounded uppercase ${statusBadgeClass}`}>
-                        {statusText}
-                      </span>
-                      <div className="border-t border-neutral-800 pt-2 w-full mt-1">
-                        <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest block mb-1">
-                          Circuit Local Time
-                        </span>
-                        <span className="text-xl font-mono font-bold text-white tracking-widest">
-                          {localTime}
-                        </span>
+                {/* Info Card Below Globe */}
+                <div className="w-full mt-2 bg-neutral-900 border border-neutral-800 rounded-xl p-4 text-center shadow-xl">
+                  {currentVenue ? (
+                    <>
+                      <div className="text-5xl mb-2">{getCountryFlag(currentVenue.country)}</div>
+                      <div className="text-neutral-400 text-xs font-bold uppercase tracking-wider mb-1">
+                        {currentVenue.country}
                       </div>
+                      <h4 className="text-white font-bold text-base leading-tight mb-3">
+                        {currentVenue.circuitName}
+                      </h4>
+
+                      <div className="flex flex-col items-center gap-3">
+                        <span className={`px-2.5 py-0.5 text-[10px] font-black tracking-widest rounded uppercase ${statusBadgeClass}`}>
+                          {statusText}
+                        </span>
+                        <div className="border-t border-neutral-800 pt-2 w-full mt-1">
+                          <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest block mb-1">
+                            Circuit Local Time
+                          </span>
+                          <span className="text-xl font-mono font-bold text-white tracking-widest">
+                            {localTime}
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="py-2">
+                      <div className="text-4xl mb-2">🏁</div>
+                      <h4 className="text-white font-bold text-base mb-1">No Active Session</h4>
+                      <p className="text-neutral-400 text-xs font-mono">
+                        22 Rounds, 20 Countries
+                      </p>
                     </div>
-                  </>
-                ) : (
-                  <div className="py-2">
-                    <div className="text-4xl mb-2">🏁</div>
-                    <h4 className="text-white font-bold text-base mb-1">No Active Session</h4>
-                    <p className="text-neutral-400 text-xs font-mono">
-                      22 Rounds, 20 Countries
-                    </p>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
+
+              {/* Weather condition status details */}
+              <WeatherWidget sessionKey={sessionKey} />
+
+              {/* Race Control feed widget */}
+              <RaceControlFeed sessionKey={sessionKey} />
             </div>
-
-            {/* Weather condition status details */}
-            <WeatherWidget sessionKey={sessionKey} />
-
-            {/* Race Control feed widget */}
-            <RaceControlFeed sessionKey={sessionKey} />
-          </div>
+          )}
 
         </div>
+
+        {preset.showTelemetry && (
+          <div className="mt-8">
+            <h3 className="text-xl font-bold text-white mb-4">Live Telemetry</h3>
+            <div className="bg-[#111111] rounded-2xl border border-[#1f1f1f] p-4">
+              <F1TelemetryTab />
+            </div>
+          </div>
+        )}
+
+        {preset.showStandings && (
+          <div className="mt-8">
+            <h3 className="text-xl font-bold text-white mb-4">Current Standings</h3>
+            <div className="bg-[#111111] rounded-2xl border border-[#1f1f1f] p-4">
+              <F1StandingsTab />
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

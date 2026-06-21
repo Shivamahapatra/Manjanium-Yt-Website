@@ -22,6 +22,8 @@ import { getTopScorers } from "@/lib/football-utils";
 import { Team, StandingsResponse } from "@/types/football";
 import { MatchSummary } from "@/types/match";
 import { PastMatches } from "@/components/football/PastMatches";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { FOOTBALL_PRESETS, FootballPresetKey } from "@/lib/dashboard-presets";
 
 function FootballHubContent() {
   const searchParams = useSearchParams();
@@ -58,6 +60,10 @@ function FootballHubContent() {
   const [loadingStandings, setLoadingStandings] = useState(true);
   const [errorStandings, setErrorStandings] = useState<string | null>(null);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+
+  const { preferences } = useUserPreferences();
+  const presetKey = (preferences?.footballDashboardPreset as FootballPresetKey) || "live_matches";
+  const preset = FOOTBALL_PRESETS[presetKey] || FOOTBALL_PRESETS.live_matches;
 
   const fetchLiveMatches = async () => {
     try {
@@ -221,92 +227,137 @@ function FootballHubContent() {
           {/* LIVE MATCHES */}
           <TabsContent value="live" className="mt-0 outline-none">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-              {loadingLive && fixtures.length === 0 ? (
-                <div className="flex justify-center items-center h-64">
-                  <Spin size="large" />
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {fixtures.map((match: any) => {
-                    const homeTeam = match.teams.home;
-                    const awayTeam = match.teams.away;
-                    const fixture = match.fixture;
-                    const league = match.league;
-                    const isMatchUpcoming = match.isUpcoming;
+              <div className={`grid grid-cols-1 ${preset.layout === 'split' ? 'lg:grid-cols-2' : preset.layout === 'three-column' ? 'lg:grid-cols-3' : 'lg:grid-cols-1'} gap-6`}>
+                
+                {/* MATCHES COLUMN */}
+                {preset.showMatches && (
+                  <div className={`${preset.layout === 'three-column' ? 'lg:col-span-2' : 'col-span-1'}`}>
+                    {preset.layout !== 'main-only' && <h3 className="text-xl font-bold text-white mb-4">Live Matches</h3>}
+                    {loadingLive && fixtures.length === 0 ? (
+                      <div className="flex justify-center items-center h-64">
+                        <Spin size="large" />
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+                        {fixtures.map((match: any) => {
+                          const homeTeam = match.teams.home;
+                          const awayTeam = match.teams.away;
+                          const fixture = match.fixture;
+                          const league = match.league;
+                          const isMatchUpcoming = match.isUpcoming;
 
-                    return (
-                      <motion.div 
-                        key={fixture.id}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="group"
-                        onClick={() => router.push(`/football/matches/${fixture.id}`)}
-                      >
-                        <div className="bg-primary border border-white/5 hover:border-manjanium-gold/50 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 shadow-lg hover:shadow-manjanium-gold/10 hover:-translate-y-1">
-                          
-                          {/* Card Header */}
-                          <div className="bg-black/40 px-5 py-3 text-xs font-semibold text-neutral-400 flex justify-between items-center border-b border-white/5">
-                            <span className="flex items-center gap-2">
-                              {league.logo && <img src={league.logo} alt={league.name} className="w-4 h-4 object-contain brightness-200" />}
-                              {league.name}
-                            </span>
-                            <span className={cn("px-2 py-1 rounded-md bg-black/50 border", isMatchUpcoming ? "text-amber-500 border-amber-500/20" : "text-red-500 border-red-500/20 animate-pulse")}>
-                              {fixture.status.elapsed ? `${fixture.status.elapsed}'` : fixture.status.short}
-                            </span>
-                          </div>
-                          
-                          {/* Card Body */}
-                          <div className="p-6">
-                            <div className="flex items-center justify-between mb-2">
-                              {/* Home Team */}
-                              <div className="flex flex-col items-center gap-3 w-[35%]">
-                                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/10 p-2 shadow-inner">
-                                  <img src={homeTeam?.logo || "/placeholder.png"} alt={homeTeam?.name} className="w-full h-full object-contain" />
+                          return (
+                            <motion.div 
+                              key={fixture.id}
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              className="group"
+                              onClick={() => router.push(`/football/matches/${fixture.id}`)}
+                            >
+                              <div className="bg-primary border border-white/5 hover:border-manjanium-gold/50 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 shadow-lg hover:shadow-manjanium-gold/10 hover:-translate-y-1">
+                                
+                                {/* Card Header */}
+                                <div className="bg-black/40 px-5 py-3 text-xs font-semibold text-neutral-400 flex justify-between items-center border-b border-white/5">
+                                  <span className="flex items-center gap-2">
+                                    {league.logo && <img src={league.logo} alt={league.name} className="w-4 h-4 object-contain brightness-200" />}
+                                    {league.name}
+                                  </span>
+                                  <span className={cn("px-2 py-1 rounded-md bg-black/50 border", isMatchUpcoming ? "text-amber-500 border-amber-500/20" : "text-red-500 border-red-500/20 animate-pulse")}>
+                                    {fixture.status.elapsed ? `${fixture.status.elapsed}'` : fixture.status.short}
+                                  </span>
                                 </div>
-                                <span className="text-sm font-bold text-center text-white line-clamp-2">{homeTeam?.name}</span>
-                              </div>
-                              
-                              {/* Score */}
-                              <div className="flex flex-col items-center justify-center w-[30%]">
-                                {isMatchUpcoming ? (
-                                  <div className="text-2xl font-bold text-neutral-400 text-center whitespace-nowrap font-mono">
-                                    {new Date(fixture.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                  </div>
-                                ) : (
-                                  <div className="text-4xl font-black font-mono text-manjanium-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">
-                                    {match.goals.home ?? 0} - {match.goals.away ?? 0}
-                                  </div>
-                                )}
-                              </div>
+                                
+                                {/* Card Body */}
+                                <div className="p-6">
+                                  <div className="flex items-center justify-between mb-2">
+                                    {/* Home Team */}
+                                    <div className="flex flex-col items-center gap-3 w-[35%]">
+                                      <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/10 p-2 shadow-inner">
+                                        <img src={homeTeam?.logo || "/placeholder.png"} alt={homeTeam?.name} className="w-full h-full object-contain" />
+                                      </div>
+                                      <span className="text-sm font-bold text-center text-white line-clamp-2">{homeTeam?.name}</span>
+                                    </div>
+                                    
+                                    {/* Score */}
+                                    <div className="flex flex-col items-center justify-center w-[30%]">
+                                      {isMatchUpcoming ? (
+                                        <div className="text-2xl font-bold text-neutral-400 text-center whitespace-nowrap font-mono">
+                                          {new Date(fixture.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                      ) : (
+                                        <div className="text-4xl font-black font-mono text-manjanium-gold drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">
+                                          {match.goals.home ?? 0} - {match.goals.away ?? 0}
+                                        </div>
+                                      )}
+                                    </div>
 
-                              {/* Away Team */}
-                              <div className="flex flex-col items-center gap-3 w-[35%]">
-                                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/10 p-2 shadow-inner">
-                                  <img src={awayTeam?.logo || "/placeholder.png"} alt={awayTeam?.name} className="w-full h-full object-contain" />
+                                    {/* Away Team */}
+                                    <div className="flex flex-col items-center gap-3 w-[35%]">
+                                      <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/10 p-2 shadow-inner">
+                                        <img src={awayTeam?.logo || "/placeholder.png"} alt={awayTeam?.name} className="w-full h-full object-contain" />
+                                      </div>
+                                      <span className="text-sm font-bold text-center text-white line-clamp-2">{awayTeam?.name}</span>
+                                    </div>
+                                  </div>
                                 </div>
-                                <span className="text-sm font-bold text-center text-white line-clamp-2">{awayTeam?.name}</span>
+                                
+                                {/* Card Footer */}
+                                <div className="bg-black/20 px-5 py-3 border-t border-white/5 text-xs flex justify-between items-center text-neutral-500">
+                                  <span className="truncate max-w-[70%]">{fixture.venue?.name || "TBD Stadium"}</span>
+                                  <span className="whitespace-nowrap">{new Date(fixture.date).toLocaleDateString()}</span>
+                                </div>
                               </div>
-                            </div>
+                            </motion.div>
+                          );
+                        })}
+                        
+                        {!fixtures.length && !loadingLive && (
+                          <div className="col-span-full flex flex-col items-center justify-center h-64 border border-dashed border-white/10 rounded-2xl bg-black/20">
+                            <p className="text-neutral-400 text-lg font-medium mb-2">No matches scheduled right now.</p>
+                            <p className="text-sm text-neutral-500">Check back later for live updates.</p>
                           </div>
-                          
-                          {/* Card Footer */}
-                          <div className="bg-black/20 px-5 py-3 border-t border-white/5 text-xs flex justify-between items-center text-neutral-500">
-                            <span className="truncate max-w-[70%]">{fixture.venue?.name || "TBD Stadium"}</span>
-                            <span className="whitespace-nowrap">{new Date(fixture.date).toLocaleDateString()}</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* STANDINGS COLUMN */}
+                {preset.showStandings && (
+                  <div className="col-span-1">
+                    <h3 className="text-xl font-bold text-white mb-4">Current Standings</h3>
+                    {loadingStandings ? (
+                      <div className="flex justify-center p-8"><Spin /></div>
+                    ) : standingsData && standingsData.standings.length > 0 ? (
+                      <div className="bg-[#111111] rounded-2xl border border-[#1f1f1f] p-4 max-h-[800px] overflow-y-auto custom-scrollbar">
+                        <GroupStandingsCard 
+                          group={standingsData.standings[0].group} 
+                          standings={standingsData.standings[0].standings} 
+                          onPlayerClick={() => {}} 
+                        />
+                        {standingsData.standings.length > 1 && (
+                          <div className="mt-4 text-center text-xs text-neutral-500">
+                            View Standings tab for all groups
                           </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                  
-                  {!fixtures.length && !loadingLive && (
-                    <div className="col-span-full flex flex-col items-center justify-center h-64 border border-dashed border-white/10 rounded-2xl bg-black/20">
-                      <p className="text-neutral-400 text-lg font-medium mb-2">No matches scheduled right now.</p>
-                      <p className="text-sm text-neutral-500">Check back later for live updates.</p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-neutral-500 p-4 bg-[#111111] border border-[#1f1f1f] rounded-xl text-sm">No standings data available</div>
+                    )}
+                  </div>
+                )}
+
+                {/* STATS COLUMN */}
+                {preset.showStats && (
+                  <div className="col-span-1">
+                    <h3 className="text-xl font-bold text-white mb-4">Top Scorers</h3>
+                    <div className="bg-[#111111] rounded-2xl border border-[#1f1f1f] p-4 h-[800px]">
+                       <TopScorersWidget scorers={getTopScorers(fixtures)} />
                     </div>
-                  )}
-                </div>
-              )}
+                  </div>
+                )}
+
+              </div>
             </motion.div>
           </TabsContent>
 
