@@ -47,8 +47,42 @@ export function useUserPreferences() {
 
         if (queryError) {
           if (queryError.code === "PGRST116") {
-            // Row doesn't exist, that's okay
-            setPreferences(null);
+            // AUTO-CREATE: Row doesn't exist, create it
+            const defaultPrefs: UserPreferences = {
+              theme: "dark",
+              fontSize: "md",
+              animationSpeed: "normal",
+              sidebarExpanded: true,
+              favoriteTeams: [],
+              f1DashboardPreset: "default",
+              footballDashboardPreset: "default",
+              notifications: { email: true, push: false, alerts: true },
+              language: "en",
+              timezone: "UTC",
+            };
+
+            const { error: insertError } = await supabase
+              .from("users_preferences")
+              .insert({
+                user_id: userId,
+                theme: defaultPrefs.theme,
+                font_size: defaultPrefs.fontSize,
+                animation_speed: defaultPrefs.animationSpeed,
+                sidebar_expanded: defaultPrefs.sidebarExpanded,
+                favorite_teams: defaultPrefs.favoriteTeams,
+                f1_dashboard_preset: defaultPrefs.f1DashboardPreset,
+                football_dashboard_preset: defaultPrefs.footballDashboardPreset,
+                notifications: defaultPrefs.notifications,
+                language: defaultPrefs.language,
+                timezone: defaultPrefs.timezone,
+              });
+            
+            if (!insertError) {
+              setPreferences(defaultPrefs);
+            } else {
+              console.error("Error auto-creating preferences:", insertError);
+              setPreferences(null);
+            }
           } else {
             setError(queryError.message);
             console.error("Error fetching preferences:", queryError);
