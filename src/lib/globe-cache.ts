@@ -1,3 +1,5 @@
+import { GeoJsonData } from "@/types/globe";
+
 /**
  * Utility for fetching and caching the Globe GeoJSON data to prevent redundant network calls.
  * Caches in localStorage for 7 days.
@@ -8,7 +10,7 @@ export async function getGlobeData(
   maxRetries = 3,
   retryDelay = 1000,
   onRetry?: (attempt: number, max: number, err: any) => void
-): Promise<any> {
+): Promise<GeoJsonData> {
   const cacheKey = "globe_geojson";
   const timeKey = "globe_geojson_time";
   const oneWeek = 7 * 24 * 60 * 60 * 1000;
@@ -21,7 +23,7 @@ export async function getGlobeData(
       if (cached && timestamp) {
         const age = Date.now() - parseInt(timestamp, 10);
         if (age < oneWeek) {
-          return JSON.parse(cached);
+          return JSON.parse(cached) as GeoJsonData;
         }
       }
     } catch (e) {
@@ -40,7 +42,7 @@ export async function getGlobeData(
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      const data = await res.json();
+      const data = (await res.json()) as GeoJsonData;
 
       if (typeof window !== "undefined") {
         try {
@@ -72,4 +74,6 @@ export async function getGlobeData(
       await new Promise((resolve) => setTimeout(resolve, retryDelay * (i + 1)));
     }
   }
+
+  throw new Error("Failed to load globe data after all retries");
 }

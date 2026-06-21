@@ -11,27 +11,32 @@ interface GlobeFallbackProps {
   maxRetries?: number;
 }
 
+interface WebGLDebugRendererInfo {
+  UNMASKED_RENDERER_VENDOR_ID: number;
+  UNMASKED_RENDERER_STRING: number;
+}
+
 export function GlobeFallback({
   errorType,
   errorMessage,
   onRetry,
   retryAttempt = 0,
   maxRetries = 3,
-}: GlobeFallbackProps) {
+}: GlobeFallbackProps): React.JSX.Element {
   // Browser user agent diagnostic helper
-  const getBrowserInfo = () => {
+  const getBrowserInfo = (): string => {
     if (typeof window === "undefined") return "Server-side rendering (SSR)";
     return `${navigator.userAgent}`;
   };
 
   // GPU context details helper
-  const getWebGLDetails = () => {
+  const getWebGLDetails = (): string => {
     if (typeof window === "undefined") return "WebGL Context Unavailable";
     try {
       const canvas = document.createElement("canvas");
       const gl = (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")) as WebGLRenderingContext | null;
       if (!gl) return "WebGL fully disabled or unsupported by hardware";
-      const debugInfo = gl.getExtension("WEBGL_debug_renderer_info") as any;
+      const debugInfo = gl.getExtension("WEBGL_debug_renderer_info") as WebGLDebugRendererInfo | null;
       if (debugInfo) {
         return (
           gl.getParameter(debugInfo.UNMASKED_RENDERER_VENDOR_ID) +
@@ -137,3 +142,4 @@ export function GlobeFallback({
     </div>
   );
 }
+export default GlobeFallback;

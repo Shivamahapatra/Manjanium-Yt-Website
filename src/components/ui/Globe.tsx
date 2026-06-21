@@ -1,20 +1,21 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import { Canvas, extend } from "@react-three/fiber";
+import { Canvas, extend, Object3DNode } from "@react-three/fiber";
 import ThreeGlobe from "three-globe";
 import { OrbitControls } from "@react-three/drei";
-import { Color, Vector3 } from "three";
+import { Color, Vector3, Mesh, Object3D, MeshPhongMaterial } from "three";
 import { message } from "antd";
 import { getGlobeData } from "@/lib/globe-cache";
 import { useResponsiveGlobe } from "@/hooks/useResponsiveGlobe";
 import { GlobeFallback, GlobeErrorType } from "@/components/ui/GlobeFallback";
+import { ArcData, PointData, GeoJsonFeature, GeoJsonData, GlobeConfig } from "@/types/globe";
 
 extend({ ThreeGlobe });
 
 declare module "@react-three/fiber" {
   interface ThreeElements {
-    threeGlobe: any;
+    threeGlobe: Object3DNode<ThreeGlobe, typeof ThreeGlobe>;
   }
 }
 
@@ -37,7 +38,7 @@ class CanvasErrorBoundary extends React.Component<
   { children: React.ReactNode; fallback: (error: Error) => React.ReactNode },
   { hasError: boolean; error: Error | null }
 > {
-  constructor(props: any) {
+  constructor(props: { children: React.ReactNode; fallback: (error: Error) => React.ReactNode }) {
     super(props);
     this.state = { hasError: false, error: null };
   }
@@ -46,7 +47,7 @@ class CanvasErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, _errorInfo: React.ErrorInfo) {
     console.error("[Globe Render Error]", {
       error: error.message,
       stack: error.stack,
@@ -64,47 +65,12 @@ class CanvasErrorBoundary extends React.Component<
   }
 }
 
-export type GlobeConfig = {
-  pointSize?: number;
-  globeColor?: string;
-  showAtmosphere?: boolean;
-  atmosphereColor?: string;
-  atmosphereAltitude?: number;
-  emissive?: string;
-  emissiveIntensity?: number;
-  shininess?: number;
-  polygonColor?: string;
-  ambientLight?: string;
-  directionalLeftLight?: string;
-  directionalTopLight?: string;
-  pointLight?: string;
-  arcTime?: number;
-  arcLength?: number;
-  rings?: number;
-  maxRings?: number;
-  initialPosition?: {
-    lat: number;
-    lng: number;
-  };
-  autoRotate?: boolean;
-  autoRotateSpeed?: number;
-  enableZoom?: boolean;
-};
-
 interface WorldProps {
   globeConfig: GlobeConfig;
-  data: Array<{
-    startLat: number;
-    startLng: number;
-    endLat: number;
-    endLng: number;
-    arcAlt?: number;
-    color?: string;
-    stroke?: number;
-  }>;
+  data: ArcData[];
   polygonResolution?: number;
   isMobile?: boolean;
-  worldData?: any;
+  worldData?: GeoJsonData | null;
 }
 
 export const GlobeComponent = React.memo(function GlobeComponent({
@@ -113,12 +79,12 @@ export const GlobeComponent = React.memo(function GlobeComponent({
   polygonResolution = 2,
   isMobile = false,
   worldData,
-}: WorldProps) {
+}: WorldProps): React.JSX.Element {
   const globeRef = useRef<ThreeGlobe>(null);
 
   // Memoize point data processing to avoid recalculations on every render
-  const points = useMemo(() => {
-    return data.flatMap((d: any) => [
+  const points = useMemo<PointData[]>(() => {
+    return data.flatMap((d: ArcData) => [
       { lat: d.startLat, lng: d.startLng, color: d.color },
       { lat: d.endLat, lng: d.endLng, color: d.color }
     ]);
@@ -127,7 +93,7 @@ export const GlobeComponent = React.memo(function GlobeComponent({
   // Handle globe geometry, arcs, and markers configuration
   useEffect(() => {
     if (globeRef.current) {
-      const globe = globeRef.current as any;
+      const globe = globeRef.current;
 
       // Atmosphere settings
       globe.showAtmosphere(globeConfig.showAtmosphere ?? true);
@@ -138,31 +104,34 @@ export const GlobeComponent = React.memo(function GlobeComponent({
         globe.atmosphereAltitude(globeConfig.atmosphereAltitude);
       }
 
-      // Globe base appearance
+      // Globe base appearance using strictly cast MeshPhongMaterial
       if (globe.globeMaterial) {
-        globe.globeMaterial().color = new Color(globeConfig.globeColor || "#06182c");
+        const material = globe.globeMaterial() as MeshPhongMaterial;
+        if (material) {
+          material.color = new Color(globeConfig.globeColor || "#06182c");
+        }
       }
 
       // Arcs rendering
       globe
         .arcsData(data)
-        .arcStartLat((d: any) => d.startLat)
-        .arcStartLng((d: any) => d.startLng)
-        .arcEndLat((d: any) => d.endLat)
-        .arcEndLng((d: any) => d.endLng)
-        .arcColor((d: any) => d.color || "#0ea5e9")
-        .arcAltitude((d: any) => d.arcAlt || 0.3)
-        .arcStroke((d: any) => d.stroke || 0.6)
+        .arcStartLat((d: ArcData) => d.startLat)
+        .arcStartLng((d: ArcData) => d.startLng)
+        .arcEndLat((d: ArcData) => d.endLat)
+        .arcEndLng((d: ArcData) => d.endLng)
+        .arcColor((d: ArcData) => d.color || "#0ea5e9")
+        .arcAltitude((d: ArcData) => d.arcAlt || 0.3)
+        .arcStroke((d: ArcData) => d.stroke || 0.6)
         .arcDashLength(0.9)
         .arcDashGap(3)
-        .arcDashAnimateTime(isMobile ? 600 : 1200); // Faster animation on mobile
+        .arcDashAnimateTime(isMobile ? 600 : 1200);
 
       // Markers on arc start/end points using memoized points
       globe
         .pointsData(points)
-        .pointLat((d: any) => d.lat)
-        .pointLng((d: any) => d.lng)
-        .pointColor((d: any) => d.color || "#ef4444")
+        .pointLat((d: PointData) => d.lat)
+        .pointLng((d: PointData) => d.lng)
+        .pointColor((d: PointData) => d.color || "#ef4444")
         .pointAltitude(0.01)
         .pointRadius(0.8);
     }
@@ -171,7 +140,7 @@ export const GlobeComponent = React.memo(function GlobeComponent({
   // Hex Polygons representing Earth continents
   useEffect(() => {
     if (globeRef.current && worldData) {
-      const globe = globeRef.current as any;
+      const globe = globeRef.current;
       globe
         .hexPolygonsData(worldData.features)
         .hexPolygonResolution(polygonResolution) // Uses dynamic responsive resolution
@@ -184,24 +153,26 @@ export const GlobeComponent = React.memo(function GlobeComponent({
   useEffect(() => {
     return () => {
       if (globeRef.current) {
-        const globe = globeRef.current as any;
+        const globe = globeRef.current;
         if (globe.globeMaterial) {
-          const mat = globe.globeMaterial();
+          const mat = globe.globeMaterial() as MeshPhongMaterial;
           if (mat && typeof mat.dispose === "function") {
             mat.dispose();
           }
         }
-        globe.traverse((object: any) => {
-          if (object.geometry && typeof object.geometry.dispose === "function") {
-            object.geometry.dispose();
-          }
-          if (object.material) {
-            if (Array.isArray(object.material)) {
-              object.material.forEach((mat: any) => {
-                if (typeof mat.dispose === "function") mat.dispose();
-              });
-            } else if (typeof object.material.dispose === "function") {
-              object.material.dispose();
+        globe.traverse((object: Object3D) => {
+          if (object instanceof Mesh) {
+            if (object.geometry && typeof object.geometry.dispose === "function") {
+              object.geometry.dispose();
+            }
+            if (object.material) {
+              if (Array.isArray(object.material)) {
+                object.material.forEach((mat) => {
+                  if (typeof mat.dispose === "function") mat.dispose();
+                });
+              } else if (typeof object.material.dispose === "function") {
+                object.material.dispose();
+              }
             }
           }
         });
@@ -212,7 +183,7 @@ export const GlobeComponent = React.memo(function GlobeComponent({
   return <threeGlobe ref={globeRef} />;
 });
 
-export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps) {
+export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps): React.JSX.Element {
   const ambientColor = globeConfig.ambientLight || "#faf0e6";
   const directionalLeftColor = globeConfig.directionalLeftLight || "#ffffff";
   const directionalTopColor = globeConfig.directionalTopLight || "#ffffff";
@@ -220,7 +191,7 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
 
   const { size, polygonResolution, cameraZ, autoRotateSpeed, isMobile, isTiny } = useResponsiveGlobe();
 
-  const [worldData, setWorldData] = useState<any>(null);
+  const [worldData, setWorldData] = useState<GeoJsonData | null>(null);
   const [error, setError] = useState<{ type: GlobeErrorType; message?: string } | null>(null);
   const [retryAttempt, setRetryAttempt] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -353,19 +324,19 @@ export const Globe = React.memo(function Globe({ globeConfig, data }: WorldProps
       signal,
       3,
       1000,
-      (attempt, max) => {
+      (attempt: number, max: number) => {
         setRetryAttempt(attempt);
         message.loading(`Globe synchronising... (attempt ${attempt}/${max})`, 1.5);
       }
     )
-      .then((data) => {
+      .then((data: GeoJsonData) => {
         clearTimeout(timeoutId);
         setWorldData(data);
         setError(null);
         setIsLoading(false);
         message.success("Interactive globe loaded successfully", 2);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         clearTimeout(timeoutId);
         if (err.name === "AbortError") return;
 
