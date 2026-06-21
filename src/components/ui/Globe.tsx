@@ -9,6 +9,7 @@ import { message } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, MapPin, Compass, Info, Trophy, Milestone } from "lucide-react";
 import localWorldData from "../../../public/globe.json";
+import { Globe2D } from "./Globe2D";
 import { useResponsiveGlobe } from "@/hooks/useResponsiveGlobe";
 import { GlobeFallback, GlobeErrorType } from "@/components/ui/GlobeFallback";
 import { ArcData, PointData, GeoJsonFeature, GeoJsonData, GlobeConfig } from "@/types/globe";
@@ -777,14 +778,28 @@ export const Globe = React.memo(function Globe({
         onMouseMove={handleMouseMove}
       >
         {error ? (
-          <GlobeFallback
-            errorType={error.type}
-            errorMessage={error.message}
-            onRetry={handleRetry}
-            retryAttempt={retryAttempt}
-            maxRetries={3}
-            theme={resolvedTheme}
-          />
+          error.type === "webgl_unsupported" || error.type === "render_failed" ? (
+            <Globe2D
+              globeConfig={mergedGlobeConfig}
+              data={data}
+              highlightedRound={highlightedRound}
+              onHoverArc={handleHoverArc}
+              onHoverPoint={handleHoverPoint}
+              onPointClick={handleClickPoint}
+              onArcClick={handleClickArc}
+              onHoverRoundChange={onHoverRoundChange}
+              hoveredArc={hoveredArc}
+            />
+          ) : (
+            <GlobeFallback
+              errorType={error.type}
+              errorMessage={error.message}
+              onRetry={handleRetry}
+              retryAttempt={retryAttempt}
+              maxRetries={3}
+              theme={resolvedTheme}
+            />
+          )
         ) : !isInViewport || isLoading || !worldData ? (
           <div className={`absolute inset-0 rounded-full animate-pulse border flex flex-col items-center justify-center gap-2 ${
             resolvedTheme === "light"
@@ -802,14 +817,22 @@ export const Globe = React.memo(function Globe({
           </div>
         ) : (
           <CanvasErrorBoundary
-            fallback={(err) => (
-              <GlobeFallback
-                errorType="render_failed"
-                errorMessage={err.message}
-                onRetry={handleRetry}
-                theme={resolvedTheme}
-              />
-            )}
+            fallback={(err) => {
+              console.warn("R3F Canvas crashed, falling back to Globe2D:", err);
+              return (
+                <Globe2D
+                  globeConfig={mergedGlobeConfig}
+                  data={data}
+                  highlightedRound={highlightedRound}
+                  onHoverArc={handleHoverArc}
+                  onHoverPoint={handleHoverPoint}
+                  onPointClick={handleClickPoint}
+                  onArcClick={handleClickArc}
+                  onHoverRoundChange={onHoverRoundChange}
+                  hoveredArc={hoveredArc}
+                />
+              );
+            }}
           >
             <motion.div
               animate={{ opacity: isTransitioning ? 0 : 1 }}
