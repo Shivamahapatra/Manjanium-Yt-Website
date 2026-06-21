@@ -172,3 +172,19 @@
 .manjanium-table .ant-table-cell-row-hover {
   background: transparent !important;
 }
+
+/* Global User Preferences Overrides */
+html.font-size-sm { font-size: 14px; }
+html.font-size-md { font-size: 16px; }
+html.font-size-lg { font-size: 18px; }
+
+html.animation-speed-fast * {
+  animation-duration: 0.2s !important;
+  transition-duration: 0.15s !important;
+}
+
+html.animation-speed-reduced * {
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+  scroll-behavior: auto !important;
+}

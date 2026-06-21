@@ -81,7 +81,9 @@ export function GlobeComponent({ globeConfig, data }: WorldProps) {
       }
 
       // Globe base appearance
-      globe.globeColor(globeConfig.globeColor || "#06182c");
+      if (globe.globeMaterial) {
+        globe.globeMaterial().color = new Color(globeConfig.globeColor || "#06182c");
+      }
 
       // Arcs rendering
       globe
