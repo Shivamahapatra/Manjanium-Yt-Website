@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { MainNavbar } from "./MainNavbar";
-import { SportsSidebar } from "./SportsSidebar";
+import MainNavbar from "./MainNavbar";
+import SportsSidebar from "./SportsSidebar";
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -69,12 +69,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       />
 
       {/* Top Navbar */}
-      <MainNavbar 
-        currentSport={currentSport}
-        liveMatchCount={liveMatchCount}
-        onSportChange={handleSportChange}
-        onSettingsClick={() => window.location.href = "/settings"}
-      />
+      <MainNavbar />
 
       {/* Main Content Area (SportsSidebar handles the left/right flex layout natively) */}
       <div className="flex-1 pt-16 relative z-10 w-full h-[100dvh]">

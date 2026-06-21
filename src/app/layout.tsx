@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import "@/styles/design-system.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-
 
 const inter = Inter({
   variable: "--font-inter",
@@ -29,7 +28,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { SettingsProvider } from "@/lib/settings-context";
 import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { ClerkProvider } from "@clerk/nextjs";
-import { AppearanceProvider } from "@/components/providers/AppearanceProvider";
+import AppearanceProvider from "@/components/providers/AppearanceProvider";
 
 export default function RootLayout({
   children,
@@ -37,30 +36,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
-        suppressHydrationWarning
-      >
-        <body className="min-h-full flex flex-col pt-16 relative">
-          <OnboardingModal />
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
+    <html
+      lang="en"
+      className={`dark ${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+      </head>
+      <body className="min-h-full flex flex-col pt-16 relative" style={{ backgroundColor: 'var(--color-background)', color: 'var(--color-text-primary)' }}>
+        <ClerkProvider>
+          <AppearanceProvider>
             <SettingsProvider>
-              <AppearanceProvider>
-                <AntdRegistry>
-                  <MainLayout>{children}</MainLayout>
-                </AntdRegistry>
-              </AppearanceProvider>
+              <OnboardingModal />
+              <AntdRegistry>
+                <MainLayout>{children}</MainLayout>
+              </AntdRegistry>
             </SettingsProvider>
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+          </AppearanceProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }

@@ -1,122 +1,129 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { useUserPreferences, UserPreferences } from '@/hooks/useUserPreferences';
-import { Spin } from 'antd';
+import { useUserPreferences } from '@/hooks/useUserPreferences'
+import { useState } from 'react'
 
-export function AppearanceSettings() {
-  const { preferences, loading, updatePreferences, error: hookError } = useUserPreferences();
-  const [localPrefs, setLocalPrefs] = useState<UserPreferences | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState('');
+type Theme = 'dark' | 'light' | 'auto'
+type FontSize = 'sm' | 'md' | 'lg'
+type AnimationSpeed = 'reduced' | 'normal' | 'fast'
 
-  useEffect(() => {
-    if (preferences) {
-      setLocalPrefs(preferences);
-    }
-  }, [preferences]);
+export default function AppearanceSettings() {
+  const { preferences, updatePreferences } = useUserPreferences()
+  const [saveMessage, setSaveMessage] = useState('')
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-full"><Spin size="large" /></div>;
+  const handleThemeChange = async (theme: Theme) => {
+    await updatePreferences({ theme })
+    document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.classList.toggle('light', theme === 'light')
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+    setSaveMessage('✓ Theme saved')
+    setTimeout(() => setSaveMessage(''), 2000)
   }
 
-  if (!localPrefs) {
-    return <div className="p-8 text-center text-neutral-400">Loading preferences...</div>;
+  const handleFontSizeChange = async (size: FontSize) => {
+    await updatePreferences({ fontSize: size })
+    setSaveMessage('✓ Font size saved')
+    setTimeout(() => setSaveMessage(''), 2000)
   }
 
-  const handleChange = async (updates: Partial<UserPreferences>) => {
-    // Optimistic update - change UI immediately
-    setLocalPrefs(prev => prev ? { ...prev, ...updates } : null);
-    setMessage('');
-    setError(null);
-    setSaving(true);
+  const handleAnimationChange = async (speed: AnimationSpeed) => {
+    await updatePreferences({ animationSpeed: speed })
+    setSaveMessage('✓ Animation speed saved')
+    setTimeout(() => setSaveMessage(''), 2000)
+  }
 
-    try {
-      await updatePreferences(updates);
-      setMessage('✓ Changes saved');
-      setTimeout(() => setMessage(''), 2000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save');
-      setLocalPrefs(preferences); // Revert on error
-    } finally {
-      setSaving(false);
-    }
-  };
+  const themeOptions: { label: string; value: Theme; description: string }[] = [
+    { label: 'Dark', value: 'dark', description: 'Optimal for low-light viewing' },
+    { label: 'Light', value: 'light', description: 'High visibility mode' },
+    { label: 'Auto', value: 'auto', description: 'System preference' }
+  ]
+
+  const fontSizes: { label: string; value: FontSize }[] = [
+    { label: 'Small', value: 'sm' },
+    { label: 'Normal', value: 'md' },
+    { label: 'Large', value: 'lg' }
+  ]
+
+  const animationSpeeds: { label: string; value: AnimationSpeed }[] = [
+    { label: 'Reduced', value: 'reduced' },
+    { label: 'Normal', value: 'normal' },
+    { label: 'Fast', value: 'fast' }
+  ]
 
   return (
-    <div className="p-8 max-w-3xl">
-      <h2 className="text-3xl font-bold text-white mb-2">Theme Preferences</h2>
-      <p className="text-neutral-400 mb-8">Customize the visual appearance of Manjanium Sports Hub.</p>
-
-      {error && <div className="bg-red-500/10 border border-red-500 text-red-400 p-4 rounded mb-6">{error}</div>}
-      {hookError && <div className="bg-red-500/10 border border-red-500 text-red-400 p-4 rounded mb-6">{hookError}</div>}
-      {message && <div className="bg-green-500/10 border border-green-500 text-green-400 p-4 rounded mb-6">{message}</div>}
-
-      {/* Theme Selection */}
-      <div className="mb-12">
-        <h3 className="text-lg font-semibold text-white mb-6">🎨 Theme Mode</h3>
-        <div className="flex gap-4 flex-wrap">
-          {(['light', 'dark', 'auto'] as const).map((theme) => (
+    <div className="space-y-8">
+      <section>
+        <h3 style={{ color: 'var(--color-primary)' }} className="font-bold text-lg mb-4 uppercase">
+          Theme
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {themeOptions.map(option => (
             <button
-              key={theme}
-              onClick={() => handleChange({ theme })}
-              disabled={saving}
-              className={`px-8 py-6 rounded-2xl border-2 font-semibold transition-all ${
-                localPrefs.theme === theme
-                  ? 'border-manjanium-gold bg-manjanium-gold/10 text-white shadow-lg'
-                  : 'border-neutral-700 text-neutral-400 hover:border-neutral-500'
-              } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              key={option.value}
+              onClick={() => handleThemeChange(option.value)}
+              style={{
+                backgroundColor: preferences?.theme === option.value ? 'var(--color-primary)' : 'var(--color-surface)',
+                color: preferences?.theme === option.value ? 'var(--color-background)' : 'var(--color-text-secondary)',
+                borderColor: 'var(--color-border)'
+              }}
+              className="p-4 rounded-lg border-2 transition-all hover:scale-105 text-center"
             >
-              {theme === 'light' ? '☀️ Light' : theme === 'dark' ? '🌙 Dark' : '⚙️ Auto'}
+              <div className="font-bold">{option.label}</div>
+              <div className="text-xs">{option.description}</div>
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Font Size */}
-      <div className="mb-12">
-        <h3 className="text-lg font-semibold text-white mb-6">T Font Size</h3>
-        <div className="flex gap-4 flex-wrap">
-          {(['sm', 'md', 'lg'] as const).map((size) => (
+      <section>
+        <h3 style={{ color: 'var(--color-primary)' }} className="font-bold text-lg mb-4 uppercase">
+          Font Size
+        </h3>
+        <div className="flex gap-4">
+          {fontSizes.map(size => (
             <button
-              key={size}
-              onClick={() => handleChange({ fontSize: size })}
-              disabled={saving}
-              className={`px-8 py-4 rounded-lg border-2 font-semibold transition-all ${
-                localPrefs.fontSize === size
-                  ? 'border-manjanium-gold bg-manjanium-gold/10 text-white shadow-lg'
-                  : 'border-neutral-700 text-neutral-400 hover:border-neutral-500'
-              } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              key={size.value}
+              onClick={() => handleFontSizeChange(size.value)}
+              style={{
+                backgroundColor: preferences?.fontSize === size.value ? 'var(--color-primary)' : 'var(--color-surface)',
+                color: preferences?.fontSize === size.value ? 'var(--color-background)' : 'var(--color-text-primary)',
+                borderColor: 'var(--color-border)'
+              }}
+              className="px-6 py-2 rounded-lg border-2 font-bold transition-all hover:scale-105"
             >
-              {size === 'sm' ? 'Small' : size === 'md' ? 'Normal' : 'Large'}
+              {size.label}
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Animation Speed */}
-      <div className="mb-12">
-        <h3 className="text-lg font-semibold text-white mb-6">⚡ Animation Speed</h3>
-        <div className="flex gap-4 flex-wrap">
-          {(['normal', 'reduced', 'fast'] as const).map((speed) => (
+      <section>
+        <h3 style={{ color: 'var(--color-primary)' }} className="font-bold text-lg mb-4 uppercase">
+          Animation Speed
+        </h3>
+        <div className="flex gap-4">
+          {animationSpeeds.map(speed => (
             <button
-              key={speed}
-              onClick={() => handleChange({ animationSpeed: speed })}
-              disabled={saving}
-              className={`px-8 py-4 rounded-lg border-2 font-semibold transition-all ${
-                localPrefs.animationSpeed === speed
-                  ? 'border-manjanium-gold bg-manjanium-gold/10 text-white shadow-lg'
-                  : 'border-neutral-700 text-neutral-400 hover:border-neutral-500'
-              } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              key={speed.value}
+              onClick={() => handleAnimationChange(speed.value)}
+              style={{
+                backgroundColor: preferences?.animationSpeed === speed.value ? 'var(--color-primary)' : 'var(--color-surface)',
+                color: preferences?.animationSpeed === speed.value ? 'var(--color-background)' : 'var(--color-text-primary)',
+                borderColor: 'var(--color-border)'
+              }}
+              className="px-6 py-2 rounded-lg border-2 font-bold transition-all hover:scale-105"
             >
-              {speed.charAt(0).toUpperCase() + speed.slice(1)}
+              {speed.label}
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      {saving && <p className="text-center text-neutral-500 text-sm">Saving...</p>}
+      {saveMessage && (
+        <div className="p-4 rounded-lg font-bold" style={{ backgroundColor: 'var(--color-surface-container)', color: 'var(--color-text-primary)' }}>
+          {saveMessage}
+        </div>
+      )}
     </div>
-  );
+  )
 }

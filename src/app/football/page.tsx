@@ -2,38 +2,23 @@
 
 import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { LiveChatMarquee } from "@/components/chat/LiveChatMarquee";
 import { Spin } from "antd";
-import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw, AlertCircle, Clock, Trophy, Activity, Users, History, Medal } from "lucide-react";
-
-// Shadcn Tabs
+import { motion } from "framer-motion";
+import { RefreshCw, Trophy, Activity, Users, History, Medal } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/shadcn-tabs";
-import { cn } from "@/lib/utils";
-import { ChannelsBanner } from '@/components/social/ChannelsBanner';
-import { ChannelsGrid } from '@/components/social/ChannelsGrid';
-import { IconBrandYoutube, IconBrandDiscord, IconBrandX } from "@tabler/icons-react";
-
-// Components
 import { GroupStandingsCard } from "@/components/football/GroupStandingsCard";
-import { PlayerStatsModal } from "@/components/football/PlayerStatsModal";
 import { TopScorersWidget } from "@/components/football/TopScorersWidget";
 import { getTopScorers } from "@/lib/football-utils";
 import { Team, StandingsResponse } from "@/types/football";
-import { MatchSummary } from "@/types/match";
 import { PastMatches } from "@/components/football/PastMatches";
-import { useUserPreferences } from "@/hooks/useUserPreferences";
-import { FOOTBALL_PRESETS, FootballPresetKey } from "@/lib/dashboard-presets";
 
 function FootballHubContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  // Tabs State (Initialize from URL if present)
   const defaultTab = searchParams.get("tab") || "live";
   const [activeTab, setActiveTab] = useState<string>(defaultTab);
 
-  // Sync tab state with URL without triggering full reloads
   useEffect(() => {
     const tab = searchParams.get("tab");
     if (tab && tab !== activeTab) {
@@ -46,462 +31,259 @@ function FootballHubContent() {
     router.push(`/football?tab=${value}`, { scroll: false });
   };
 
-  // State
   const [fixtures, setFixtures] = useState<any[]>([]);
-  const [debugStats, setDebugStats] = useState<any>(null);
   const [loadingLive, setLoadingLive] = useState(true);
-
-  const [pastMatches, setPastMatches] = useState<MatchSummary[]>([]);
-  const [loadingPast, setLoadingPast] = useState(true);
-  const [errorPast, setErrorPast] = useState<string | null>(null);
-
-
+  const [pastMatches, setPastMatches] = useState<any[]>([]);
   const [standingsData, setStandingsData] = useState<StandingsResponse | null>(null);
   const [loadingStandings, setLoadingStandings] = useState(true);
-  const [errorStandings, setErrorStandings] = useState<string | null>(null);
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
-
-  const { preferences } = useUserPreferences();
-  const presetKey = (preferences?.footballDashboardPreset as FootballPresetKey) || "live_matches";
-  const preset = FOOTBALL_PRESETS[presetKey] || FOOTBALL_PRESETS.live_matches;
-
-  const fetchLiveMatches = async () => {
-    try {
-      const response = await fetch('/api/football/fixtures/live');
-      const data = await response.json();
-      if (data.response) {
-        setFixtures(data.response);
-        setDebugStats(data.debug);
-      }
-    } catch (error) {
-      console.error("Error fetching Live Matches", error);
-    } finally {
-      setLoadingLive(false);
-    }
-  };
-
-  const fetchPastMatches = async () => {
-    setLoadingPast(true);
-    try {
-      const res = await fetch('/api/football/matches/past?limit=20');
-      if (!res.ok) throw new Error('Failed to fetch past matches');
-      const data = await res.json();
-      setPastMatches(data.matches || []);
-    } catch (err: any) {
-      console.error(err);
-      setErrorPast('Failed to load past matches');
-    } finally {
-      setLoadingPast(false);
-    }
-  };
-
-  const fetchStandingsData = async (bypassCache = false) => {
-    setLoadingStandings(true);
-    setErrorStandings(null);
-    try {
-      const url = bypassCache 
-        ? '/api/football/world-cup/standings-with-players?cache=false' 
-        : '/api/football/world-cup/standings-with-players';
-        
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch standings');
-      
-      const data = await response.json();
-      setStandingsData(data);
-    } catch (error: any) {
-      setErrorStandings(error.message || 'Failed to load standings');
-    } finally {
-      setLoadingStandings(false);
-    }
-  };
 
   useEffect(() => {
+    const fetchLiveMatches = async () => {
+      try {
+        const response = await fetch('/api/football/fixtures/live');
+        const data = await response.json();
+        if (data.response) setFixtures(data.response);
+      } catch (error) {} finally {
+        setLoadingLive(false);
+      }
+    };
+    const fetchPastMatches = async () => {
+      try {
+        const res = await fetch('/api/football/matches/past?limit=20');
+        const data = await res.json();
+        setPastMatches(data.matches || []);
+      } catch (err) {}
+    };
+    const fetchStandingsData = async () => {
+      try {
+        const res = await fetch('/api/football/world-cup/standings-with-players');
+        const data = await res.json();
+        setStandingsData(data);
+      } catch (error) {} finally {
+        setLoadingStandings(false);
+      }
+    };
+
     fetchLiveMatches();
     fetchPastMatches();
     fetchStandingsData();
-    const interval = setInterval(fetchLiveMatches, 30000); // 30s polling
+    const interval = setInterval(fetchLiveMatches, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleManualRefresh = () => {
-    if (activeTab === 'live') {
-      setLoadingLive(true);
-      fetchLiveMatches();
-    } else if (activeTab === 'pastMatches') {
-      fetchPastMatches();
-    } else {
-      fetchStandingsData(true);
-    }
-  };
-
-  const liveCount = debugStats?.liveCount || 0;
-  const isLive = liveCount > 0;
-  const isUpcoming = !isLive && fixtures.length > 0;
-
   const topScorers = standingsData?.groups ? getTopScorers(standingsData.groups, 10) : [];
-  const lastUpdated = standingsData?.lastUpdated || new Date().toISOString();
 
   return (
-    <div className="w-full flex flex-col pt-8 px-4 sm:px-8 max-w-7xl mx-auto z-10 relative">
+    <div className="w-full flex flex-col pt-4 px-4 sm:px-8 max-w-7xl mx-auto z-10 relative pb-24 animate-fade-in-up">
       
-      {/* Hero Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-6 border-b border-white/10 gap-4">
-        <div className="flex flex-col gap-2">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3"
-          >
-            <div className="w-1.5 h-8 bg-accent rounded-full shadow-[0_0_8px_var(--accent)]" />
-            <h1 className="text-3xl md:text-5xl font-black font-heading tracking-tight text-text-primary drop-shadow-md">
-              Football Hub
-            </h1>
-          </motion.div>
-          <p className="text-sm md:text-base text-text-secondary font-medium pl-4">
-            FIFA World Cup 2026 Live Coverage
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-3 self-start md:self-auto">
-          {isLive ? (
-            <motion.div
-              animate={{ opacity: [1, 0.6, 1] }}
-              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-              className="bg-red-500/20 border border-red-500/50 text-red-500 px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.3)] backdrop-blur-sm"
-            >
-              <div className="w-2.5 h-2.5 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
-              {liveCount} LIVE MATCHES
-            </motion.div>
-          ) : isUpcoming ? (
-            <div className="bg-amber-500/10 border border-amber-500/20 text-amber-500 px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2">
-              UPCOMING MATCHES
+      {/* Featured Match Hero from Stitch */}
+      {fixtures.length > 0 && activeTab === 'live' && (
+        <section className="relative h-64 md:h-96 overflow-hidden glass-panel group border border-primary/20 rounded-2xl mb-8">
+          <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-40" style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuB3NY6o5XP0w9-K1jzK9q8qk1ygTDR7oBeZFvi_wcyqG18uGl4NMnPiQeuVtzG6wEedRO_IfBdO1fQGUkkSWt5wXAHHoJebUITGJxmhJQUMxXLqIqxgOxVARSQ8lZokABJ_8cB1xj2WV3Z-NFko8hxQYEFJEgKweB0awnrV0CzSYFSLo9XQiW83HkUJXR85DPTWMHbdi0Vtr2h-DA4vvhrCe2PE5wTcvFcevLyUi1cYiRJvzKpWkKHMGMU-cx2wgGO678L1YTxQ2os')` }}></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+          <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 space-y-4 z-20">
+            <div className="flex items-center gap-2">
+              {fixtures[0].status.short === "1H" || fixtures[0].status.short === "2H" ? (
+                <span className="px-2 py-1 bg-error text-white font-bold text-xs rounded flex items-center gap-2 animate-pulse">
+                  <span className="w-2 h-2 rounded-full bg-white"></span> LIVE
+                </span>
+              ) : (
+                <span className="px-2 py-1 bg-surface-container text-text-primary font-bold text-xs rounded">
+                  UPCOMING
+                </span>
+              )}
+              <span className="font-bold text-xs text-primary uppercase tracking-widest drop-shadow-md">
+                {fixtures[0].league.name}
+              </span>
             </div>
-          ) : null}
-
-          <button 
-            onClick={handleManualRefresh}
-            disabled={loadingLive || loadingStandings || loadingPast}
-            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-xs font-semibold text-white hover:bg-white/10 hover:border-white/20 transition-all disabled:opacity-50 group"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 group-hover:text-manjanium-gold transition-colors ${(loadingLive && activeTab === 'live') || (loadingStandings && activeTab !== 'live' && activeTab !== 'pastMatches') || (loadingPast && activeTab === 'pastMatches') ? 'animate-spin' : ''}`} />
-            Refresh
-          </button>
-        </div>
-      </div>
+            
+            <div className="flex items-center justify-between gap-6 max-w-4xl">
+              <div className="flex-1 flex items-center gap-6">
+                <div className="text-right hidden md:block">
+                  <h2 className="text-2xl md:text-3xl font-black drop-shadow-md uppercase text-text-primary">{fixtures[0].teams.home.name}</h2>
+                  <p className="text-xs font-bold text-text-secondary uppercase">HOME</p>
+                </div>
+                <div className="w-16 h-16 md:w-24 md:h-24 glass-panel rounded-full p-3 flex items-center justify-center">
+                  <img src={fixtures[0].teams.home.logo} alt="Home" className="w-full h-full object-contain" />
+                </div>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <span className="font-mono text-4xl md:text-6xl text-primary font-bold drop-shadow-[0_0_12px_rgba(var(--color-primary),0.6)]">
+                  {fixtures[0].goals.home ?? 0} : {fixtures[0].goals.away ?? 0}
+                </span>
+                <span className="text-xs font-bold text-text-primary">{fixtures[0].status.elapsed ? `${fixtures[0].status.elapsed}'` : 'TBD'}</span>
+              </div>
+              
+              <div className="flex-1 flex items-center justify-end gap-6">
+                <div className="w-16 h-16 md:w-24 md:h-24 glass-panel rounded-full p-3 flex items-center justify-center">
+                  <img src={fixtures[0].teams.away.logo} alt="Away" className="w-full h-full object-contain" />
+                </div>
+                <div className="text-left hidden md:block">
+                  <h2 className="text-2xl md:text-3xl font-black drop-shadow-md uppercase text-text-primary">{fixtures[0].teams.away.name}</h2>
+                  <p className="text-xs font-bold text-text-secondary uppercase">AWAY</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Tabs System */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex flex-col">
-        
-        {/* Tab Navigation */}
-        <div className="w-full overflow-x-auto scrollbar-hide pb-2 mb-6">
-          <TabsList className="bg-surface border border-border-color p-1 rounded-xl flex w-max sm:w-full sm:justify-start shadow-sm">
-            <TabsTrigger value="live" className="gap-2 px-6 rounded-lg data-[state=active]:bg-accent data-[state=active]:text-bg-primary data-[state=active]:shadow-md transition-all">
-              <Activity className="w-4 h-4" /> LIVE MATCHES
+        <div className="w-full overflow-x-auto pb-2 mb-6" style={{ scrollbarWidth: 'none' }}>
+          <TabsList className="bg-surface border border-border-default p-1 rounded-xl flex w-max shadow-sm">
+            <TabsTrigger value="live" className="gap-2 px-6 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-background font-bold text-xs uppercase tracking-wider transition-all">
+              <Activity className="w-4 h-4" /> Live
             </TabsTrigger>
-            <TabsTrigger value="standings" className="gap-2 px-6 rounded-lg data-[state=active]:bg-accent data-[state=active]:text-bg-primary data-[state=active]:shadow-md transition-all">
-              <Trophy className="w-4 h-4" /> STANDINGS
+            <TabsTrigger value="standings" className="gap-2 px-6 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-background font-bold text-xs uppercase tracking-wider transition-all">
+              <Trophy className="w-4 h-4" /> Standings
             </TabsTrigger>
-            <TabsTrigger value="topScorers" className="gap-2 px-6 rounded-lg data-[state=active]:bg-accent data-[state=active]:text-bg-primary data-[state=active]:shadow-md transition-all">
-              <Medal className="w-4 h-4" /> TOP SCORERS
+            <TabsTrigger value="topScorers" className="gap-2 px-6 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-background font-bold text-xs uppercase tracking-wider transition-all">
+              <Medal className="w-4 h-4" /> Scorers
             </TabsTrigger>
-            <TabsTrigger value="playerSearch" className="gap-2 px-6 rounded-lg data-[state=active]:bg-accent data-[state=active]:text-bg-primary data-[state=active]:shadow-md transition-all">
-              <Users className="w-4 h-4" /> PLAYER SEARCH
-            </TabsTrigger>
-            <TabsTrigger value="pastMatches" className="gap-2 px-6 rounded-lg data-[state=active]:bg-accent data-[state=active]:text-bg-primary data-[state=active]:shadow-md transition-all">
-              <History className="w-4 h-4" /> PAST MATCHES
+            <TabsTrigger value="pastMatches" className="gap-2 px-6 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-background font-bold text-xs uppercase tracking-wider transition-all">
+              <History className="w-4 h-4" /> Past
             </TabsTrigger>
           </TabsList>
         </div>
 
-        {/* Global Timestamp */}
-        {activeTab !== 'live' && activeTab !== 'playerSearch' && activeTab !== 'pastMatches' && (
-          <div className="flex items-center gap-2 mb-6 text-xs text-text-secondary font-medium px-2">
-            <Clock className="w-3.5 h-3.5 text-semantic-green" />
-            <span>Updates daily at 12:00 AM UTC</span>
-          </div>
-        )}
-
-        {/* Tab Contents */}
         <div className="relative min-h-[500px] w-full">
           
-          {/* LIVE MATCHES */}
           <TabsContent value="live" className="mt-0 outline-none">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-              <div className={`grid grid-cols-1 ${preset.layout === 'split' ? 'lg:grid-cols-2' : preset.layout === 'three-column' ? 'lg:grid-cols-3' : 'lg:grid-cols-1'} gap-6`}>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              <div className="lg:col-span-8 space-y-4">
+                <div className="flex items-center justify-between border-l-4 border-primary pl-3 mb-4">
+                  <h3 className="text-xl font-bold uppercase text-text-primary tracking-widest">Match Center</h3>
+                </div>
                 
-                {/* MATCHES COLUMN */}
-                {preset.showMatches && (
-                  <div className={`${preset.layout === 'three-column' ? 'lg:col-span-2' : 'col-span-1'}`}>
-                    {preset.layout !== 'main-only' && <h3 className="text-xl font-bold text-text-primary mb-4">Live Matches</h3>}
-                    {loadingLive && fixtures.length === 0 ? (
-                      <div className="flex justify-center items-center h-64">
-                        <Spin size="large" />
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
-                        {fixtures.map((match: any) => {
-                          const homeTeam = match.teams.home;
-                          const awayTeam = match.teams.away;
-                          const fixture = match.fixture;
-                          const league = match.league;
-                          const isMatchUpcoming = match.isUpcoming;
-
-                          return (
-                            <motion.div 
-                              key={fixture.id}
-                              initial={{ opacity: 0, scale: 0.95 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              className="group"
-                              onClick={() => router.push(`/football/matches/${fixture.id}`)}
-                            >
-                              <div className="bg-surface border border-border-color hover:border-accent/50 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 shadow-medium hover:shadow-[0_4px_20px_rgba(var(--accent-rgb),0.1)] hover:-translate-y-1 flex flex-col h-full">
-                                
-                                {/* Card Header */}
-                                <div className="bg-bg-primary/50 px-5 py-3 text-xs font-semibold text-text-secondary flex justify-between items-center border-b border-border-color">
-                                  <span className="flex items-center gap-2">
-                                    {league.logo && <img src={league.logo} alt={league.name} className="w-4 h-4 object-contain brightness-200" />}
-                                    {league.name}
-                                  </span>
-                                  <span className={cn("px-2 py-1 rounded-md font-bold border", isMatchUpcoming ? "text-amber-500 border-amber-500/20 bg-amber-500/5" : "text-semantic-red border-red-500/20 bg-red-500/5 animate-pulse")}>
-                                    {fixture.status.elapsed ? `${fixture.status.elapsed}'` : fixture.status.short}
-                                  </span>
-                                </div>
-                                
-                                {/* Card Body */}
-                                <div className="p-6 flex-1 flex flex-col justify-center">
-                                  <div className="flex items-center justify-between">
-                                    {/* Home Team */}
-                                    <div className="flex flex-col items-center gap-4 w-[35%]">
-                                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-bg-primary flex items-center justify-center border border-border-color p-3 shadow-inner transition-transform group-hover:scale-105">
-                                        <img src={homeTeam?.logo || "/placeholder.png"} alt={homeTeam?.name} className="w-full h-full object-contain" />
-                                      </div>
-                                      <span className="text-sm sm:text-base font-bold text-center text-text-primary line-clamp-2 leading-tight">{homeTeam?.name}</span>
-                                    </div>
-                                    
-                                    {/* Score */}
-                                    <div className="flex flex-col items-center justify-center w-[30%]">
-                                      {isMatchUpcoming ? (
-                                        <div className="text-xl sm:text-2xl font-bold text-text-secondary text-center whitespace-nowrap font-mono bg-bg-primary px-3 py-1.5 rounded-lg border border-border-color">
-                                          {new Date(fixture.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </div>
-                                      ) : (
-                                        <div className="text-3xl sm:text-5xl font-black font-mono text-accent drop-shadow-[0_0_12px_var(--accent)] tracking-tighter">
-                                          {match.goals.home ?? 0} <span className="text-text-secondary font-sans text-2xl mx-1">-</span> {match.goals.away ?? 0}
-                                        </div>
-                                      )}
-                                    </div>
-
-                                    {/* Away Team */}
-                                    <div className="flex flex-col items-center gap-4 w-[35%]">
-                                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-bg-primary flex items-center justify-center border border-border-color p-3 shadow-inner transition-transform group-hover:scale-105">
-                                        <img src={awayTeam?.logo || "/placeholder.png"} alt={awayTeam?.name} className="w-full h-full object-contain" />
-                                      </div>
-                                      <span className="text-sm sm:text-base font-bold text-center text-text-primary line-clamp-2 leading-tight">{awayTeam?.name}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                {/* Card Footer */}
-                                <div className="bg-bg-primary/50 px-5 py-3 border-t border-border-color text-xs flex justify-between items-center text-text-secondary mt-auto">
-                                  <span className="truncate max-w-[70%] font-medium">{fixture.venue?.name || "TBD Stadium"}</span>
-                                  <span className="whitespace-nowrap">{new Date(fixture.date).toLocaleDateString()}</span>
-                                </div>
-                              </div>
-                            </motion.div>
-                          );
-                        })}
-                        
-                        {!fixtures.length && !loadingLive && (
-                          <div className="col-span-full flex flex-col items-center justify-center h-64 border border-dashed border-border-color rounded-2xl bg-surface/50">
-                            <p className="text-text-secondary text-lg font-medium mb-2">No matches scheduled right now.</p>
-                            <p className="text-text-secondary/70 text-sm">Check back later for live updates.</p>
+                {loadingLive ? (
+                  <div className="flex justify-center p-8"><Spin size="large" /></div>
+                ) : fixtures.length === 0 ? (
+                   <div className="glass-panel p-8 text-center text-text-secondary rounded-xl">No live matches currently.</div>
+                ) : (
+                  fixtures.map((match) => (
+                    <div key={match.fixture.id} onClick={() => router.push(`/football/matches/${match.fixture.id}`)} className={`glass-panel p-4 hover-lift cursor-pointer flex items-center justify-between rounded-xl min-h-[88px] ${match.fixture.status.short === '1H' || match.fixture.status.short === '2H' ? 'border-l-4 border-l-primary bg-primary/5' : ''}`}>
+                      <div className="flex-1 grid grid-cols-3 items-center">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-surface p-1 border border-border-default flex items-center justify-center">
+                            <img src={match.teams.home.logo} className="w-6 h-6 object-contain" />
                           </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* STANDINGS COLUMN */}
-                {preset.showStandings && (
-                  <div className="col-span-1">
-                    <h3 className="text-xl font-bold text-text-primary mb-4">Current Standings</h3>
-                    {loadingStandings ? (
-                      <div className="flex justify-center p-8"><Spin /></div>
-                    ) : standingsData && standingsData.groups && standingsData.groups.length > 0 ? (
-                      <div className="bg-surface rounded-2xl border border-border-color p-4 shadow-medium max-h-[800px] overflow-y-auto custom-scrollbar transition-colors">
-                        <GroupStandingsCard 
-                          groupData={standingsData.groups[0]} 
-                          onTeamClick={(team) => setSelectedTeam(team)} 
-                        />
-                        {standingsData.groups.length > 1 && (
-                          <div className="mt-4 text-center text-xs text-text-secondary font-medium">
-                            View Standings tab for all groups
+                          <span className="font-bold text-sm hidden sm:block uppercase">{match.teams.home.name}</span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          {match.fixture.status.short === '1H' || match.fixture.status.short === '2H' ? (
+                            <span className="text-xs font-bold text-error animate-pulse mb-1">LIVE</span>
+                          ) : (
+                            <span className="text-xs font-bold text-text-secondary mb-1 uppercase">{match.fixture.status.short}</span>
+                          )}
+                          <span className="font-mono text-xl md:text-2xl font-bold text-text-primary">
+                            {match.goals.home ?? 0} - {match.goals.away ?? 0}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 justify-end">
+                          <span className="font-bold text-sm hidden sm:block uppercase">{match.teams.away.name}</span>
+                          <div className="w-10 h-10 rounded-full bg-surface p-1 border border-border-default flex items-center justify-center">
+                            <img src={match.teams.away.logo} className="w-6 h-6 object-contain" />
                           </div>
-                        )}
+                        </div>
                       </div>
-                    ) : (
-                      <div className="text-text-secondary p-4 bg-surface border border-border-color rounded-xl text-sm transition-colors">No standings data available</div>
-                    )}
-                  </div>
-                )}
-
-                {/* STATS COLUMN */}
-                {preset.showStats && (
-                  <div className="col-span-1">
-                    <h3 className="text-xl font-bold text-text-primary mb-4">Top Scorers</h3>
-                    <div className="bg-surface rounded-2xl border border-border-color p-4 h-[800px] shadow-medium transition-colors">
-                       <TopScorersWidget 
-                         scorers={getTopScorers(fixtures)} 
-                         lastUpdated={standingsData?.lastUpdated || new Date().toISOString()} 
-                       />
                     </div>
-                  </div>
+                  ))
                 )}
+              </div>
 
+              <div className="lg:col-span-4 space-y-6">
+                <div>
+                  <h3 className="text-xl font-bold border-l-4 border-secondary pl-3 uppercase tracking-widest text-text-primary mb-4">Standings</h3>
+                  {loadingStandings ? (
+                    <div className="flex justify-center p-8"><Spin /></div>
+                  ) : standingsData && standingsData.groups && standingsData.groups.length > 0 ? (
+                    <div className="glass-panel overflow-hidden rounded-xl">
+                      <table className="w-full text-left text-sm">
+                        <thead className="bg-surface-container border-b border-border-variant">
+                          <tr>
+                            <th className="p-3 text-xs font-bold text-primary">POS</th>
+                            <th className="p-3 text-xs font-bold text-primary">CLUB</th>
+                            <th className="p-3 text-xs font-bold text-primary text-center">PTS</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {standingsData.groups[0].standings[0].slice(0, 5).map((team, idx) => (
+                            <tr key={team.team.id} className="hover:bg-primary/5 transition-colors border-b border-border-variant last:border-0 min-h-[44px]">
+                              <td className="p-3 font-mono text-primary font-bold">0{idx + 1}</td>
+                              <td className="p-3">
+                                <div className="flex items-center gap-2">
+                                  <img src={team.team.logo} className="w-5 h-5 object-contain" />
+                                  <span className="font-bold text-text-primary">{team.team.name}</span>
+                                </div>
+                              </td>
+                              <td className="p-3 font-mono text-center font-bold">{team.points}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : null}
+                </div>
+                
+                <div className="glass-panel p-4 space-y-3 rounded-xl border border-border-default">
+                  <div className="flex items-center justify-between border-b border-border-variant pb-2">
+                    <h4 className="text-xs font-bold text-primary uppercase">Top Scorers</h4>
+                  </div>
+                  <div className="space-y-2">
+                    {topScorers.slice(0, 3).map((scorer, idx) => (
+                      <div key={idx} className="flex items-center justify-between px-2 py-1 hover:bg-surface-container rounded cursor-pointer">
+                        <span className="text-sm font-medium text-text-primary">{scorer.player.name}</span>
+                        <span className="font-mono text-primary font-bold text-base">{scorer.statistics[0].goals.total}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="standings" className="mt-0 outline-none">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              {loadingStandings ? (
+                 <div className="flex justify-center items-center h-64"><Spin size="large" /></div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {standingsData?.groups?.map((group) => (
+                    <GroupStandingsCard key={group.groupName} groupData={group} isExpanded={true} />
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          </TabsContent>
+          
+          <TabsContent value="topScorers" className="mt-0 outline-none">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div className="w-full max-w-4xl mx-auto glass-panel p-6 rounded-2xl">
+                 <TopScorersWidget scorers={topScorers} lastUpdated={standingsData?.lastUpdated || ""} />
               </div>
             </motion.div>
           </TabsContent>
 
-          {/* STANDINGS */}
-          <TabsContent value="standings" className="mt-0 outline-none">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-              {loadingStandings && !standingsData ? (
-                <div className="flex justify-center items-center h-64">
-                  <Spin size="large" />
-                </div>
-              ) : errorStandings ? (
-                <div className="flex flex-col items-center justify-center h-64 bg-red-500/10 border border-red-500/20 rounded-2xl">
-                  <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-                  <p className="text-red-500 font-bold mb-2">Failed to load standings</p>
-                  <button onClick={() => fetchStandingsData(true)} className="px-4 py-2 bg-neutral-900 text-white rounded-md text-sm font-medium hover:bg-neutral-800">
-                    Retry Connection
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {standingsData?.groups?.map((group) => (
-                    <GroupStandingsCard key={group.groupName} groupData={group} onTeamClick={(team) => setSelectedTeam(team)} isExpanded={true} />
-                  ))}
-                  {(!standingsData?.groups || standingsData.groups.length === 0) && (
-                    <div className="col-span-full text-center py-12 text-neutral-500">Standings data is not available yet.</div>
-                  )}
-                </div>
-              )}
-            </motion.div>
-          </TabsContent>
-
-          {/* TOP SCORERS */}
-          <TabsContent value="topScorers" className="mt-0 outline-none">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex justify-center">
-              {loadingStandings && !standingsData ? (
-                <div className="flex justify-center items-center h-64">
-                  <Spin size="large" />
-                </div>
-              ) : errorStandings ? (
-                <div className="text-red-500 p-8 text-center bg-red-500/10 rounded-xl w-full max-w-2xl border border-red-500/20">
-                  Failed to load scorer data.
-                </div>
-              ) : (
-                <div className="w-full max-w-4xl">
-                  <TopScorersWidget scorers={topScorers} lastUpdated={lastUpdated} />
-                </div>
-              )}
-            </motion.div>
-          </TabsContent>
-
-          {/* PAST MATCHES */}
           <TabsContent value="pastMatches" className="mt-0 outline-none">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-              {errorPast ? (
-                <div className="flex flex-col items-center justify-center h-64 bg-red-500/10 border border-red-500/20 rounded-2xl">
-                  <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-                  <p className="text-red-500 font-bold mb-2">Failed to load past matches</p>
-                  <button onClick={() => fetchPastMatches()} className="px-4 py-2 bg-neutral-900 text-white rounded-md text-sm font-medium hover:bg-neutral-800">
-                    Retry Connection
-                  </button>
-                </div>
-              ) : (
-                <div className="w-full bg-primary/50 rounded-2xl border border-white/5 p-6 shadow-xl">
-                  <PastMatches matches={pastMatches} isLoading={loadingPast && pastMatches.length === 0} onMatchClick={(match) => router.push(`/football/matches/${match.id}`)} />
-                </div>
-              )}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+               <div className="w-full glass-panel rounded-2xl p-6">
+                 <PastMatches matches={pastMatches} isLoading={pastMatches.length === 0} onMatchClick={(match) => router.push(`/football/matches/${match.id}`)} />
+               </div>
             </motion.div>
           </TabsContent>
-
-          {/* PLAYER SEARCH */}
-          <TabsContent value="playerSearch" className="mt-0 outline-none">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex justify-center">
-               <div className="flex flex-col items-center justify-center h-80 border border-dashed border-white/10 rounded-2xl w-full max-w-3xl bg-black/20">
-                  <Users className="w-16 h-16 text-neutral-600 mb-4 opacity-50" />
-                  <p className="text-white text-2xl font-bold mb-3 font-heading">Global Player Search</p>
-                  <p className="text-sm text-manjanium-gold bg-manjanium-gold/10 border border-manjanium-gold/20 px-4 py-1.5 rounded-full font-bold">Coming Soon</p>
-                </div>
-            </motion.div>
-          </TabsContent>
-
+          
         </div>
       </Tabs>
-
-      {/* ===== FOOTBALL SOCIAL PROMO ===== */}
-      <div className="mt-16 mb-8 flex flex-col gap-12 relative z-10 w-full">
-        <ChannelsBanner
-          title="World Cup Highlights"
-          description="Subscribe to our YouTube channel for exclusive match highlights, deep-dive tactical analysis, and World Cup predictions."
-          icon={<IconBrandYoutube className="w-10 h-10 text-red-500" />}
-          buttonText="Subscribe Now"
-          url="https://www.youtube.com/@manjaniumonsofts67"
-          accentColor="bg-red-600/20"
-        />
-
-        <div>
-          <h3 className="text-2xl font-bold text-white mb-6">Connect With Us</h3>
-          <ChannelsGrid channels={[
-            {
-              name: "Twitter / X",
-              description: "Live score updates, goal alerts, and breaking transfer news.",
-              icon: <IconBrandX className="w-8 h-8" />,
-              followers: "25K",
-              buttonText: "Follow",
-              url: "#",
-              accentColor: "text-neutral-200 border-neutral-200/20 group-hover:border-neutral-200/50",
-            },
-            {
-              name: "YouTube",
-              description: "Post-match analysis, player ratings, and weekly recaps.",
-              icon: <IconBrandYoutube className="w-8 h-8" />,
-              followers: "100K",
-              buttonText: "Subscribe",
-              url: "https://www.youtube.com/@manjaniumonsofts67",
-              accentColor: "text-red-500 border-red-500/20 group-hover:border-red-500/50",
-            },
-            {
-              name: "Discord",
-              description: "Join the Football community. Live match chat and debates.",
-              icon: <IconBrandDiscord className="w-8 h-8" />,
-              followers: "5K",
-              buttonText: "Join Server",
-              url: "#",
-              accentColor: "text-indigo-400 border-indigo-400/20 group-hover:border-indigo-400/50",
-            }
-          ]} />
-        </div>
-      </div>
-
-      {/* Global Modals */}
-      <PlayerStatsModal isOpen={selectedTeam !== null} team={selectedTeam} players={selectedTeam?.players || []} onClose={() => setSelectedTeam(null)} />
-
-      {/* Simulation of Live Chat when active */}
-      <LiveChatMarquee isActive={isLive && activeTab === 'live'} />
-      
     </div>
   );
 }
 
-// Wrap in Suspense boundary for useSearchParams
 export default function FootballHubPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Spin size="large" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><Spin size="large" /></div>}>
       <FootballHubContent />
     </Suspense>
   );

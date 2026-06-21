@@ -48,8 +48,6 @@ const globeConfig = {
   autoRotateSpeed: 0.6,
 };
 
-// --- Subcomponents for live panels ---
-
 function WeatherWidget({ sessionKey }: { sessionKey: string }) {
   const [weatherData, setWeatherData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -60,7 +58,6 @@ function WeatherWidget({ sessionKey }: { sessionKey: string }) {
         const res = await fetch(`/api/f1/weather?session_key=${sessionKey}`);
         const json = await res.json();
         if (json.weather && json.weather.length > 0) {
-          // Latest weather record
           setWeatherData(json.weather[json.weather.length - 1]);
         }
       } catch (err) {
@@ -69,53 +66,33 @@ function WeatherWidget({ sessionKey }: { sessionKey: string }) {
         setLoading(false);
       }
     };
-
     fetchWeather();
     const interval = setInterval(fetchWeather, 30000);
     return () => clearInterval(interval);
   }, [sessionKey]);
 
-  if (loading) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">Loading Weather...</div>;
-  if (!weatherData) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">No Weather Data</div>;
-
-  const isRaining = weatherData.rainfall === 1 || weatherData.rainfall === "1";
+  if (loading || !weatherData) return <div className="glass-panel p-4 rounded-xl flex items-center justify-center min-h-[100px]"><Spin size="small" /></div>;
 
   return (
-    <div className="bg-surface border border-border-color rounded-xl p-4 shadow-medium transition-colors">
-      <h4 className="text-text-primary font-bold text-xs mb-3 flex items-center gap-2 border-b border-border-color pb-2 uppercase tracking-wider">
-        <CloudRain className="w-4 h-4 text-blue-400" />
-        Track Weather Conditions
-      </h4>
-      <div className="grid grid-cols-2 gap-3 text-xs font-mono">
-        <div className="flex items-center gap-2 bg-black/30 p-2 rounded border border-neutral-850">
-          <Thermometer className="w-4 h-4 text-red-400" />
-          <div>
-            <div className="text-neutral-500 text-[8px] uppercase">Air Temp</div>
-            <div className="text-white font-bold">{weatherData.air_temperature}°C</div>
-          </div>
+    <div className="grid grid-cols-2 gap-4">
+      <div className="glass-panel p-4 rounded-xl flex flex-col gap-2 hover-lift">
+        <span className="font-bold text-xs uppercase text-text-primary opacity-80">AIR TEMP</span>
+        <div className="flex items-baseline gap-1">
+          <span className="text-3xl font-bold">{weatherData.air_temperature}</span>
+          <span className="text-sm">°C</span>
         </div>
-        <div className="flex items-center gap-2 bg-black/30 p-2 rounded border border-neutral-850">
-          <Thermometer className="w-4 h-4 text-orange-500" />
-          <div>
-            <div className="text-neutral-500 text-[8px] uppercase">Track Temp</div>
-            <div className="text-white font-bold">{weatherData.track_temperature}°C</div>
-          </div>
+        <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+          <div className="bg-primary h-full transition-all" style={{ width: `${Math.min(weatherData.air_temperature * 2, 100)}%` }} />
         </div>
-        <div className="flex items-center gap-2 bg-black/30 p-2 rounded border border-neutral-850">
-          <Wind className="w-4 h-4 text-zinc-400" />
-          <div>
-            <div className="text-neutral-500 text-[8px] uppercase">Wind Speed</div>
-            <div className="text-white font-bold">{weatherData.wind_speed} m/s</div>
-          </div>
+      </div>
+      <div className="glass-panel p-4 rounded-xl flex flex-col gap-2 hover-lift">
+        <span className="font-bold text-xs uppercase text-text-primary opacity-80">TRACK TEMP</span>
+        <div className="flex items-baseline gap-1">
+          <span className="text-3xl font-bold">{weatherData.track_temperature}</span>
+          <span className="text-sm">°C</span>
         </div>
-        <div className="flex items-center gap-2 bg-black/30 p-2 rounded border border-neutral-850">
-          <CloudRain className="w-4 h-4 text-blue-500" />
-          <div>
-            <div className="text-neutral-500 text-[8px] uppercase">Rainfall</div>
-            <div className={`font-bold ${isRaining ? "text-blue-400 animate-pulse" : "text-green-500"}`}>
-              {isRaining ? "WET" : "DRY"}
-            </div>
-          </div>
+        <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+          <div className="bg-secondary h-full transition-all" style={{ width: `${Math.min(weatherData.track_temperature * 1.5, 100)}%` }} />
         </div>
       </div>
     </div>
@@ -124,62 +101,43 @@ function WeatherWidget({ sessionKey }: { sessionKey: string }) {
 
 function RaceControlFeed({ sessionKey }: { sessionKey: string }) {
   const [messages, setMessages] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchControl = async () => {
       try {
         const res = await fetch(`/api/f1/racecontrol?session_key=${sessionKey}`);
         const json = await res.json();
-        if (json.racecontrol && Array.isArray(json.racecontrol)) {
-          const sorted = [...json.racecontrol].sort(
-            (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
-          );
-          setMessages(sorted.slice(0, 10)); // keep last 10 entries
+        if (json.racecontrol) {
+          const sorted = [...json.racecontrol].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          setMessages(sorted.slice(0, 8));
         }
-      } catch (err) {
-        console.error("Failed to fetch race control messages", err);
-      } finally {
-        setLoading(false);
-      }
+      } catch (err) {}
     };
-
     fetchControl();
     const interval = setInterval(fetchControl, 10000);
     return () => clearInterval(interval);
   }, [sessionKey]);
 
-  if (loading) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">Loading Feed...</div>;
-  if (messages.length === 0) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">No Messages</div>;
-
   return (
-    <div className="bg-surface border border-border-color rounded-xl p-4 shadow-medium flex flex-col h-[320px] transition-colors">
-      <h4 className="text-text-primary font-bold text-xs mb-3 flex items-center gap-2 border-b border-border-color pb-2 uppercase tracking-wider shrink-0">
-        <Flag className="w-4 h-4 text-semantic-red animate-pulse" />
-        Race Control Messages
-      </h4>
-      <div className="flex-1 overflow-y-auto space-y-2 pr-1 scrollbar-hide">
-        {messages.map((msg, idx) => {
-          const date = new Date(msg.date);
-          const timeStr = date.toLocaleTimeString("en-GB", { hour12: false });
-          
-          let badgeClass = "text-neutral-400";
-          if (msg.message.toUpperCase().includes("YELLOW")) badgeClass = "text-yellow-500 font-bold";
-          else if (msg.message.toUpperCase().includes("RED")) badgeClass = "text-red-500 font-bold";
-          else if (msg.message.toUpperCase().includes("SAFETY CAR")) badgeClass = "text-orange-500 font-bold";
-          else if (msg.message.toUpperCase().includes("VSC")) badgeClass = "text-orange-400 font-bold";
-          else if (msg.message.toUpperCase().includes("GREEN")) badgeClass = "text-green-500 font-bold";
-
-          return (
-            <div key={idx} className="text-xs border-b border-[#1f1f1f]/50 pb-2">
-              <div className="flex justify-between items-center text-[9px] text-neutral-500 font-mono mb-0.5">
-                <span>{timeStr}</span>
-                <span className="uppercase tracking-wider text-neutral-600">{msg.category}</span>
+    <div className="h-full glass-panel rounded-xl overflow-hidden flex flex-col p-4">
+      <div className="flex items-center gap-2 border-b border-border-default pb-3 mb-3">
+        <span className="material-symbols-outlined text-primary text-[18px]">flag</span>
+        <h4 className="font-bold uppercase tracking-widest text-sm text-text-primary">Race Control</h4>
+      </div>
+      <div className="flex-1 overflow-y-auto space-y-3 pr-1" style={{ scrollbarWidth: 'none' }}>
+        {messages.length === 0 ? (
+          <div className="text-text-secondary text-sm opacity-50">No messages</div>
+        ) : (
+          messages.map((msg, idx) => (
+            <div key={idx} className="text-sm border-b border-border-variant pb-2 last:border-0">
+              <div className="flex justify-between items-center text-[10px] text-text-secondary font-mono mb-1">
+                <span>{new Date(msg.date).toLocaleTimeString("en-GB", { hour12: false })}</span>
+                <span className="uppercase">{msg.category}</span>
               </div>
-              <p className={`font-sans leading-relaxed text-[11px] ${badgeClass}`}>{msg.message}</p>
+              <p className="font-medium text-xs text-text-primary leading-tight">{msg.message}</p>
             </div>
-          );
-        })}
+          ))
+        )}
       </div>
     </div>
   );
@@ -187,71 +145,45 @@ function RaceControlFeed({ sessionKey }: { sessionKey: string }) {
 
 function TeamRadioPanel({ sessionKey }: { sessionKey: string }) {
   const [radioMsgs, setRadioMsgs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRadio = async () => {
       try {
         const res = await fetch(`/api/f1/radio?session_key=${sessionKey}`);
         const json = await res.json();
-        if (json.radio && Array.isArray(json.radio)) {
-          const sorted = [...json.radio].sort(
-            (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
-          );
-          setRadioMsgs(sorted.slice(0, 5)); // latest 5 records
+        if (json.radio) {
+          const sorted = [...json.radio].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          setRadioMsgs(sorted.slice(0, 4));
         }
-      } catch (err) {
-        console.error("Failed to fetch team radio messages", err);
-      } finally {
-        setLoading(false);
-      }
+      } catch (err) {}
     };
-
     fetchRadio();
     const interval = setInterval(fetchRadio, 15000);
     return () => clearInterval(interval);
   }, [sessionKey]);
 
-  if (loading) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">Loading Team Radio...</div>;
-  if (radioMsgs.length === 0) return <div className="text-text-secondary font-mono text-xs p-4 bg-surface border border-border-color rounded-xl">No Radio Transmissions</div>;
-
   return (
-    <div className="bg-surface border border-border-color rounded-xl p-4 shadow-medium transition-colors">
-      <h4 className="text-text-primary font-bold text-xs mb-3 flex items-center gap-2 border-b border-border-color pb-2 uppercase tracking-wider">
-        <Volume2 className="w-4 h-4 text-semantic-green" />
-        Live Team Radio Transmissions
-      </h4>
-      <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
-        {radioMsgs.map((msg, idx) => {
-          const timeStr = new Date(msg.date).toLocaleTimeString("en-GB", { hour12: false });
-          return (
-            <div key={idx} className="flex flex-col gap-1.5 bg-black/20 p-2.5 rounded border border-[#1f1f1f]/50 text-xs">
-              <div className="flex justify-between text-[10px] text-neutral-500 font-mono">
-                <span className="font-bold text-neutral-400">DRIVER CAR #{msg.driver_number}</span>
-                <span>{timeStr}</span>
-              </div>
-              <audio src={msg.recording_url} controls className="w-full h-6 max-h-6 scale-90 origin-left" />
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    <>
+      {radioMsgs.map((msg, idx) => (
+        <div key={idx} className="glass-panel p-4 rounded-xl flex flex-col gap-2 hover-lift">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary">volume_up</span>
+            <span className="text-xs font-bold uppercase text-text-primary">CAR #{msg.driver_number}</span>
+          </div>
+          <audio src={msg.recording_url} controls className="w-full h-8 scale-90 origin-left" />
+        </div>
+      ))}
+    </>
   );
 }
 
-// --- Main Page Component ---
-
 export function F1LiveTab() {
   const { preferences } = useUserPreferences();
-  const presetKey = (preferences?.f1DashboardPreset as F1PresetKey) || "live_focused";
-  const preset = F1_PRESETS[presetKey] || F1_PRESETS.live_focused;
-
   const [session, setSession] = useState<any>(null);
   const [sessionKey, setSessionKey] = useState<string>("latest");
   const [loading, setLoading] = useState(true);
   const [localTime, setLocalTime] = useState<string>("");
 
-  // Poll for active session key and details
   useEffect(() => {
     const fetchSessionInfo = async () => {
       try {
@@ -261,197 +193,103 @@ export function F1LiveTab() {
           setSession(data.session);
           setSessionKey(String(data.session.session_key || "latest"));
         }
-      } catch (err) {
-        console.error("Failed to fetch session metadata", err);
-      } finally {
+      } catch (err) {} finally {
         setLoading(false);
       }
     };
-
     fetchSessionInfo();
     const interval = setInterval(fetchSessionInfo, 10000);
     return () => clearInterval(interval);
   }, []);
 
-  // Match the OpenF1 country name to the F1_VENUES_2026 array (Correction case-insensitive)
   const currentVenue = useMemo(() => {
     if (!session?.country_name) return null;
-
     const countryStr = session.country_name.toLowerCase();
-
-    // Map common spelling variations
-    const countryAliases: Record<string, string> = {
-      "great britain": "uk",
-      "united kingdom": "uk",
-      "united states": "usa",
-      "united states gp": "usa",
-      "united arab emirates": "uae",
-    };
-
+    const countryAliases: Record<string, string> = { "great britain": "uk", "united kingdom": "uk", "united states": "usa", "united states gp": "usa" };
     const targetCountry = countryAliases[countryStr] || countryStr;
-
-    const venue = F1_VENUES_2026.find(
-      (v) => v.country.toLowerCase() === targetCountry
-    );
-
+    const venue = F1_VENUES_2026.find((v) => v.country.toLowerCase() === targetCountry);
     if (!venue) return null;
-
     return {
       circuitName: venue.circuit,
       raceName: venue.name,
       country: venue.country,
-      lat: venue.lat,
-      lng: venue.lng,
-      sessionType: (session.session_type || "Practice") as any,
+      sessionType: session.session_type || "Practice",
       sessionName: session.session_name || "FP1",
     };
   }, [session]);
 
-  // Update circuit local time clock every second
   useEffect(() => {
     if (!currentVenue) return;
     const tz = getTimezoneForVenue(currentVenue.circuitName);
-
     const updateTime = () => {
       try {
-        const formatted = new Intl.DateTimeFormat("en-GB", {
-          timeZone: tz,
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        }).format(new Date());
-        setLocalTime(formatted);
+        setLocalTime(new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date()));
       } catch {
         setLocalTime("--:--:--");
       }
     };
-
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, [currentVenue]);
 
-  // Determine theme colors based on session type
-  let isRaceOrSprint = false;
-  let isQuali = false;
-  let statusText = "";
-  let statusBadgeClass = "";
-
-  if (currentVenue) {
-    isRaceOrSprint = currentVenue.sessionType === "Race" || currentVenue.sessionType === "Sprint";
-    isQuali = currentVenue.sessionType === "Qualifying";
-
-    if (isRaceOrSprint) {
-      statusText = "● RACE LIVE";
-      statusBadgeClass = "bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse";
-    } else if (isQuali) {
-      statusText = "● QUALIFYING";
-      statusBadgeClass = "bg-amber-500/20 text-amber-400 border border-amber-500/30";
-    } else {
-      statusText = `● ${currentVenue.sessionName}`;
-      statusBadgeClass = "bg-blue-500/20 text-blue-400 border border-blue-500/30";
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-bg-primary">
-        <Spin size="large" />
-      </div>
-    );
-  }
+  if (loading) return <div className="flex items-center justify-center min-h-[400px]"><Spin size="large" /></div>;
 
   return (
-    <div className="p-4 md:p-8 min-h-screen bg-bg-primary transition-colors duration-200">
-      <div className="max-w-7xl mx-auto">
+    <div className="w-full relative animate-fade-in-up">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 w-full max-w-[1600px] mx-auto pb-10">
         
-        {/* Dual column responsive sidebar layout (65% / 35%) */}
-        <div className={`grid grid-cols-1 ${preset.timingSize === 'large' ? 'lg:grid-cols-1' : preset.timingSize === 'medium' ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-6`}>
-          
-          {/* LEFT COLUMN: Timing Tower + Radio (col-span-2) */}
-          <div className={`${preset.timingSize === 'medium' ? 'lg:col-span-2' : 'col-span-1'} space-y-6`}>
-            <LiveTimingTower />
-            {preset.timingSize !== 'small' && <TeamRadioPanel sessionKey={sessionKey} />}
+        {/* Live Timing Tower */}
+        <section className="md:col-span-4 lg:col-span-3 flex flex-col gap-4">
+          <div className="flex items-center justify-between px-2">
+            <h2 className="text-xs font-bold uppercase text-primary flex items-center gap-2">
+              <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse shadow-[0_0_8px_var(--color-primary)]"></span>
+              LIVE TIMING TOWER
+            </h2>
           </div>
+          <div className="glass-panel rounded-xl overflow-hidden h-[600px]">
+             <LiveTimingTower />
+          </div>
+        </section>
 
-          {/* RIGHT COLUMN: Live Globe Focus + Weather + Race Control */}
-          {preset.layout !== 'compact' && preset.timingSize !== 'large' && (
-            <div className={`${preset.timingSize === 'medium' ? 'lg:col-span-1' : 'col-span-1'} space-y-6`}>
-              {/* Live Globe container */}
-              <div className="bg-surface/30 border border-border-color rounded-2xl p-4 flex flex-col items-center justify-center shadow-medium w-full transition-colors">
-                <span className="text-xs text-text-secondary font-mono uppercase tracking-wider block mb-4">
-                  Live Circuit Focus
-                </span>
-                <div className="relative w-full aspect-square md:h-[320px] overflow-hidden rounded-full border border-border-color/30 bg-surface flex items-center justify-center mb-4 transition-colors">
-                  <Globe globeConfig={globeConfig} data={globeArcs} />
-                </div>
+        {/* Center Section: Globe & Weather */}
+        <section className="md:col-span-8 lg:col-span-6 flex flex-col gap-6">
+          <div className="relative h-[300px] md:h-[400px] glass-panel rounded-xl overflow-hidden flex items-center justify-center border-border-default">
+             <Globe globeConfig={globeConfig} data={globeArcs} />
+             <div className="absolute top-6 left-6 z-10 pointer-events-none">
+                <h3 className="text-xs font-bold uppercase text-primary mb-1 tracking-widest">GLOBAL RACE TRACKER</h3>
+                <p className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-text-primary drop-shadow-md">
+                   {currentVenue ? currentVenue.raceName : "AWAITING RACE"}
+                </p>
+             </div>
+             <div className="absolute bottom-6 right-6 text-right z-10 pointer-events-none">
+                <span className="text-xs text-text-secondary uppercase font-bold tracking-widest block mb-1">LOCAL TIME</span>
+                <span className="text-2xl text-primary font-mono font-bold drop-shadow-md">{localTime || "--:--:--"}</span>
+             </div>
+          </div>
+          <WeatherWidget sessionKey={sessionKey} />
+        </section>
 
-                {/* Info Card Below Globe */}
-                <div className="w-full mt-2 bg-surface border border-border-color rounded-xl p-4 text-center shadow-medium transition-colors">
-                  {currentVenue ? (
-                    <>
-                      <div className="text-5xl mb-2">{getCountryFlag(currentVenue.country)}</div>
-                      <div className="text-text-secondary text-xs font-bold uppercase tracking-wider mb-1">
-                        {currentVenue.country}
-                      </div>
-                      <h4 className="text-text-primary font-bold text-base leading-tight mb-3">
-                        {currentVenue.circuitName}
-                      </h4>
+        {/* Circuit Focus / Race Control Card */}
+        <section className="md:col-span-12 lg:col-span-3 flex flex-col gap-6 h-full">
+           <RaceControlFeed sessionKey={sessionKey} />
+        </section>
 
-                      <div className="flex flex-col items-center gap-3">
-                        <span className={`px-2.5 py-0.5 text-[10px] font-black tracking-widest rounded uppercase ${statusBadgeClass}`}>
-                          {statusText}
-                        </span>
-                        <div className="border-t border-neutral-800 pt-2 w-full mt-1">
-                          <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest block mb-1">
-                            Circuit Local Time
-                          </span>
-                          <span className="text-xl font-mono font-bold text-white tracking-widest">
-                            {localTime}
-                          </span>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="py-2">
-                      <div className="text-4xl mb-2">🏁</div>
-                      <h4 className="text-white font-bold text-base mb-1">No Active Session</h4>
-                      <p className="text-neutral-400 text-xs font-mono">
-                        22 Rounds, 20 Countries
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
+        {/* Supplementary Feed (Team Radio) */}
+        <section className="md:col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
+           <TeamRadioPanel sessionKey={sessionKey} />
+        </section>
+      </div>
 
-              {/* Weather condition status details */}
-              <WeatherWidget sessionKey={sessionKey} />
-
-              {/* Race Control feed widget */}
-              <RaceControlFeed sessionKey={sessionKey} />
-            </div>
-          )}
-
+      <div className="mt-8 space-y-8">
+        <div className="glass-panel rounded-xl p-4 md:p-6">
+          <h3 className="text-xl font-bold uppercase mb-4 text-primary tracking-wider">Live Telemetry</h3>
+          <F1TelemetryTab />
         </div>
-
-        {preset.showTelemetry && (
-          <div className="mt-8">
-            <h3 className="text-xl font-bold text-text-primary mb-4">Live Telemetry</h3>
-            <div className="bg-surface rounded-2xl border border-border-color p-4 shadow-medium transition-colors">
-              <F1TelemetryTab />
-            </div>
-          </div>
-        )}
-
-        {preset.showStandings && (
-          <div className="mt-8">
-            <h3 className="text-xl font-bold text-text-primary mb-4">Current Standings</h3>
-            <div className="bg-surface rounded-2xl border border-border-color p-4 shadow-medium transition-colors">
-              <F1StandingsTab />
-            </div>
-          </div>
-        )}
-
+        <div className="glass-panel rounded-xl p-4 md:p-6">
+          <h3 className="text-xl font-bold uppercase mb-4 text-primary tracking-wider">Championship Standings</h3>
+          <F1StandingsTab />
+        </div>
       </div>
     </div>
   );

@@ -1,54 +1,27 @@
-"use client";
+'use client'
 
-import React, { useEffect } from "react";
-import { useUserPreferences } from "@/hooks/useUserPreferences";
-import { useTheme } from "next-themes";
-import { MotionConfig } from "framer-motion";
+import React, { useEffect } from 'react'
+import { useUserPreferences } from '@/hooks/useUserPreferences'
 
-export function AppearanceProvider({ children }: { children: React.ReactNode }) {
-  const { preferences, loading } = useUserPreferences();
-  const { setTheme } = useTheme();
+export default function AppearanceProvider({ children }: { children: React.ReactNode }) {
+  const { preferences } = useUserPreferences()
 
   useEffect(() => {
-    if (!preferences || loading) return;
-
-    const root = document.documentElement;
-
-    // Set theme
-    if (preferences.theme) {
-      setTheme(preferences.theme);
-      root.setAttribute("data-theme", preferences.theme);
+    if (preferences?.theme) {
+      document.documentElement.setAttribute('data-theme', preferences.theme)
+      document.documentElement.classList.toggle('light', preferences.theme === 'light')
+      document.documentElement.classList.toggle('dark', preferences.theme === 'dark')
     }
 
-    // Set font size
-    if (preferences.fontSize) {
-      const fontSizeMap = {
-        sm: "12px",
-        md: "14px",
-        lg: "16px",
-      };
-      root.style.setProperty("--font-size", fontSizeMap[preferences.fontSize]);
+    if (preferences?.fontsize) {
+      document.documentElement.style.fontSize = preferences.fontsize === 'large' ? '18px' : preferences.fontsize === 'small' ? '14px' : '16px'
     }
 
-    // Set animation duration
-    if (preferences.animationSpeed) {
-      const animSpeedMap = {
-        reduced: "0.1s",
-        fast: "0.15s",
-        normal: "0.3s",
-      };
-      root.style.setProperty("--animation-duration", animSpeedMap[preferences.animationSpeed]);
+    if (preferences?.animationspeed) {
+      const speed = preferences.animationspeed === 'fast' ? '0.3s' : preferences.animationspeed === 'reduced' ? '0.8s' : '0.5s'
+      document.documentElement.style.setProperty('--transition-normal', speed)
     }
-  }, [preferences, loading, setTheme]);
+  }, [preferences])
 
-  // Map speed to numeric duration for Framer Motion
-  let motionDuration = 0.3;
-  if (preferences?.animationSpeed === "reduced") motionDuration = 0.1;
-  else if (preferences?.animationSpeed === "fast") motionDuration = 0.15;
-
-  return (
-    <MotionConfig transition={{ duration: motionDuration }}>
-      {children}
-    </MotionConfig>
-  );
+  return <>{children}</>
 }
