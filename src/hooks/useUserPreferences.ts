@@ -1,158 +1,88 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from '@clerk/nextjs'
+import { useEffect, useState } from 'react'
 
 export interface UserPreferences {
-  theme: "light" | "dark" | "auto";
-  fontSize: "sm" | "md" | "lg";
-  animationSpeed: "normal" | "reduced" | "fast";
-  sidebarExpanded: boolean;
-  favoriteTeams: string[];
-  f1DashboardPreset: string;
-  footballDashboardPreset: string;
-  notifications: {
-    email: boolean;
-    push: boolean;
-    alerts: boolean;
-  };
-  language: string;
-  timezone: string;
+  theme?: 'dark' | 'light' | 'auto'
+  font_size?: 'sm' | 'md' | 'lg'
+  animation_speed?: 'reduced' | 'normal' | 'fast'
+  f1_dashboard_preset?: string
+  football_dashboard_preset?: string
+  notifications?: {
+    email: boolean
+    push: boolean
+    alerts: boolean
+  }
 }
 
 export function useUserPreferences() {
-  const { userId, isLoaded } = useAuth();
-  const [preferences, setPreferences] = useState<UserPreferences | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { userId } = useAuth()
+  const [preferences, setPreferences] = useState<UserPreferences | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Fetch preferences on mount or when userId changes
+  // Load preferences from Supabase
   useEffect(() => {
-    if (!isLoaded) return;
-    
     if (!userId) {
-      setLoading(false);
-      setPreferences(null);
-      return;
+      setLoading(false)
+      return
     }
 
-    async function fetchPreferences() {
+    const loadPreferences = async () => {
       try {
-        const { data, error: queryError } = await supabase
-          .from("users_preferences")
-          .select("*")
-          .eq("user_id", userId)
-          .single();
+        const response = await fetch('/api/user/preferences', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        })
 
-        if (queryError) {
-          if (queryError.code === "PGRST116") {
-            // AUTO-CREATE: Row doesn't exist, create it
-            const defaultPrefs: UserPreferences = {
-              theme: "dark",
-              fontSize: "md",
-              animationSpeed: "normal",
-              sidebarExpanded: true,
-              favoriteTeams: [],
-              f1DashboardPreset: "default",
-              footballDashboardPreset: "default",
-              notifications: { email: true, push: false, alerts: true },
-              language: "en",
-              timezone: "UTC",
-            };
-
-            const { error: insertError } = await supabase
-              .from("users_preferences")
-              .insert({
-                user_id: userId,
-                theme: defaultPrefs.theme,
-                font_size: defaultPrefs.fontSize,
-                animation_speed: defaultPrefs.animationSpeed,
-                sidebar_expanded: defaultPrefs.sidebarExpanded,
-                favorite_teams: defaultPrefs.favoriteTeams,
-                f1_dashboard_preset: defaultPrefs.f1DashboardPreset,
-                football_dashboard_preset: defaultPrefs.footballDashboardPreset,
-                notifications: defaultPrefs.notifications,
-                language: defaultPrefs.language,
-                timezone: defaultPrefs.timezone,
-              });
-            
-            if (!insertError) {
-              setPreferences(defaultPrefs);
-            } else {
-              console.error("Error auto-creating preferences:", insertError);
-              setPreferences(null);
-            }
-          } else {
-            setError(queryError.message);
-            console.error("Error fetching preferences:", queryError);
-          }
-        } else if (data) {
-          setPreferences({
-            theme: data.theme,
-            fontSize: data.font_size,
-            animationSpeed: data.animation_speed,
-            sidebarExpanded: data.sidebar_expanded,
-            favoriteTeams: data.favorite_teams || [],
-            f1DashboardPreset: data.f1_dashboard_preset,
-            footballDashboardPreset: data.football_dashboard_preset,
-            notifications: data.notifications,
-            language: data.language,
-            timezone: data.timezone,
-          });
+        if (!response.ok) {
+          throw new Error('Failed to load preferences')
         }
+
+        const data = await response.json()
+        setPreferences(data.preferences)
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-        console.error("Error:", err);
+        console.error('Error loading preferences:', err)
+        setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
 
-    fetchPreferences();
-  }, [userId, isLoaded]);
+    loadPreferences()
+  }, [userId])
 
-  async function updatePreferences(updates: Partial<UserPreferences>) {
+  // Update preferences
+  const updatePreferences = async (updates: Partial<UserPreferences>) => {
     if (!userId) {
-      setError("Not authenticated");
-      return;
+      throw new Error('User not authenticated')
     }
 
     try {
-      const { error: updateError } = await supabase
-        .from("users_preferences")
-        .update({
-          theme: updates.theme,
-          font_size: updates.fontSize,
-          animation_speed: updates.animationSpeed,
-          sidebar_expanded: updates.sidebarExpanded,
-          favorite_teams: updates.favoriteTeams,
-          f1_dashboard_preset: updates.f1DashboardPreset,
-          football_dashboard_preset: updates.footballDashboardPreset,
-          notifications: updates.notifications,
-          language: updates.language,
-          timezone: updates.timezone,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", userId);
+      const response = await fetch('/api/user/preferences', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      })
 
-      if (updateError) {
-        setError(updateError.message);
-        console.error("Error updating preferences:", updateError);
-        throw updateError;
-      } else {
-        setPreferences((prev) =>
-          prev ? { ...prev, ...updates } : null
-        );
-        setError(null);
+      if (!response.ok) {
+        throw new Error('Failed to update preferences')
       }
+
+      const data = await response.json()
+      setPreferences(data.preferences)
+      return data.preferences
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      setError(message);
-      console.error("Error:", err);
-      throw err;
+      console.error('Error updating preferences:', err)
+      throw err
     }
   }
 
-  return { preferences, loading, error, updatePreferences };
+  return {
+    preferences,
+    loading,
+    error,
+    updatePreferences
+  }
 }

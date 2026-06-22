@@ -21,13 +21,13 @@ export function AppearanceSettings() {
   }
 
   const handleFontSizeChange = async (size: FontSize) => {
-    await updatePreferences({ fontSize: size })
+    await updatePreferences({ font_size: size })
     setSaveMessage('✓ Font size saved')
     setTimeout(() => setSaveMessage(''), 2000)
   }
 
   const handleAnimationChange = async (speed: AnimationSpeed) => {
-    await updatePreferences({ animationSpeed: speed })
+    await updatePreferences({ animation_speed: speed })
     setSaveMessage('✓ Animation speed saved')
     setTimeout(() => setSaveMessage(''), 2000)
   }
@@ -85,11 +85,11 @@ export function AppearanceSettings() {
               key={size.value}
               onClick={() => handleFontSizeChange(size.value)}
               style={{
-                backgroundColor: preferences?.fontSize === size.value ? 'var(--color-primary)' : 'var(--color-surface)',
-                color: preferences?.fontSize === size.value ? 'var(--color-background)' : 'var(--color-text-primary)',
+                backgroundColor: preferences?.font_size === size.value ? 'var(--color-primary)' : 'var(--color-surface)',
+                color: preferences?.font_size === size.value ? 'var(--color-background)' : 'var(--color-text-primary)',
                 borderColor: 'var(--color-border)'
               }}
-              className="px-6 py-2 rounded-lg border-2 font-bold transition-all hover:scale-105"
+              className="px-6 py-2 rounded-lg border-2 font-bold transition-all hover:scale-105 cursor-pointer"
             >
               {size.label}
             </button>
@@ -107,11 +107,11 @@ export function AppearanceSettings() {
               key={speed.value}
               onClick={() => handleAnimationChange(speed.value)}
               style={{
-                backgroundColor: preferences?.animationSpeed === speed.value ? 'var(--color-primary)' : 'var(--color-surface)',
-                color: preferences?.animationSpeed === speed.value ? 'var(--color-background)' : 'var(--color-text-primary)',
+                backgroundColor: preferences?.animation_speed === speed.value ? 'var(--color-primary)' : 'var(--color-surface)',
+                color: preferences?.animation_speed === speed.value ? 'var(--color-background)' : 'var(--color-text-primary)',
                 borderColor: 'var(--color-border)'
               }}
-              className="px-6 py-2 rounded-lg border-2 font-bold transition-all hover:scale-105"
+              className="px-6 py-2 rounded-lg border-2 font-bold transition-all hover:scale-105 cursor-pointer"
             >
               {speed.label}
             </button>

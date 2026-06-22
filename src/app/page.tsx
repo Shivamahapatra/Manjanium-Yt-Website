@@ -26,9 +26,10 @@ const FeaturesHoverEffect = ({ items }: { items: any[] }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-10">
       {items.map((item, idx) => (
-        <div
+        <Link
           key={item.title}
-          className="relative group block p-2 h-full w-full"
+          href={item.path}
+          className="relative group block p-2 h-full w-full cursor-pointer"
           onMouseEnter={() => setHoveredIndex(idx)}
           onMouseLeave={() => setHoveredIndex(null)}
         >
@@ -48,10 +49,10 @@ const FeaturesHoverEffect = ({ items }: { items: any[] }) => {
             <h4 className="text-zinc-900 dark:text-zinc-50 font-bold tracking-wide mt-4">{item.title}</h4>
             <p className="mt-4 text-zinc-600 dark:text-zinc-400 tracking-wide leading-relaxed text-sm flex-1">{item.description}</p>
             <div className={`mt-6 text-sm font-bold ${item.textColor} flex items-center gap-1`}>
-              Explore <IconArrowRight className="w-4 h-4" />
+              Explore <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );
@@ -146,6 +147,7 @@ export default function HomePage() {
       accent: "blue",
       textColor: "text-blue-500",
       hoverBg: "bg-blue-500/[0.1]",
+      path: "/f1?tab=live",
     },
     {
       title: "Head-to-Head Telemetry",
@@ -154,6 +156,7 @@ export default function HomePage() {
       accent: "blue",
       textColor: "text-blue-500",
       hoverBg: "bg-blue-500/[0.1]",
+      path: "/f1?tab=telemetry",
     },
     {
       title: "Championship Standings",
@@ -162,6 +165,7 @@ export default function HomePage() {
       accent: "amber",
       textColor: "text-amber-500",
       hoverBg: "bg-amber-500/[0.1]",
+      path: "/f1?tab=standings",
     },
     {
       title: "Football Match Center",
@@ -170,6 +174,7 @@ export default function HomePage() {
       accent: "green",
       textColor: "text-green-500",
       hoverBg: "bg-green-500/[0.1]",
+      path: "/football",
     },
     {
       title: "Race Calendar",
@@ -178,6 +183,7 @@ export default function HomePage() {
       accent: "blue",
       textColor: "text-blue-500",
       hoverBg: "bg-blue-500/[0.1]",
+      path: "/f1?tab=calendar",
     },
     {
       title: "Technical Updates",
@@ -186,6 +192,7 @@ export default function HomePage() {
       accent: "neutral",
       textColor: "text-neutral-500 dark:text-neutral-400",
       hoverBg: "bg-neutral-500/[0.1]",
+      path: "/f1?tab=updates",
     },
   ];
 
@@ -309,20 +316,18 @@ export default function HomePage() {
                 transition={{ delay: 0.8, duration: 0.7 }}
                 className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full"
               >
-                <Link href="/f1" className="w-full sm:w-auto">
-                  <button
-                    className="bg-stitch-secondary hover:bg-stitch-secondary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full cursor-pointer"
-                  >
-                    Enter F1 Hub <IconArrowRight className="w-5 h-5" />
-                  </button>
+                <Link
+                  href="/f1"
+                  className="bg-stitch-secondary hover:bg-stitch-secondary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer"
+                >
+                  Enter F1 Hub <IconArrowRight className="w-5 h-5" />
                 </Link>
 
-                <Link href="/football" className="w-full sm:w-auto">
-                  <button
-                    className="bg-stitch-primary hover:bg-stitch-primary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full cursor-pointer"
-                  >
-                    Enter Football Center <IconArrowRight className="w-5 h-5" />
-                  </button>
+                <Link
+                  href="/football"
+                  className="bg-stitch-primary hover:bg-stitch-primary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer"
+                >
+                  Enter Football Center <IconArrowRight className="w-5 h-5" />
                 </Link>
               </motion.div>
             </div>

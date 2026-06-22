@@ -13,12 +13,12 @@ export default function AppearanceProvider({ children }: { children: React.React
       document.documentElement.classList.toggle('dark', preferences.theme === 'dark')
     }
 
-    if (preferences?.fontSize) {
-      document.documentElement.style.fontSize = preferences.fontSize === 'lg' ? '18px' : preferences.fontSize === 'sm' ? '12px' : '14px';
+    if (preferences?.font_size) {
+      document.documentElement.style.fontSize = preferences.font_size === 'lg' ? '18px' : preferences.font_size === 'sm' ? '12px' : '14px';
     }
 
-    if (preferences?.animationSpeed) {
-      const speed = preferences.animationSpeed === 'fast' ? '0.3s' : preferences.animationSpeed === 'reduced' ? '0.8s' : '0.5s'
+    if (preferences?.animation_speed) {
+      const speed = preferences.animation_speed === 'fast' ? '0.3s' : preferences.animation_speed === 'reduced' ? '0.8s' : '0.5s'
       document.documentElement.style.setProperty('--transition-normal', speed)
     }
   }, [preferences])
