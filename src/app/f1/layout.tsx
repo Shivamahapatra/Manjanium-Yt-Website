@@ -4,17 +4,11 @@ import { motion } from "framer-motion";
 import { IconBrandYoutube } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import { F1SubNav } from "@/components/f1/F1SubNav";
 
 export default function F1Layout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   const [session, setSession] = useState<any>(null);
-
-  if (pathname === '/f1') {
-    return <>{children}</>;
-  }
   const [nextRace, setNextRace] = useState<any>(null);
   const [countdown, setCountdown] = useState<string>('');
   const [isLive, setIsLive] = useState(false);

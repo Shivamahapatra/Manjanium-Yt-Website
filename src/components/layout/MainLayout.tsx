@@ -9,27 +9,6 @@ import SportsSidebar from "./SportsSidebar";
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const isCustomLayoutPage = pathname === '/f1' || pathname === '/football';
-
-  if (isCustomLayoutPage) {
-    return (
-      <div className="relative min-h-screen" style={{ backgroundColor: 'var(--color-background)', color: 'var(--color-text-primary)' }}>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={pathname}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="w-full h-screen"
-          >
-            {children}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    );
-  }
-
   return (
     <div className="relative min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-background)', color: 'var(--color-text-primary)' }}>
       {/* Accessibility: Skip to main content */}
