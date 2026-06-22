@@ -15,7 +15,6 @@ import {
   Loader2,
   SkipBack,
   Settings,
-  Map,
   AlertCircle
 } from 'lucide-react';
 import { getTeamColor, formatGap } from '@/lib/f1-helpers';
