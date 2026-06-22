@@ -6,36 +6,37 @@ export function useF1PresetLayout() {
   const { config } = useF1DashboardPreset()
 
   return {
-    // Apply visibility classes
-    timingTowerClass: config.showLiveTimingTower ? 'block' : 'hidden',
-    telemetryChartsClass: config.showTelemetryCharts ? 'block' : 'hidden',
-    standingsClass: config.showStandings ? 'block' : 'hidden',
-    circuitFocusClass: config.showCircuitFocus ? 'block' : 'hidden',
-    weatherClass: config.showWeather ? 'block' : 'hidden',
-    strategyClass: config.showStrategy ? 'block' : 'hidden',
+    // Visibility classes
+    timingTowerClass: config.showLiveTimingTower ? '' : 'hidden',
+    telemetryChartsClass: config.showTelemetryCharts ? '' : 'hidden',
+    standingsClass: config.showStandings ? '' : 'hidden',
+    circuitFocusClass: config.showCircuitFocus ? '' : 'hidden',
+    weatherClass: config.showWeather ? '' : 'hidden',
+    strategyClass: config.showStrategy ? '' : 'hidden',
 
-    // Apply size adjustments
+    // Timing tower height — must be generous enough to show the full table
     timingTowerHeight:
       config.timingTowerSize === 'large'
-        ? 'h-96'
+        ? 'h-[700px]'
         : config.timingTowerSize === 'medium'
-          ? 'h-80'
-          : 'h-64',
+          ? 'h-[600px]'
+          : 'h-[450px]',
 
-    // Apply layout adjustments
-    mainGridCols:
-      config.timingTowerSize === 'large'
-        ? 'lg:col-span-4'
-        : config.timingTowerSize === 'medium'
-          ? 'lg:col-span-3'
-          : 'lg:col-span-2',
-
+    // On a 12-col grid, how wide should the timing tower column be
     timingTowerCols:
       config.timingTowerSize === 'large'
-        ? 'lg:col-span-1'
+        ? 'lg:col-span-5'
         : config.timingTowerSize === 'medium'
-          ? 'lg:col-span-1'
-          : 'lg:col-span-1'
+          ? 'lg:col-span-4'
+          : 'lg:col-span-3',
+
+    // The main content area (globe / weather) fills the remaining cols
+    mainGridCols:
+      config.timingTowerSize === 'large'
+        ? 'lg:col-span-7'
+        : config.timingTowerSize === 'medium'
+          ? 'lg:col-span-8'
+          : 'lg:col-span-9'
   }
 }
 
@@ -43,14 +44,14 @@ export function useFootballPresetLayout() {
   const { config } = useFootballDashboardPreset()
 
   return {
-    // Apply visibility classes
-    liveMatchesClass: config.showLiveMatches ? 'block' : 'hidden',
-    standingsClass: config.showStandings ? 'block' : 'hidden',
-    playerStatsClass: config.showPlayerStats ? 'block' : 'hidden',
-    matchStatsClass: config.showMatchStats ? 'block' : 'hidden',
-    lineupsClass: config.showLineups ? 'block' : 'hidden',
+    // Visibility classes
+    liveMatchesClass: config.showLiveMatches ? '' : 'hidden',
+    standingsClass: config.showStandings ? '' : 'hidden',
+    playerStatsClass: config.showPlayerStats ? '' : 'hidden',
+    matchStatsClass: config.showMatchStats ? '' : 'hidden',
+    lineupsClass: config.showLineups ? '' : 'hidden',
 
-    // Apply layout based on preset
+    // Grid distribution
     gridLayout:
       config.layout === 'three-column'
         ? 'grid-cols-1 lg:grid-cols-3'

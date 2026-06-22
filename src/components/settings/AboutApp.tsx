@@ -6,116 +6,97 @@ import { Info, Code, ShieldCheck, FileText, Bug, MessageSquare, ExternalLink } f
 export function AboutApp() {
   const currentYear = new Date().getFullYear();
   
+  const linkItems = [
+    { icon: <FileText className="w-5 h-5" />, label: "Documentation", href: "#" },
+    { icon: <MessageSquare className="w-5 h-5" />, label: "Community Discord", href: "#" },
+    { icon: <ShieldCheck className="w-5 h-5" />, label: "Privacy Policy", href: "#" },
+    { icon: <Bug className="w-5 h-5" />, label: "Report a Bug", href: "#" },
+  ];
+
   return (
     <div className="p-6 md:p-10 max-w-4xl mx-auto flex flex-col gap-10">
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">About App</h2>
-        <p className="text-[#94a3b8]">Information, features, and credits for Manjanium Sports Hub.</p>
+        <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>About App</h2>
+        <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>Information, features, and credits for Manjanium Sports Hub.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         {/* App Info Card */}
-        <div className="bg-[#0f172a] p-6 md:p-8 rounded-2xl border border-white/5 shadow-lg flex flex-col items-center justify-center text-center">
-          <div className="w-20 h-20 bg-[#fbbf24] rounded-2xl flex items-center justify-center mb-6 shadow-xl shadow-[#fbbf24]/10">
-            <span className="text-3xl font-black text-black">M</span>
+        <div
+          className="p-6 md:p-8 rounded-2xl border shadow-lg flex flex-col items-center justify-center text-center"
+          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
+        >
+          <div
+            className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-xl"
+            style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 8px 24px rgba(251,191,36,0.15)' }}
+          >
+            <span className="text-3xl font-black" style={{ color: 'var(--color-background)' }}>M</span>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">Manjanium Sports Hub</h3>
-          <p className="text-[#94a3b8] mb-6">The ultimate live telemetry and match center.</p>
+          <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Manjanium Sports Hub</h3>
+          <p className="mb-6" style={{ color: 'var(--color-text-secondary)' }}>The ultimate live telemetry and match center.</p>
           
           <div className="grid grid-cols-2 gap-4 w-full">
-            <div className="bg-background/50 rounded-lg p-3 border border-white/5">
-              <div className="text-xs text-[#94a3b8] mb-1">Version</div>
-              <div className="font-mono font-bold text-white">v1.2.0-beta</div>
+            <div className="rounded-lg p-3 border" style={{ backgroundColor: 'var(--color-surface-container)', borderColor: 'var(--color-border)' }}>
+              <div className="text-xs mb-1" style={{ color: 'var(--color-text-secondary)' }}>Version</div>
+              <div className="font-mono font-bold" style={{ color: 'var(--color-text-primary)' }}>v1.2.0-beta</div>
             </div>
-            <div className="bg-background/50 rounded-lg p-3 border border-white/5">
-              <div className="text-xs text-[#94a3b8] mb-1">Build</div>
-              <div className="font-mono font-bold text-white">2026.06.20</div>
+            <div className="rounded-lg p-3 border" style={{ backgroundColor: 'var(--color-surface-container)', borderColor: 'var(--color-border)' }}>
+              <div className="text-xs mb-1" style={{ color: 'var(--color-text-secondary)' }}>Build</div>
+              <div className="font-mono font-bold" style={{ color: 'var(--color-text-primary)' }}>2026.06.22</div>
             </div>
           </div>
         </div>
 
         {/* Links and Credits */}
-        <div className="flex flex-col gap-4">
-          <a href="#" className="flex items-center justify-between p-4 bg-[#0f172a] rounded-xl border border-white/5 hover:border-white/10 transition-colors group">
-            <div className="flex items-center gap-3">
-              <FileText className="w-5 h-5 text-[#94a3b8] group-hover:text-white transition-colors" />
-              <span className="font-medium text-white">Documentation</span>
-            </div>
-            <ExternalLink className="w-4 h-4 text-[#94a3b8] group-hover:text-[#fbbf24] transition-colors" />
-          </a>
-          
-          <a href="#" className="flex items-center justify-between p-4 bg-[#0f172a] rounded-xl border border-white/5 hover:border-white/10 transition-colors group">
-            <div className="flex items-center gap-3">
-              <MessageSquare className="w-5 h-5 text-[#94a3b8] group-hover:text-white transition-colors" />
-              <span className="font-medium text-white">Community Discord</span>
-            </div>
-            <ExternalLink className="w-4 h-4 text-[#94a3b8] group-hover:text-[#fbbf24] transition-colors" />
-          </a>
-          
-          <a href="#" className="flex items-center justify-between p-4 bg-[#0f172a] rounded-xl border border-white/5 hover:border-white/10 transition-colors group">
-            <div className="flex items-center gap-3">
-              <ShieldCheck className="w-5 h-5 text-[#94a3b8] group-hover:text-white transition-colors" />
-              <span className="font-medium text-white">Privacy Policy</span>
-            </div>
-            <ExternalLink className="w-4 h-4 text-[#94a3b8] group-hover:text-[#fbbf24] transition-colors" />
-          </a>
-
-          <a href="#" className="flex items-center justify-between p-4 bg-[#0f172a] rounded-xl border border-white/5 hover:border-white/10 transition-colors group">
-            <div className="flex items-center gap-3">
-              <Bug className="w-5 h-5 text-[#94a3b8] group-hover:text-white transition-colors" />
-              <span className="font-medium text-white">Report a Bug</span>
-            </div>
-            <ExternalLink className="w-4 h-4 text-[#94a3b8] group-hover:text-[#fbbf24] transition-colors" />
-          </a>
+        <div className="flex flex-col gap-3">
+          {linkItems.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              className="flex items-center justify-between p-4 rounded-xl border transition-all duration-200 group hover:scale-[1.01]"
+              style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
+            >
+              <div className="flex items-center gap-3">
+                <span style={{ color: 'var(--color-text-secondary)' }} className="group-hover:text-[var(--color-text-primary)] transition-colors">{item.icon}</span>
+                <span className="font-medium text-sm" style={{ color: 'var(--color-text-primary)' }}>{item.label}</span>
+              </div>
+              <ExternalLink className="w-4 h-4 transition-colors" style={{ color: 'var(--color-text-secondary)' }} />
+            </a>
+          ))}
         </div>
       </div>
 
       {/* Credits Section */}
-      <div className="bg-[#0f172a] p-6 md:p-8 rounded-2xl border border-white/5 shadow-lg">
+      <div
+        className="p-6 md:p-8 rounded-2xl border shadow-lg"
+        style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
+      >
         <div className="flex items-center gap-3 mb-6">
-          <Code className="w-5 h-5 text-[#fbbf24]" />
-          <h3 className="font-bold text-white text-lg">Credits & Technology</h3>
+          <Code className="w-5 h-5" style={{ color: 'var(--color-primary)' }} />
+          <h3 className="font-bold text-lg" style={{ color: 'var(--color-text-primary)' }}>Credits & Technology</h3>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Core Stack</h4>
-            <ul className="space-y-2 text-sm text-[#94a3b8]">
-              <li>Next.js 14</li>
-              <li>React 19</li>
-              <li>TypeScript</li>
-              <li>Tailwind CSS v4</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-white mb-3">UI & Design</h4>
-            <ul className="space-y-2 text-sm text-[#94a3b8]">
-              <li>Aceternity UI</li>
-              <li>Framer Motion</li>
-              <li>Lucide Icons</li>
-              <li>Tabler Icons</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Data Providers</h4>
-            <ul className="space-y-2 text-sm text-[#94a3b8]">
-              <li>ESPN API</li>
-              <li>FIA Data API</li>
-              <li>OpenF1</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Development</h4>
-            <ul className="space-y-2 text-sm text-[#94a3b8]">
-              <li>Manjanium Team</li>
-              <li>Open Source Contributors</li>
-            </ul>
-          </div>
+          {[
+            { title: "Core Stack", items: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS v4"] },
+            { title: "UI & Design", items: ["Aceternity UI", "Framer Motion", "Lucide Icons", "Tabler Icons"] },
+            { title: "Data Providers", items: ["ESPN API", "FIA Data API", "OpenF1"] },
+            { title: "Development", items: ["Manjanium Team", "Open Source Contributors"] },
+          ].map((section) => (
+            <div key={section.title}>
+              <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>{section.title}</h4>
+              <ul className="space-y-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                {section.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
       
-      <div className="text-center text-sm text-[#94a3b8]/60 pb-8">
+      <div className="text-center text-sm pb-8" style={{ color: 'var(--color-text-secondary)', opacity: 0.5 }}>
         &copy; {currentYear} Manjanium Sports. All rights reserved.
       </div>
     </div>
