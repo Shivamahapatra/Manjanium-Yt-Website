@@ -43,7 +43,7 @@ function F1HubContent() {
       <div className="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen" style={{ filter: 'sepia(1) hue-rotate(330deg) saturate(5)' }}>
         <DarkVeil
           hueShift={0}
-          noiseIntensity={0.3}
+          noiseIntensity={0}
           scanlineIntensity={0.4}
           speed={0.8}
           scanlineFrequency={60}
