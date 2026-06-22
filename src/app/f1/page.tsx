@@ -14,7 +14,7 @@ import { F1StandingsTab } from "@/components/f1/tabs/F1StandingsTab";
 import { F1CalendarTab } from "@/components/f1/tabs/F1CalendarTab";
 import { F1ResultsTab } from "@/components/f1/tabs/F1ResultsTab";
 import { F1UpdatesTab } from "@/components/f1/tabs/F1UpdatesTab";
-import Ferrofluid from "@/components/ui/Ferrofluid";
+import DarkVeil from "@/components/ui/DarkVeil";
 
 function F1HubContent() {
   const searchParams = useSearchParams();
@@ -40,26 +40,19 @@ function F1HubContent() {
   return (
     <div className="w-full flex flex-col pt-4 px-4 sm:px-8 max-w-7xl mx-auto z-10 relative pb-32">
       {/* Background glow tailored for F1 */}
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-30 mix-blend-screen">
-        <Ferrofluid
-          colors={["#E10600", "#900000", "#111111"]}
-          speed={0.4}
-          scale={1.2}
-          turbulence={1.5}
-          fluidity={0.2}
-          rimWidth={0.3}
-          sharpness={2}
-          shimmer={1}
-          glow={1.5}
-          flowDirection="down"
-          opacity={1}
-          mouseInteraction={true}
-          mouseStrength={1}
-          mouseRadius={0.3}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen" style={{ filter: 'sepia(1) hue-rotate(330deg) saturate(5)' }}>
+        <DarkVeil
+          hueShift={0}
+          noiseIntensity={0.3}
+          scanlineIntensity={0.4}
+          speed={0.8}
+          scanlineFrequency={60}
+          warpAmount={0.05}
+          resolutionScale={1}
         />
       </div>
-      <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-red-600/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
-      <div className="fixed top-1/4 left-1/4 w-[400px] h-[400px] bg-blue-600/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
+      <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-[#e10600]/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
+      <div className="fixed top-1/4 left-1/4 w-[400px] h-[400px] bg-red-800/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
 
       {/* ===== TABS CONTENT ===== */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex flex-col relative z-10">
