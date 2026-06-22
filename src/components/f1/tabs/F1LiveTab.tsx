@@ -177,8 +177,13 @@ function TeamRadioPanel({ sessionKey }: { sessionKey: string }) {
   );
 }
 
-export function F1LiveTab() {
+import { useF1PresetLayout } from "@/hooks/usePresetLayout";
+
+export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
   const { preferences } = useUserPreferences();
+  const localPresetLayout = useF1PresetLayout();
+  const layout = presetLayout || localPresetLayout;
+
   const [session, setSession] = useState<any>(null);
   const [sessionKey, setSessionKey] = useState<string>("latest");
   const [loading, setLoading] = useState(true);
@@ -240,21 +245,21 @@ export function F1LiveTab() {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 w-full max-w-[1600px] mx-auto pb-10">
         
         {/* Live Timing Tower */}
-        <section className="md:col-span-4 lg:col-span-3 flex flex-col gap-4">
+        <section className={`md:col-span-4 ${layout.timingTowerCols} flex flex-col gap-4 ${layout.timingTowerClass}`}>
           <div className="flex items-center justify-between px-2">
             <h2 className="text-xs font-bold uppercase text-primary flex items-center gap-2">
               <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse shadow-[0_0_8px_var(--color-primary)]"></span>
               LIVE TIMING TOWER
             </h2>
           </div>
-          <div className="glass-panel rounded-xl overflow-hidden h-[600px]">
+          <div className={`glass-panel rounded-xl overflow-hidden ${layout.timingTowerHeight || 'h-[600px]'}`}>
              <LiveTimingTower />
           </div>
         </section>
 
         {/* Center Section: Globe & Weather */}
-        <section className="md:col-span-8 lg:col-span-6 flex flex-col gap-6">
-          <div className="relative h-[300px] md:h-[400px] glass-panel rounded-xl overflow-hidden flex items-center justify-center border-border-default">
+        <section className={`md:col-span-8 ${layout.mainGridCols} flex flex-col gap-6`}>
+          <div className={`relative h-[300px] md:h-[400px] glass-panel rounded-xl overflow-hidden flex items-center justify-center border-border-default ${layout.circuitFocusClass}`}>
              <Globe globeConfig={globeConfig} data={globeArcs} />
              <div className="absolute top-6 left-6 z-10 pointer-events-none">
                 <h3 className="text-xs font-bold uppercase text-primary mb-1 tracking-widest">GLOBAL RACE TRACKER</h3>
@@ -267,7 +272,9 @@ export function F1LiveTab() {
                 <span className="text-2xl text-primary font-mono font-bold drop-shadow-md">{localTime || "--:--:--"}</span>
              </div>
           </div>
-          <WeatherWidget sessionKey={sessionKey} />
+          <div className={layout.weatherClass}>
+            <WeatherWidget sessionKey={sessionKey} />
+          </div>
         </section>
 
         {/* Circuit Focus / Race Control Card */}
@@ -282,11 +289,11 @@ export function F1LiveTab() {
       </div>
 
       <div className="mt-8 space-y-8">
-        <div className="glass-panel rounded-xl p-4 md:p-6">
+        <div className={`glass-panel rounded-xl p-4 md:p-6 ${layout.telemetryChartsClass}`}>
           <h3 className="text-xl font-bold uppercase mb-4 text-primary tracking-wider">Live Telemetry</h3>
           <F1TelemetryTab />
         </div>
-        <div className="glass-panel rounded-xl p-4 md:p-6">
+        <div className={`glass-panel rounded-xl p-4 md:p-6 ${layout.standingsClass}`}>
           <h3 className="text-xl font-bold uppercase mb-4 text-primary tracking-wider">Championship Standings</h3>
           <F1StandingsTab />
         </div>

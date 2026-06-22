@@ -1,9 +1,10 @@
-"use client";
+'use client'
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Spin } from 'antd';
 import { Tabs, TabsContent } from '@/components/ui/shadcn-tabs';
+import { useF1PresetLayout } from '@/hooks/usePresetLayout';
 
 // Import our premium F1 tab components
 import { F1LiveTab } from "@/components/f1/tabs/F1LiveTab";
@@ -17,6 +18,7 @@ import { F1UpdatesTab } from "@/components/f1/tabs/F1UpdatesTab";
 function F1HubContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const presetLayout = useF1PresetLayout();
 
   // Tab State
   const defaultTab = searchParams.get('tab') || 'live';
@@ -46,7 +48,7 @@ function F1HubContent() {
           
           {/* ----- LIVE ----- */}
           <TabsContent value="live" className="mt-0 outline-none">
-            {activeTab === 'live' && <F1LiveTab />}
+            {activeTab === 'live' && <F1LiveTab presetLayout={presetLayout} />}
           </TabsContent>
 
           {/* ----- REPLAY ----- */}
@@ -55,12 +57,12 @@ function F1HubContent() {
           </TabsContent>
 
           {/* ----- TELEMETRY ----- */}
-          <TabsContent value="telemetry" className="mt-0 outline-none">
+          <TabsContent value="telemetry" className={`mt-0 outline-none ${presetLayout.telemetryChartsClass}`}>
             {activeTab === 'telemetry' && <F1TelemetryTab />}
           </TabsContent>
 
           {/* ----- STANDINGS ----- */}
-          <TabsContent value="standings" className="mt-0 outline-none">
+          <TabsContent value="standings" className={`mt-0 outline-none ${presetLayout.standingsClass}`}>
             {activeTab === 'standings' && <F1StandingsTab />}
           </TabsContent>
 
