@@ -207,7 +207,7 @@ const Ferrofluid = ({
   mouseRadius = 0.35,
   mouseDampening = 0.15,
   mixBlendMode
-}) => {
+}: any) => {
   const containerRef = useRef(null);
   const rafRef = useRef(null);
   const programRef = useRef(null);
