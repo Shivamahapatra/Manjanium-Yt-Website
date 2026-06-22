@@ -257,19 +257,26 @@ export const GlobeComponent = React.memo(function GlobeComponent({
         });
 
       // Register interactive events
-      globe
-        .onArcHover((hovered: object | null) => {
+      if (typeof globe.onArcHover === "function") {
+        globe.onArcHover((hovered: object | null) => {
           onHoverArc(hovered as ArcData | null);
-        })
-        .onPointHover((hovered: object | null) => {
+        });
+      }
+      if (typeof globe.onPointHover === "function") {
+        globe.onPointHover((hovered: object | null) => {
           onHoverPoint(hovered as PointData | null);
-        })
-        .onPointClick((clicked: object) => {
+        });
+      }
+      if (typeof globe.onPointClick === "function") {
+        globe.onPointClick((clicked: object) => {
           onClickPoint(clicked as PointData);
-        })
-        .onArcClick((clicked: object) => {
+        });
+      }
+      if (typeof globe.onArcClick === "function") {
+        globe.onArcClick((clicked: object) => {
           onClickArc(clicked as ArcData);
         });
+      }
     }
   }, [globeConfig, data, points, isMobile, hoveredArc, onHoverArc, onHoverPoint, onClickPoint, onClickArc, theme, highlightedRound]);
 

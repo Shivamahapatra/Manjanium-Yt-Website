@@ -46,37 +46,37 @@ function F1HubContent() {
           
           {/* ----- LIVE ----- */}
           <TabsContent value="live" className="mt-0 outline-none">
-            <F1LiveTab />
+            {activeTab === 'live' && <F1LiveTab />}
           </TabsContent>
 
           {/* ----- REPLAY ----- */}
           <TabsContent value="replay" className="mt-0 outline-none">
-            <F1ReplayTab />
+            {activeTab === 'replay' && <F1ReplayTab />}
           </TabsContent>
 
           {/* ----- TELEMETRY ----- */}
           <TabsContent value="telemetry" className="mt-0 outline-none">
-            <F1TelemetryTab />
+            {activeTab === 'telemetry' && <F1TelemetryTab />}
           </TabsContent>
 
           {/* ----- STANDINGS ----- */}
           <TabsContent value="standings" className="mt-0 outline-none">
-            <F1StandingsTab />
+            {activeTab === 'standings' && <F1StandingsTab />}
           </TabsContent>
 
           {/* ----- CALENDAR ----- */}
           <TabsContent value="calendar" className="mt-0 outline-none">
-            <F1CalendarTab />
+            {activeTab === 'calendar' && <F1CalendarTab />}
           </TabsContent>
 
           {/* ----- RESULTS ----- */}
           <TabsContent value="results" className="mt-0 outline-none">
-            <F1ResultsTab />
+            {activeTab === 'results' && <F1ResultsTab />}
           </TabsContent>
 
           {/* ----- UPDATES ----- */}
           <TabsContent value="updates" className="mt-0 outline-none">
-            <F1UpdatesTab />
+            {activeTab === 'updates' && <F1UpdatesTab />}
           </TabsContent>
 
         </div>
