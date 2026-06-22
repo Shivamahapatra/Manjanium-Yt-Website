@@ -14,6 +14,7 @@ import { F1StandingsTab } from "@/components/f1/tabs/F1StandingsTab";
 import { F1CalendarTab } from "@/components/f1/tabs/F1CalendarTab";
 import { F1ResultsTab } from "@/components/f1/tabs/F1ResultsTab";
 import { F1UpdatesTab } from "@/components/f1/tabs/F1UpdatesTab";
+import Ferrofluid from "@/components/ui/Ferrofluid";
 
 function F1HubContent() {
   const searchParams = useSearchParams();
@@ -39,6 +40,24 @@ function F1HubContent() {
   return (
     <div className="w-full flex flex-col pt-4 px-4 sm:px-8 max-w-7xl mx-auto z-10 relative pb-32">
       {/* Background glow tailored for F1 */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-30 mix-blend-screen">
+        <Ferrofluid
+          colors={["#E10600", "#900000", "#111111"]}
+          speed={0.4}
+          scale={1.2}
+          turbulence={1.5}
+          fluidity={0.2}
+          rimWidth={0.3}
+          sharpness={2}
+          shimmer={1}
+          glow={1.5}
+          flowDirection="down"
+          opacity={1}
+          mouseInteraction={true}
+          mouseStrength={1}
+          mouseRadius={0.3}
+        />
+      </div>
       <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-red-600/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
       <div className="fixed top-1/4 left-1/4 w-[400px] h-[400px] bg-blue-600/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
 
