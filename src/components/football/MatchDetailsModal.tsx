@@ -4,6 +4,10 @@ import { Clock, MapPin, AlertCircle, Shield, RefreshCw, X } from 'lucide-react';
 import { LiveTimeline } from '@/components/football/LiveTimeline';
 import { TeamLineup } from '@/components/football/TeamLineup';
 import { MatchStatistics } from '@/components/football/MatchStatistics';
+import { FiClock, FiMapPin, FiInfo, FiChevronLeft, FiPlayCircle, FiMoreHorizontal } from "react-icons/fi";
+import { fetchMatchDetails } from "@/lib/football-api";
+import { MatchStatusBadge } from "./MatchStatusBadge";
+import DecryptedText from "@/components/ui/DecryptedText";
 
 export interface MatchDetailsModalProps {
   matchId: string;

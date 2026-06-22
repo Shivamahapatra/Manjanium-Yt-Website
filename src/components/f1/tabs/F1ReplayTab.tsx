@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Table, Tag, Spin, Slider, Button } from 'antd';
+import { Table, Tag, Spin, Slider, Button, Select } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
@@ -12,9 +12,14 @@ import {
   RotateCcw,
   Trophy,
   FastForward,
-  Loader2
+  Loader2,
+  SkipBack,
+  Settings,
+  Map,
+  AlertCircle
 } from 'lucide-react';
 import { getTeamColor, formatGap } from '@/lib/f1-helpers';
+import DecryptedText from '@/components/ui/DecryptedText';
 
 const OPENF1_COUNTRIES: Record<string, string> = {
   'USA': 'United States',
@@ -423,7 +428,7 @@ export function F1ReplayTab() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Loading...
+                  <DecryptedText text="Loading..." animateOn="view" speed={30} />
                 </>
               ) : (
                 'Load Session'

@@ -12,6 +12,7 @@ import localWorldData from "../../../public/globe.json";
 import { Globe2D } from "./Globe2D";
 import { useResponsiveGlobe } from "@/hooks/useResponsiveGlobe";
 import { GlobeFallback, GlobeErrorType } from "@/components/ui/GlobeFallback";
+import DecryptedText from "./DecryptedText";
 import { ArcData, PointData, GeoJsonFeature, GeoJsonData, GlobeConfig } from "@/types/globe";
 import { findVenueByCoords, VenueDetailInfo } from "@/lib/globe-interactions";
 import { VenueTooltip } from "@/components/globe/VenueTooltip";
@@ -808,18 +809,22 @@ export const Globe = React.memo(function Globe({
             />
           )
         ) : !isInViewport || isLoading || !worldData ? (
-          <div className={`absolute inset-0 rounded-2xl animate-pulse border flex flex-col items-center justify-center gap-2 ${
+          <div className={`absolute inset-0 rounded-2xl border flex flex-col items-center justify-center gap-2 ${
             resolvedTheme === "light"
               ? "bg-neutral-50/60 border-neutral-200"
               : "bg-neutral-900/40 border-neutral-850"
           }`}>
-            <span className={`text-xs font-mono ${resolvedTheme === "light" ? "text-neutral-600" : "text-neutral-500"}`}>
-              Initializing 3D viewport...
-            </span>
             {isLoading && (
-              <span className={`text-[10px] font-mono ${resolvedTheme === "light" ? "text-neutral-400" : "text-neutral-600"}`}>
-                Loading satellite telemetry...
-              </span>
+              <div className="text-neutral-400 text-sm font-mono tracking-widest flex items-center gap-3">
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <DecryptedText
+                  text="Loading satellite telemetry..."
+                  animateOn="view"
+                  speed={40}
+                  revealDirection="start"
+                  className="text-neutral-200 font-semibold"
+                />
+              </div>
             )}
           </div>
         ) : (

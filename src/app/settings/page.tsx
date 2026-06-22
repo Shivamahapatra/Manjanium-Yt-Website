@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useAuth } from "@clerk/nextjs";
 import { Spin } from "antd";
+import DecryptedText from "@/components/ui/DecryptedText";
 
 const SETTINGS_CATEGORIES = [
   { id: "appearance", label: "APPEARANCE", icon: <Palette className="w-5 h-5" /> },
@@ -34,8 +35,12 @@ export default function SettingsPage() {
   };
 
   const renderActiveTab = () => {
-    if (!isSignedIn && !isLoaded) {
-      return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    if (!isLoaded || loading) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <DecryptedText text="Loading settings..." animateOn="view" speed={40} className="text-xl font-bold tracking-wider text-neutral-400" />
+        </div>
+      );
     }
 
     if (!isSignedIn && activeTab !== "about") {
