@@ -28,37 +28,58 @@ const FeaturesHoverEffect = ({ items }: { items: any[] }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-10">
       {items.map((item, idx) => (
-        <Link
+        <motion.div
           key={item.title}
-          href={item.path}
-          className="relative group block p-2 h-full w-full cursor-pointer"
-          onMouseEnter={() => setHoveredIndex(idx)}
-          onMouseLeave={() => setHoveredIndex(null)}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ delay: idx * 0.1, duration: 0.5 }}
+          className="h-full"
         >
-          <AnimatePresence>
-            {hoveredIndex === idx && (
-              <motion.span
-                className={`absolute inset-0 h-full w-full ${item.hoverBg} block rounded-3xl`}
-                layoutId="hoverBackground"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, transition: { duration: 0.15 } }}
-                exit={{ opacity: 0, transition: { duration: 0.15, delay: 0.2 } }}
-              />
-            )}
-          </AnimatePresence>
-          <div className="rounded-2xl h-full w-full p-6 bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm dark:shadow-2xl relative z-20 flex flex-col overflow-hidden transition-colors">
-            <div className={`mb-4 ${item.textColor}`}>{item.icon}</div>
-            <h4 className="text-zinc-900 dark:text-zinc-50 font-bold tracking-wide mt-4">{item.title}</h4>
-            <p className="mt-4 text-zinc-600 dark:text-zinc-400 tracking-wide leading-relaxed text-sm flex-1">{item.description}</p>
-            <div className={`mt-6 text-sm font-bold ${item.textColor} flex items-center gap-1`}>
-              Explore <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-        </Link>
+          <Link
+            href={item.path}
+            className="relative group block h-full w-full cursor-pointer"
+            onMouseEnter={() => setHoveredIndex(idx)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
+            <AnimatePresence>
+              {hoveredIndex === idx && (
+                <motion.span
+                  className={`absolute inset-0 h-full w-full ${item.hoverBg} block rounded-2xl`}
+                  layoutId="hoverBackground"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1, transition: { duration: 0.2 } }}
+                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
+                />
+              )}
+            </AnimatePresence>
+            <motion.div 
+              className="rounded-2xl h-full w-full p-6 bg-card-bg dark:bg-card-bg backdrop-blur-md border border-card-border dark:border-card-border shadow-md dark:shadow-lg relative z-20 flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg dark:hover:shadow-xl"
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div 
+                className={`mb-4 ${item.textColor} text-4xl`}
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+              >
+                {item.icon}
+              </motion.div>
+              <h4 className="text-text-primary dark:text-text-primary font-bold text-lg tracking-wide mt-2">{item.title}</h4>
+              <p className="mt-3 text-text-secondary dark:text-text-secondary tracking-wide leading-relaxed text-sm flex-1">{item.description}</p>
+              <motion.div 
+                className={`mt-6 text-sm font-semibold ${item.textColor} flex items-center gap-2`}
+                whileHover={{ x: 4 }}
+              >
+                Explore <motion.span whileHover={{ x: 2 }} transition={{ type: 'spring', stiffness: 400 }}><IconArrowRight className="w-4 h-4" /></motion.span>
+              </motion.div>
+            </motion.div>
+          </Link>
+        </motion.div>
       ))}
     </div>
   );
-};
+}
 
 // --- MOCK TIMING TOWER ---
 const MockTimingTower = () => {

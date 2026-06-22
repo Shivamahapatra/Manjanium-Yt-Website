@@ -14,7 +14,7 @@ const navItems = [
   { label: 'Settings', href: '/settings' }
 ]
 
-export default function MainNavbar() {
+export default function MainNavbarEnhanced() {
   const { isSignedIn } = useAuth()
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
