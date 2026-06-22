@@ -82,7 +82,7 @@ export default function F1Layout({ children }: { children: React.ReactNode }) {
               <motion.div
                 animate={{ opacity: [1, 0.4, 1] }}
                 transition={{ repeat: Infinity, duration: 1.5 }}
-                className="w-2.5 h-2.5 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.8)]"
+                className="w-2.5 h-2.5 bg-red-500 rounded-2xl shadow-[0_0_8px_rgba(239,68,68,0.8)]"
               />
               LIVE — {session.session_name} — {session.country_name}
             </div>
@@ -100,7 +100,7 @@ export default function F1Layout({ children }: { children: React.ReactNode }) {
         <Link 
           href="https://www.youtube.com/@manjaniumonsofts67" 
           target="_blank"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1f1f1f] hover:bg-[#2a2a2a] transition-colors border border-[#333]"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-[#1f1f1f] hover:bg-[#2a2a2a] transition-colors border border-[#333]"
         >
           <IconBrandYoutube className="w-4 h-4 text-red-500" />
           <span className="text-xs font-semibold text-white tracking-wide">Subscribe</span>

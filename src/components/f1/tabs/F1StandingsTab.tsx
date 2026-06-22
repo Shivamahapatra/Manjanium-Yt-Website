@@ -205,7 +205,7 @@ export function F1StandingsTab() {
               return (
                 <div key={item.name} className="flex items-center justify-between gap-4">
                   <span className="flex items-center gap-1.5" style={{ color }}>
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
+                    <span className="w-1.5 h-1.5 rounded-2xl" style={{ backgroundColor: color }} />
                     {item.name}
                   </span>
                   <span className="text-neutral-400 font-bold">P{item.pos}</span>
@@ -612,19 +612,19 @@ export function F1StandingsTab() {
                 </span>
                 <div className="grid grid-cols-2 gap-3 text-[10px] text-neutral-400 font-bold uppercase tracking-widest">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#3b82f6] shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-2xl bg-[#3b82f6] shrink-0" />
                     <span>Win</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#818cf8] shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-2xl bg-[#818cf8] shrink-0" />
                     <span>Podium</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#6366f1] shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-2xl bg-[#6366f1] shrink-0" />
                     <span>Points Finish</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#ec4899] shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-2xl bg-[#ec4899] shrink-0" />
                     <span>DNFs</span>
                   </div>
                 </div>

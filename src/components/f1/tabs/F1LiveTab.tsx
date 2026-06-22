@@ -17,7 +17,7 @@ const Globe = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-[320px] h-[320px] rounded-full bg-neutral-900 animate-pulse mx-auto border border-neutral-800" />
+      <div className="w-[320px] h-[320px] rounded-2xl bg-neutral-900 animate-pulse mx-auto border border-neutral-800" />
     ),
   }
 );
@@ -81,7 +81,7 @@ function WeatherWidget({ sessionKey }: { sessionKey: string }) {
           <span className="text-3xl font-bold">{weatherData.air_temperature}</span>
           <span className="text-sm">°C</span>
         </div>
-        <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+        <div className="w-full bg-surface-container h-1.5 rounded-2xl overflow-hidden">
           <div className="bg-primary h-full transition-all" style={{ width: `${Math.min(weatherData.air_temperature * 2, 100)}%` }} />
         </div>
       </div>
@@ -91,7 +91,7 @@ function WeatherWidget({ sessionKey }: { sessionKey: string }) {
           <span className="text-3xl font-bold">{weatherData.track_temperature}</span>
           <span className="text-sm">°C</span>
         </div>
-        <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+        <div className="w-full bg-surface-container h-1.5 rounded-2xl overflow-hidden">
           <div className="bg-secondary h-full transition-all" style={{ width: `${Math.min(weatherData.track_temperature * 1.5, 100)}%` }} />
         </div>
       </div>
@@ -248,7 +248,7 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
         <section className={`md:col-span-12 ${layout.timingTowerCols} flex flex-col gap-4 ${layout.timingTowerClass}`}>
           <div className="flex items-center justify-between px-2">
             <h2 className="text-xs font-bold uppercase text-primary flex items-center gap-2">
-              <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse shadow-[0_0_8px_var(--color-primary)]"></span>
+              <span className="w-2.5 h-2.5 bg-primary rounded-2xl animate-pulse shadow-[0_0_8px_var(--color-primary)]"></span>
               LIVE TIMING TOWER
             </h2>
           </div>

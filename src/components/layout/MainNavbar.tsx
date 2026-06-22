@@ -34,7 +34,7 @@ export default function MainNavbar() {
       <Link href="/" className="flex items-center gap-4 hover:opacity-90 transition-opacity">
         <div
           style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-background)' }}
-          className="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm shrink-0"
+          className="w-9 h-9 rounded-2xl flex items-center justify-center font-black text-sm shrink-0"
         >
           MN
         </div>

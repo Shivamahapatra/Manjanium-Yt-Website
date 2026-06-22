@@ -37,7 +37,7 @@ export function ChannelsBanner({
       {/* Background gradients and glow */}
       <div className="absolute inset-0 bg-primary/40 backdrop-blur-md z-0" />
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-0" />
-      <div className={cn("absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity z-0 pointer-events-none", accentColor)} />
+      <div className={cn("absolute -top-24 -right-24 w-64 h-64 rounded-2xl blur-3xl opacity-20 group-hover:opacity-40 transition-opacity z-0 pointer-events-none", accentColor)} />
       
       {/* Grid Pattern */}
       <div className="absolute inset-0 opacity-[0.03] z-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, #ffffff 1px, transparent 1px)', backgroundSize: '16px 16px' }} />

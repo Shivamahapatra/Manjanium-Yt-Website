@@ -56,7 +56,7 @@ export function OnboardingModal() {
             {/* Close button */}
             <button
               onClick={dismissModal}
-              className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
+              className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors p-1 rounded-2xl hover:bg-white/10"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />

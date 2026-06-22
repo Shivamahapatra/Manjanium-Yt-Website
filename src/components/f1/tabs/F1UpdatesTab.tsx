@@ -155,7 +155,7 @@ export function F1UpdatesTab() {
                     <div className="flex items-center justify-between mb-3">
                       {item.source && (
                         <span
-                          className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${getSourceColor(
+                          className={`text-xs font-bold px-2.5 py-0.5 rounded-2xl border ${getSourceColor(
                             item.source
                           )}`}
                         >
@@ -184,7 +184,7 @@ export function F1UpdatesTab() {
                         {tags.map((tag) => (
                           <span
                             key={tag}
-                            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${getTagColor(
+                            className={`text-xs font-semibold px-2 py-0.5 rounded-2xl ${getTagColor(
                               tag
                             )}`}
                           >

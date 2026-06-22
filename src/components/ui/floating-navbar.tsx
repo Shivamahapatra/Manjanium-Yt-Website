@@ -58,7 +58,7 @@ export const FloatingNav = ({
         )}
       >
         <div 
-          className="flex items-center justify-center gap-2 rounded-full border-b-[2px] px-3 py-1.5 backdrop-blur-md"
+          className="flex items-center justify-center gap-2 rounded-2xl border-b-[2px] px-3 py-1.5 backdrop-blur-md"
           style={{
             backgroundColor: "rgba(15, 23, 42, 0.8)",
             borderColor: "var(--color-accent)",
@@ -73,7 +73,7 @@ export const FloatingNav = ({
                 key={`link-${idx}`}
                 href={navItem.link}
                 className={cn(
-                  "relative flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-colors group"
+                  "relative flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold transition-colors group"
                 )}
                 style={{
                   color: "var(--color-text)",
@@ -94,7 +94,7 @@ export const FloatingNav = ({
 
           {/* CTA Button */}
           <button 
-            className="relative rounded-full px-5 py-2 text-sm font-bold transition-all hover:scale-105"
+            className="relative rounded-2xl px-5 py-2 text-sm font-bold transition-all hover:scale-105"
             style={{
               backgroundColor: "var(--color-accent)",
               color: "var(--color-primary)",

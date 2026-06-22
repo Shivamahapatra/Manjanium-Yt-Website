@@ -71,7 +71,7 @@ export function StandingsTable({
   if (!teams || teams.length === 0) {
     return (
       <div className="w-full p-12 flex flex-col items-center justify-center bg-neutral-900 border border-neutral-800 rounded-xl shadow-lg">
-        <div className="w-16 h-16 rounded-full bg-neutral-800/50 flex items-center justify-center mb-4">
+        <div className="w-16 h-16 rounded-2xl bg-neutral-800/50 flex items-center justify-center mb-4">
           <ArrowUpDown className="w-8 h-8 text-neutral-500 opacity-50" />
         </div>
         <p className="text-neutral-400 font-medium">No teams available</p>
@@ -128,7 +128,7 @@ export function StandingsTable({
                   {index + 1}
                 </td>
                 <td className="px-4 py-4 font-medium text-neutral-100 flex items-center gap-3">
-                  <div className="w-8 h-8 flex items-center justify-center bg-neutral-950 border border-neutral-800 rounded-full shrink-0 overflow-hidden shadow-sm">
+                  <div className="w-8 h-8 flex items-center justify-center bg-neutral-950 border border-neutral-800 rounded-2xl shrink-0 overflow-hidden shadow-sm">
                     {team.logo ? (
                       <img src={team.logo} alt={team.name} className="w-5 h-5 object-contain" loading="lazy" />
                     ) : team.flag ? (

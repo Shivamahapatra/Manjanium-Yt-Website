@@ -39,8 +39,8 @@ function F1HubContent() {
   return (
     <div className="w-full flex flex-col pt-4 px-4 sm:px-8 max-w-7xl mx-auto z-10 relative pb-32">
       {/* Background glow tailored for F1 */}
-      <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-[150px] pointer-events-none z-0" />
-      <div className="fixed top-1/4 left-1/4 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0" />
+      <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-red-600/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
+      <div className="fixed top-1/4 left-1/4 w-[400px] h-[400px] bg-blue-600/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
 
       {/* ===== TABS CONTENT ===== */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex flex-col relative z-10">

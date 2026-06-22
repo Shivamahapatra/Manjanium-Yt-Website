@@ -167,7 +167,7 @@ export function PlayerStatsModal({
             {/* Header */}
             <div className="flex items-center justify-between p-4 md:p-6 border-b border-neutral-800 bg-neutral-900 shrink-0">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 flex items-center justify-center bg-neutral-950 border border-neutral-800 rounded-full shadow-inner overflow-hidden">
+                <div className="w-12 h-12 flex items-center justify-center bg-neutral-950 border border-neutral-800 rounded-2xl shadow-inner overflow-hidden">
                   {team?.logo ? (
                     <img src={team.logo} alt={team.name} className="w-8 h-8 object-contain" />
                   ) : team?.flag ? (
@@ -181,7 +181,7 @@ export function PlayerStatsModal({
               </div>
               <button 
                 onClick={onClose}
-                className="p-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-full transition-colors"
+                className="p-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-2xl transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -196,7 +196,7 @@ export function PlayerStatsModal({
                   <button
                     key={pos}
                     onClick={() => setFilterPos(pos)}
-                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2
+                    className={`px-4 py-1.5 rounded-2xl text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2
                       ${filterPos === pos 
                         ? 'bg-white text-black' 
                         : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-200'
@@ -204,7 +204,7 @@ export function PlayerStatsModal({
                     `}
                   >
                     {pos !== 'All' && (
-                      <span className={`w-2 h-2 rounded-full ${getPosBadgeColor(pos)}`} />
+                      <span className={`w-2 h-2 rounded-2xl ${getPosBadgeColor(pos)}`} />
                     )}
                     {pos}
                   </button>
@@ -255,9 +255,9 @@ export function PlayerStatsModal({
                           </td>
                           <td className="px-4 py-3 font-medium text-neutral-100 flex items-center gap-3">
                             {player.photo ? (
-                              <img src={player.photo} alt={player.name} className="w-8 h-8 rounded-full object-cover bg-neutral-800" loading="lazy" />
+                              <img src={player.photo} alt={player.name} className="w-8 h-8 rounded-2xl object-cover bg-neutral-800" loading="lazy" />
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-xs text-neutral-500 font-bold">
+                              <div className="w-8 h-8 rounded-2xl bg-neutral-800 flex items-center justify-center text-xs text-neutral-500 font-bold">
                                 {player.name.charAt(0)}
                               </div>
                             )}
@@ -340,7 +340,7 @@ export function PlayerStatsModal({
             {/* Footer */}
             <div className="p-4 border-t border-neutral-800 bg-neutral-900 shrink-0 text-center md:text-left">
               <p className="text-xs text-neutral-500 flex items-center justify-center md:justify-start gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                <span className="w-1.5 h-1.5 rounded-2xl bg-emerald-500 inline-block animate-pulse"></span>
                 Last updated: 1 hour ago
               </p>
             </div>

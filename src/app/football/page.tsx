@@ -87,7 +87,7 @@ function FootballHubContent() {
             <div className="flex items-center gap-2">
               {fixtures[0].fixture?.status?.short === "1H" || fixtures[0].fixture?.status?.short === "2H" ? (
                 <span className="px-2 py-1 bg-error text-white font-bold text-xs rounded flex items-center gap-2 animate-pulse">
-                  <span className="w-2 h-2 rounded-full bg-white"></span> LIVE
+                  <span className="w-2 h-2 rounded-2xl bg-white"></span> LIVE
                 </span>
               ) : (
                 <span className="px-2 py-1 bg-surface-container text-text-primary font-bold text-xs rounded">
@@ -105,7 +105,7 @@ function FootballHubContent() {
                   <h2 className="text-2xl md:text-3xl font-black drop-shadow-md uppercase text-text-primary">{fixtures[0].teams.home.name}</h2>
                   <p className="text-xs font-bold text-text-secondary uppercase">HOME</p>
                 </div>
-                <div className="w-16 h-16 md:w-24 md:h-24 glass-panel rounded-full p-3 flex items-center justify-center">
+                <div className="w-16 h-16 md:w-24 md:h-24 glass-panel rounded-2xl p-3 flex items-center justify-center">
                   <img src={fixtures[0].teams.home.logo} alt="Home" className="w-full h-full object-contain" />
                 </div>
               </div>
@@ -118,7 +118,7 @@ function FootballHubContent() {
               </div>
               
               <div className="flex-1 flex items-center justify-end gap-6">
-                <div className="w-16 h-16 md:w-24 md:h-24 glass-panel rounded-full p-3 flex items-center justify-center">
+                <div className="w-16 h-16 md:w-24 md:h-24 glass-panel rounded-2xl p-3 flex items-center justify-center">
                   <img src={fixtures[0].teams.away.logo} alt="Away" className="w-full h-full object-contain" />
                 </div>
                 <div className="text-left hidden md:block">
@@ -172,7 +172,7 @@ function FootballHubContent() {
                         <div key={match.fixture.id} onClick={() => router.push(`/football/matches/${match.fixture.id}`)} className={`glass-panel p-4 hover-lift cursor-pointer flex items-center justify-between rounded-xl min-h-[88px] ${match.fixture.status.short === '1H' || match.fixture.status.short === '2H' ? 'border-l-4 border-l-primary bg-primary/5' : ''}`}>
                           <div className="flex-1 grid grid-cols-3 items-center">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-surface p-1 border border-border-default flex items-center justify-center">
+                              <div className="w-10 h-10 rounded-2xl bg-surface p-1 border border-border-default flex items-center justify-center">
                                 <img src={match.teams.home.logo} className="w-6 h-6 object-contain" />
                               </div>
                               <span className="font-bold text-sm hidden sm:block uppercase">{match.teams.home.name}</span>
@@ -189,7 +189,7 @@ function FootballHubContent() {
                             </div>
                             <div className="flex items-center gap-3 justify-end">
                               <span className="font-bold text-sm hidden sm:block uppercase">{match.teams.away.name}</span>
-                              <div className="w-10 h-10 rounded-full bg-surface p-1 border border-border-default flex items-center justify-center">
+                              <div className="w-10 h-10 rounded-2xl bg-surface p-1 border border-border-default flex items-center justify-center">
                                 <img src={match.teams.away.logo} className="w-6 h-6 object-contain" />
                               </div>
                             </div>

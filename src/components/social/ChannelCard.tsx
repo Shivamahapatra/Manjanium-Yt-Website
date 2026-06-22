@@ -27,14 +27,14 @@ export function ChannelCard({
       <div className="rounded-2xl h-full w-full p-6 bg-primary/80 backdrop-blur-md border border-border relative z-20 flex flex-col overflow-hidden transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 hover:border-manjanium-gold/50">
         
         {/* Subtle glow effect behind icon */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-manjanium-gold/10 transition-all pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-2xl blur-3xl group-hover:bg-manjanium-gold/10 transition-all pointer-events-none" />
 
         <div className="flex items-center justify-between mb-4 relative z-10">
           <div className={`p-3 rounded-xl bg-white/5 border border-white/10 ${accentColor}`}>
             {icon}
           </div>
           {followers && (
-            <div className="text-xs font-bold text-neutral-400 bg-black/40 px-3 py-1.5 rounded-full border border-white/5">
+            <div className="text-xs font-bold text-neutral-400 bg-black/40 px-3 py-1.5 rounded-2xl border border-white/5">
               {followers}
             </div>
           )}

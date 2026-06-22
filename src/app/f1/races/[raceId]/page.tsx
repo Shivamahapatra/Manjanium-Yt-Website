@@ -23,8 +23,8 @@ export default async function F1RaceDetailsPage({ params }: Props) {
     <div className="min-h-screen bg-neutral-950 text-white flex flex-col pb-20">
       
       {/* Background elements */}
-      <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-red-600/5 rounded-full blur-[150px] pointer-events-none z-0" />
-      <div className="fixed top-1/4 left-1/4 w-[400px] h-[400px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none z-0" />
+      <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-red-600/5 rounded-2xl blur-[150px] pointer-events-none z-0" />
+      <div className="fixed top-1/4 left-1/4 w-[400px] h-[400px] bg-blue-600/5 rounded-2xl blur-[150px] pointer-events-none z-0" />
 
       {/* Header Area */}
       <div className="bg-black/40 border-b border-white/10 pt-8 pb-8 px-4 sm:px-8 relative z-10">
@@ -40,7 +40,7 @@ export default async function F1RaceDetailsPage({ params }: Props) {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3">
-                <div className="w-1.5 h-8 bg-blue-500 rounded-full" />
+                <div className="w-1.5 h-8 bg-blue-500 rounded-2xl" />
                 <h1 className="text-3xl md:text-5xl font-black font-heading tracking-tight drop-shadow-md flex items-center gap-3">
                   Grand Prix Analysis
                 </h1>
@@ -70,7 +70,7 @@ export default async function F1RaceDetailsPage({ params }: Props) {
             <p className="text-neutral-400 mb-6 text-center max-w-md">
               Full race classification, lap-by-lap telemetry, and strategy insights will be available here shortly after the session concludes.
             </p>
-            <div className="text-xs text-blue-400 bg-blue-400/10 border border-blue-400/20 px-4 py-1.5 rounded-full font-bold">
+            <div className="text-xs text-blue-400 bg-blue-400/10 border border-blue-400/20 px-4 py-1.5 rounded-2xl font-bold">
               PAGE UNDER CONSTRUCTION
             </div>
          </div>

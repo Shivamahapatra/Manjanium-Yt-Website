@@ -80,7 +80,7 @@ export function F1ResultsTab() {
               {record.Driver?.givenName} {record.Driver?.familyName}
             </span>
             {hasFastestLap && (
-              <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
+              <div className="w-2 h-2 rounded-2xl bg-purple-500 shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
             )}
           </div>
         );
@@ -527,7 +527,7 @@ export function F1ResultsTab() {
 
         {data?.race && (
           <div className="mb-6 p-4 rounded-xl bg-[#111111] border border-[#1f1f1f] flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center shrink-0">
               <Trophy className="w-6 h-6 text-blue-500" />
             </div>
             <div>

@@ -98,7 +98,7 @@ export function SuggestionPage() {
                 exit={{ opacity: 0, scale: 0.9 }}
                 className="flex flex-col items-center justify-center text-center py-12"
               >
-                <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-6">
+                <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-6">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <h4 className="text-xl font-bold text-white mb-2">Thank you!</h4>
@@ -183,7 +183,7 @@ export function SuggestionPage() {
                   className="w-full py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all bg-[#fbbf24] text-black hover:bg-[#fbbf24]/90 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
-                    <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-2xl animate-spin" />
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
@@ -210,7 +210,7 @@ export function SuggestionPage() {
                       {getTypeIcon(fb.type)}
                       <span className="text-xs font-mono text-[#94a3b8]">{fb.id}</span>
                     </div>
-                    <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider", getStatusColor(fb.status))}>
+                    <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-2xl border uppercase tracking-wider", getStatusColor(fb.status))}>
                       {fb.status}
                     </span>
                   </div>

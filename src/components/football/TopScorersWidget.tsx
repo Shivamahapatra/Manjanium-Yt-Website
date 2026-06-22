@@ -97,7 +97,7 @@ export function TopScorersWidget({
         <h2 className={`font-bold text-white flex items-center gap-2 ${isCompact ? 'text-lg' : 'text-xl md:text-2xl'}`}>
           <span>🏆</span> Top Scorers
         </h2>
-        <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-medium bg-neutral-950 px-3 py-1.5 rounded-full border border-neutral-800/50">
+        <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-medium bg-neutral-950 px-3 py-1.5 rounded-2xl border border-neutral-800/50">
           <Clock className="w-3.5 h-3.5 text-emerald-500" />
           <span>Updated: {getRelativeTime(lastUpdated)}</span>
         </div>
@@ -132,7 +132,7 @@ export function TopScorersWidget({
                   {/* Player Info */}
                   <div className="flex items-center flex-1 min-w-0 gap-3 md:gap-4">
                     {!isCompact && (
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden shrink-0 bg-neutral-800 border border-neutral-700/50">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl overflow-hidden shrink-0 bg-neutral-800 border border-neutral-700/50">
                         {player.photo ? (
                           <img src={player.photo} alt={player.name} className="w-full h-full object-cover" loading="lazy" />
                         ) : (
@@ -157,7 +157,7 @@ export function TopScorersWidget({
                           <span className="truncate">{player.teamName || 'Unknown Team'}</span>
                           {player.position && (
                             <>
-                              <span className="w-1 h-1 rounded-full bg-neutral-700 mx-1"></span>
+                              <span className="w-1 h-1 rounded-2xl bg-neutral-700 mx-1"></span>
                               <span className="font-mono text-[10px] uppercase text-neutral-500">{player.position}</span>
                             </>
                           )}

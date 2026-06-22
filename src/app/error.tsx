@@ -25,7 +25,7 @@ export default function GlobalError({
         transition={{ duration: 0.5 }}
         className="flex flex-col items-center max-w-lg"
       >
-        <div className="w-24 h-24 mb-8 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
+        <div className="w-24 h-24 mb-8 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
           <AlertCircle className="w-12 h-12" />
         </div>
         

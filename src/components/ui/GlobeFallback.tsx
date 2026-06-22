@@ -83,15 +83,15 @@ export function GlobeFallback({
       {/* Styled Icon Header based on Error State */}
       <div className="mb-4 relative z-10">
         {errorType === "offline" ? (
-          <div className="p-3 bg-amber-500/15 text-amber-500 rounded-full border border-amber-500/30 inline-block animate-pulse">
+          <div className="p-3 bg-amber-500/15 text-amber-500 rounded-2xl border border-amber-500/30 inline-block animate-pulse">
             <WifiOff className="w-8 h-8" />
           </div>
         ) : errorType === "webgl_unsupported" ? (
-          <div className="p-3 bg-red-500/15 text-red-500 rounded-full border border-red-500/30 inline-block">
+          <div className="p-3 bg-red-500/15 text-red-500 rounded-2xl border border-red-500/30 inline-block">
             <Cpu className="w-8 h-8" />
           </div>
         ) : (
-          <div className="p-3 bg-red-500/15 text-red-500 rounded-full border border-red-500/30 inline-block">
+          <div className="p-3 bg-red-500/15 text-red-500 rounded-2xl border border-red-500/30 inline-block">
             <AlertCircle className="w-8 h-8" />
           </div>
         )}

@@ -123,7 +123,7 @@ export function MatchDetailsModal({ matchId, isLive, onClose }: MatchDetailsModa
           
           <button 
             onClick={onClose}
-            className="absolute -top-2 right-0 md:-right-4 p-2 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-full transition-colors"
+            className="absolute -top-2 right-0 md:-right-4 p-2 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-2xl transition-colors"
           >
             <X className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
           </button>
@@ -136,7 +136,7 @@ export function MatchDetailsModal({ matchId, isLive, onClose }: MatchDetailsModa
                   transition={{ repeat: Infinity, duration: 1.5 }}
                   className="bg-red-500 text-white px-3 py-1 rounded-md text-xs font-bold flex items-center gap-2 shadow-sm"
                 >
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <div className="w-2 h-2 bg-white rounded-2xl"></div>
                   LIVE {match.elapsedTime > 0 ? `${match.elapsedTime}'` : ''}
                 </motion.div>
               ) : (

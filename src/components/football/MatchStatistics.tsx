@@ -133,7 +133,7 @@ export function MatchStatistics({
         </div>
 
         {/* Dual Progress Bar */}
-        <div className="flex h-2.5 md:h-3 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800 gap-1 shadow-inner">
+        <div className="flex h-2.5 md:h-3 rounded-2xl overflow-hidden bg-neutral-200 dark:bg-neutral-800 gap-1 shadow-inner">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${homePct}%` }}

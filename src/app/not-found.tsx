@@ -17,7 +17,7 @@ export default function NotFound() {
         transition={{ duration: 0.5 }}
         className="flex flex-col items-center max-w-lg"
       >
-        <div className="w-24 h-24 mb-8 bg-manjanium-gold/10 text-manjanium-gold rounded-full flex items-center justify-center border border-manjanium-gold/20 shadow-[0_0_30px_rgba(251,191,36,0.15)]">
+        <div className="w-24 h-24 mb-8 bg-manjanium-gold/10 text-manjanium-gold rounded-2xl flex items-center justify-center border border-manjanium-gold/20 shadow-[0_0_30px_rgba(251,191,36,0.15)]">
           <AlertTriangle className="w-12 h-12" />
         </div>
         

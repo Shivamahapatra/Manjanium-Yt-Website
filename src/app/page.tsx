@@ -18,6 +18,7 @@ import Link from "next/link";
 import { ChannelsGrid } from "@/components/social/ChannelsGrid";
 import { Activity, BarChart2, Trophy, Calendar, Rss, MapPin } from "lucide-react";
 import { Terminal } from "@/components/ui/terminal";
+import SideRays from "@/components/ui/SideRays";
 
 // --- HOVER EFFECT COMPONENT ---
 const FeaturesHoverEffect = ({ items }: { items: any[] }) => {
@@ -283,6 +284,23 @@ export default function HomePage() {
       <div className="relative">
         <AuroraBackground showRadialGradient className="min-h-screen w-full relative pb-20 pt-10 lg:pt-0 bg-transparent">
           
+          {/* Side Rays Effect */}
+          <div className="absolute inset-0 pointer-events-none z-0">
+            <SideRays
+              speed={1.8}
+              rayColor1="#E10600"
+              rayColor2="#3671C6"
+              intensity={1.2}
+              spread={1.8}
+              origin="top-right"
+              tilt={0}
+              saturation={1.2}
+              blend={0.5}
+              falloff={2.0}
+              opacity={0.6}
+            />
+          </div>
+
           <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-16 min-h-screen w-full relative z-10 pt-20 lg:pt-0">
             {/* Hero Left Text Column */}
             <div className="flex flex-col gap-8 items-center lg:items-start text-center lg:text-left max-w-2xl">

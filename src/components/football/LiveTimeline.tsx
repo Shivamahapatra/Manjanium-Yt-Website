@@ -95,7 +95,7 @@ export function LiveTimeline({
             <motion.div 
               animate={{ opacity: [1, 0.5, 1] }} 
               transition={{ repeat: Infinity, duration: 1.5 }}
-              className="w-2 h-2 rounded-full bg-red-500"
+              className="w-2 h-2 rounded-2xl bg-red-500"
             />
             LIVE {currentMinute > 0 && `${currentMinute}'`}
           </div>
@@ -134,7 +134,7 @@ export function LiveTimeline({
                           onClick={() => onEventClick(evt)}
                         >
                           {/* Node on the line */}
-                          <div className={`absolute -left-[35px] md:-left-[43px] top-1.5 w-6 h-6 rounded-full flex items-center justify-center ring-4 ring-white dark:ring-neutral-900 shadow-sm ${bgColor}`}>
+                          <div className={`absolute -left-[35px] md:-left-[43px] top-1.5 w-6 h-6 rounded-2xl flex items-center justify-center ring-4 ring-white dark:ring-neutral-900 shadow-sm ${bgColor}`}>
                             {icon}
                           </div>
 

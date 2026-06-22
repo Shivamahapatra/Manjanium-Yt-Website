@@ -53,7 +53,7 @@ function StintBar({ stints, currentLap, totalLaps }: { stints: any[]; currentLap
   return (
     <div className="relative w-full h-8 flex items-center">
       {/* Timeline background track */}
-      <div className="absolute left-0 right-0 h-1.5 bg-neutral-800 rounded-full" />
+      <div className="absolute left-0 right-0 h-1.5 bg-neutral-800 rounded-2xl" />
       
       {/* Stints segments */}
       {stints.map((st, idx) => {
@@ -108,7 +108,7 @@ function StintBar({ stints, currentLap, totalLaps }: { stints: any[]; currentLap
       {/* Current lap indicator */}
       {currentLap > 0 && (
         <div
-          className="absolute w-2.5 h-2.5 rounded-full bg-white border border-black shadow-[0_0_4px_rgba(255,255,255,0.8)] z-20"
+          className="absolute w-2.5 h-2.5 rounded-2xl bg-white border border-black shadow-[0_0_4px_rgba(255,255,255,0.8)] z-20"
           style={{ left: `${Math.max(0, Math.min(100, (currentLap / displayTotalLaps) * 100))}%` }}
           title={`Current Lap: ${currentLap}`}
         />
@@ -335,8 +335,8 @@ export function LiveTimingTower() {
           }`}>
             {isRace && (
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-2xl bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-2xl h-2 w-2 bg-red-500"></span>
               </span>
             )}
             {sessionName} — {sessionInfo?.circuit_short_name || sessionInfo?.country_name}
@@ -535,7 +535,7 @@ export function LiveTimingTower() {
                             <td className="pr-4">
                               <div className="flex items-center gap-2">
                                 {/* Compound Icon */}
-                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black border ${
+                                <span className={`w-6 h-6 rounded-2xl flex items-center justify-center text-xs font-black border ${
                                   drv.tireCompound === 'S' ? 'bg-red-600 text-white border-red-500' :
                                   drv.tireCompound === 'M' ? 'bg-yellow-500 text-black border-yellow-400' :
                                   drv.tireCompound === 'H' ? 'bg-neutral-100 text-black border-neutral-300' :
@@ -613,7 +613,7 @@ export function LiveTimingTower() {
                             {/* Compound details */}
                             <td>
                               <div className="flex items-center gap-2">
-                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black border ${
+                                <span className={`w-6 h-6 rounded-2xl flex items-center justify-center text-xs font-black border ${
                                   drv.tireCompound === 'S' ? 'bg-red-600 text-white border-red-500' :
                                   drv.tireCompound === 'M' ? 'bg-yellow-500 text-black border-yellow-400' :
                                   drv.tireCompound === 'H' ? 'bg-neutral-100 text-black border-neutral-300' :

@@ -808,7 +808,7 @@ export const Globe = React.memo(function Globe({
             />
           )
         ) : !isInViewport || isLoading || !worldData ? (
-          <div className={`absolute inset-0 rounded-full animate-pulse border flex flex-col items-center justify-center gap-2 ${
+          <div className={`absolute inset-0 rounded-2xl animate-pulse border flex flex-col items-center justify-center gap-2 ${
             resolvedTheme === "light"
               ? "bg-neutral-50/60 border-neutral-200"
               : "bg-neutral-900/40 border-neutral-850"

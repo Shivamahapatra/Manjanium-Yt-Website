@@ -140,12 +140,12 @@ export function TeamLineup({ team, isHomeTeam, highlightedPlayerId, onPlayerClic
                 onClick={() => onPlayerClick(player)}
               >
                 {/* Player Circle */}
-                <div className={`relative w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white font-bold text-xs md:text-sm border-2 shadow-lg transition-colors
+                <div className={`relative w-8 h-8 md:w-10 md:h-10 rounded-2xl flex items-center justify-center text-white font-bold text-xs md:text-sm border-2 shadow-lg transition-colors
                   ${isHomeTeam ? 'bg-blue-600 border-blue-400 group-hover:bg-blue-500' : 'bg-red-600 border-red-400 group-hover:bg-red-500'}
                   ${isHighlighted ? 'ring-4 ring-yellow-400' : ''}
                 `}>
                   {player.photo ? (
-                    <img src={player.photo} alt={player.name} className="w-full h-full rounded-full object-cover" />
+                    <img src={player.photo} alt={player.name} className="w-full h-full rounded-2xl object-cover" />
                   ) : (
                     player.number
                   )}
@@ -159,7 +159,7 @@ export function TeamLineup({ team, isHomeTeam, highlightedPlayerId, onPlayerClic
 
                   {/* Substituted Indicator */}
                   {player.isSubstituted && (
-                    <div className="absolute -bottom-1 -right-1 bg-neutral-900 rounded-full p-0.5 border border-neutral-700">
+                    <div className="absolute -bottom-1 -right-1 bg-neutral-900 rounded-2xl p-0.5 border border-neutral-700">
                       <ArrowRight className="w-3 h-3 text-red-400" />
                     </div>
                   )}
@@ -201,7 +201,7 @@ export function TeamLineup({ team, isHomeTeam, highlightedPlayerId, onPlayerClic
                 }
               `}
             >
-              <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-xs font-bold text-neutral-500 shrink-0">
+              <div className="w-8 h-8 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-xs font-bold text-neutral-500 shrink-0">
                 {sub.number}
               </div>
               <div className="flex flex-col">

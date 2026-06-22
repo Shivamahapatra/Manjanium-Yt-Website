@@ -54,10 +54,10 @@ export function LiveChatMarquee({
         >
           <div className="relative">
             <span className="absolute -top-1 -right-1 flex h-4 w-4">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-white dark:border-neutral-900"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-2xl bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-2xl h-4 w-4 bg-red-500 border-2 border-white dark:border-neutral-900"></span>
             </span>
-            <div className="bg-blue-600 p-4 rounded-full shadow-lg hover:bg-blue-500 transition">
+            <div className="bg-blue-600 p-4 rounded-2xl shadow-lg hover:bg-blue-500 transition">
               <IconMessageCircle className="text-white w-6 h-6" />
             </div>
           </div>

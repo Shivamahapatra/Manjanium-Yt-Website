@@ -122,7 +122,7 @@ export function MatchDetailsClient({ matchId }: MatchDetailsClientProps) {
                   transition={{ repeat: Infinity, duration: 1.5 }}
                   className="bg-red-500 text-white px-3 py-1 rounded-md text-xs font-bold flex items-center gap-2 shadow-sm"
                 >
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <div className="w-2 h-2 bg-white rounded-2xl"></div>
                   LIVE {match.elapsedTime > 0 ? `${match.elapsedTime}'` : ''}
                 </motion.div>
               ) : (

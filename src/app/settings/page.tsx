@@ -41,7 +41,7 @@ export default function SettingsPage() {
     if (!isSignedIn && activeTab !== "about") {
       return (
         <div className="flex flex-col items-center justify-center h-full p-8 text-center max-w-md mx-auto">
-          <div className="w-16 h-16 bg-surface rounded-full flex items-center justify-center mb-6 shadow-sm border border-border-color">
+          <div className="w-16 h-16 bg-surface rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-border-color">
             <Lock className="w-8 h-8 text-text-secondary" />
           </div>
           <h2 className="text-2xl font-bold text-text-primary mb-2">Sign in to customize</h2>

@@ -153,7 +153,7 @@ export function F1CalendarTab() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-blue-900/40 to-[#0a0a0a] border border-blue-500/30 relative overflow-hidden shadow-[0_0_30px_rgba(59,130,246,0.15)]"
           >
-            <div className="absolute -right-20 -top-20 w-64 h-64 bg-blue-500/10 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute -right-20 -top-20 w-64 h-64 bg-blue-500/10 blur-3xl rounded-2xl pointer-events-none" />
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
                 <Tag color="blue" className="mb-2 border-none font-bold">

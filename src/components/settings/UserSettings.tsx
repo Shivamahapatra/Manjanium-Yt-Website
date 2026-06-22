@@ -53,11 +53,11 @@ export function UserSettingsComponent() {
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 mt-0.5 border-2"
+        className="relative inline-flex h-6 w-11 items-center rounded-2xl transition-colors duration-200 shrink-0 mt-0.5 border-2"
         style={toggleStyle(checked)}
       >
         <span
-          className="inline-block h-4 w-4 transform rounded-full transition-transform duration-200"
+          className="inline-block h-4 w-4 transform rounded-2xl transition-transform duration-200"
           style={{
             backgroundColor: checked ? 'var(--color-background)' : 'var(--color-text-secondary)',
             transform: checked ? 'translateX(20px)' : 'translateX(2px)',

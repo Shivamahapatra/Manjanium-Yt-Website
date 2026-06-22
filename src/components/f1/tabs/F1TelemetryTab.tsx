@@ -273,7 +273,7 @@ export function F1TelemetryTab() {
               </label>
               <div className="flex items-center gap-2">
                 <div
-                  className="w-3 h-3 rounded-full shrink-0"
+                  className="w-3 h-3 rounded-2xl shrink-0"
                   style={{ backgroundColor: d1Color }}
                 />
                 <select
@@ -300,7 +300,7 @@ export function F1TelemetryTab() {
               </label>
               <div className="flex items-center gap-2">
                 <div
-                  className="w-3 h-3 rounded-full shrink-0"
+                  className="w-3 h-3 rounded-2xl shrink-0"
                   style={{ backgroundColor: d2Color }}
                 />
                 <select
