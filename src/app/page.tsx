@@ -19,6 +19,7 @@ import { ChannelsGrid } from "@/components/social/ChannelsGrid";
 import { Activity, BarChart2, Trophy, Calendar, Rss, MapPin } from "lucide-react";
 import { Terminal } from "@/components/ui/terminal";
 import SideRays from "@/components/ui/SideRays";
+import Ferrofluid from "@/components/ui/Ferrofluid";
 
 // --- HOVER EFFECT COMPONENT ---
 const FeaturesHoverEffect = ({ items }: { items: any[] }) => {
@@ -456,9 +457,27 @@ export default function HomePage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8 }}
-          className="w-full bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm dark:shadow-2xl rounded-3xl p-8 md:p-12 relative z-10 mb-12"
-        >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          className="w-full bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm dark:shadow-2xl rounded-3xl p-8 md:p-12 relative z-10 mb-12 overflow-hidden"
+      >
+        <div className="absolute inset-0 z-0 opacity-40 mix-blend-screen pointer-events-none">
+          <Ferrofluid
+            colors={["#22c55e", "#16a34a", "#15803d"]}
+            speed={0.4}
+            scale={1.2}
+            turbulence={1.5}
+            fluidity={0.2}
+            rimWidth={0.3}
+            sharpness={2}
+            shimmer={1}
+            glow={1.5}
+            flowDirection="right"
+            opacity={1}
+            mouseInteraction={true}
+            mouseStrength={1}
+            mouseRadius={0.3}
+          />
+        </div>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
             <div className="text-center md:text-left">
               <h2 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-zinc-50 mb-3 flex items-center justify-center md:justify-start gap-3">
                 <span className="text-2xl">⚽</span> FIFA World Cup 2026
