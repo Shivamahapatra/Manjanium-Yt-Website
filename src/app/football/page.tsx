@@ -77,7 +77,7 @@ function FootballHubContent() {
   const topScorers = standingsData?.groups ? getTopScorers(standingsData.groups, 10) : [];
 
   return (
-    <div className="w-full flex flex-col pt-4 px-4 sm:px-8 max-w-7xl mx-auto z-10 relative pb-24 animate-fade-in-up">
+    <div className="w-full flex flex-col pt-4 px-4 sm:px-8 max-w-[1600px] mx-auto lg:pr-[400px] z-10 relative pb-24 animate-fade-in-up">
       
       {/* Featured Match Hero from Stitch */}
       {fixtures.length > 0 && activeTab === 'live' && (

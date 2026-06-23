@@ -243,7 +243,7 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
 
   return (
     <div className="w-full relative animate-fade-in-up">
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 w-full max-w-[1600px] mx-auto pb-10">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 w-full max-w-[1800px] px-4 lg:pl-8 lg:pr-[400px] pb-10">
         
         {/* Live Timing Tower */}
         <section className={`md:col-span-12 ${layout.timingTowerCols} flex flex-col gap-4 ${layout.timingTowerClass}`}>
@@ -292,7 +292,7 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
         <TerminalChat context="f1" />
       </div>
 
-      <div className="mt-8 space-y-8">
+      <div className="mt-8 space-y-8 max-w-[1800px] px-4 lg:pl-8 lg:pr-[400px]">
         <div className={`glass-panel rounded-xl p-4 md:p-6 ${layout.telemetryChartsClass}`}>
           <h3 className="text-xl font-bold uppercase mb-4 text-primary tracking-wider">Live Telemetry</h3>
           <F1TelemetryTab />

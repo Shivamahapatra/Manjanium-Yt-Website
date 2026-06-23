@@ -190,7 +190,7 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
   };
 
   return (
-    <div className={`fixed bottom-6 right-6 z-50 flex flex-col items-end ${className}`}>
+    <div className={`fixed top-24 right-6 z-50 flex flex-col items-end ${className}`}>
       <AnimatePresence>
         {!isExpanded && (
           <motion.button
@@ -208,10 +208,10 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
       <AnimatePresence>
         {isExpanded && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="flex flex-col w-[320px] sm:w-[400px] bg-black/90 border border-primary/20 rounded-xl overflow-hidden font-mono text-xs sm:text-sm shadow-[0_0_25px_rgba(var(--color-primary),0.3)] origin-bottom-right"
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="flex flex-col w-[320px] sm:w-[400px] bg-black/90 border border-primary/20 rounded-xl overflow-hidden font-mono text-xs sm:text-sm shadow-[0_0_25px_rgba(var(--color-primary),0.3)] origin-top-right"
           >
             <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 border-b border-primary/20 text-primary cursor-pointer" onClick={() => setIsExpanded(false)}>
               <Terminal className="w-4 h-4" />
