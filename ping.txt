@@ -2,15 +2,22 @@ This is a placeholder file added to allow pushing to origin.
 Revert 1
 Revert 2
 
---- Update: Terminal Chat Integration (2026-06-23T15:43:43+05:30) ---
+--- Update: Terminal Chat Integration (2026-06-23T15:02:14+05:30) ---
 Changes made:
 - Created TerminalChat.tsx in src/components/chat/TerminalChat.tsx with Clerk user integration and Supabase real-time subscriptions for the 'terminal_chats' table.
 - Added a command palette accessible via '/' featuring /predict, /stats, /compare, /help.
-- Integrated the TerminalChat inline into F1LiveTab.tsx and football/page.tsx.
+- Integrated the TerminalChat inline into F1LiveTab.tsx.
+- Integrated the TerminalChat inline into Football page.tsx.
+- Updated PRD (Stitch UIUX/V2/project_prd_manjanium_on_softs.md) to include Manjanium OS Terminal Chat feature.
+Context:
+- The Manjanium OS Terminal Chat feature is now live on both F1 and Football Live tabs.
+- Ready for active testing with Supabase table 'terminal_chats'.
+
+--- Update: Terminal Sidebar Design (2026-06-23T15:43:43+05:30) ---
+Changes made:
 - CONVERTED Terminal Chat into a permanent, vertical right sidebar (`fixed top-24 right-4 h-[calc(100vh-110px)]`).
 - Styled the chat to be sleek, glassmorphic (`bg-[#0a0a0a]/95`), with no fake macOS buttons (pure text header).
 - Removed all fake/mock System Data generating intervals.
 - Used React Portal `createPortal` to break the sidebar out of all CSS transform containers.
 Context:
 - The Manjanium OS Terminal Chat feature is live as a dedicated vertical sidebar on the right side.
-- Ready for active testing with Supabase table 'terminal_chats'.
