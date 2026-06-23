@@ -1,29 +1,29 @@
 :root {
-  /* Colors */
-  --accent: #FBBF24;
-  --surface: #131313;
-  --on-surface: #FFFFFF;
-  --secondary: #0EA5E9;
-  --success: #10B981;
-  --alert: #EF4444;
-  --border: #333333;
-  --muted: #6B7280;
-  --surface-alt: #1F2937;
+  /* Colors - Circuit Dark Theme */
+  --f1-accent: #FBBF24;
+  --f1-surface: #131313;
+  --f1-surface-alt: #1F2937;
+  --f1-on-surface: #FFFFFF;
+  --f1-secondary: #0EA5E9;
+  --f1-success: #10B981;
+  --f1-alert: #EF4444;
+  --f1-border: #333333;
+  --f1-muted: #6B7280;
 
   /* Typography */
-  --font-heading: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --f1-font-heading: 'Space Grotesk', sans-serif;
+  --f1-font-body: 'Inter', sans-serif;
 
   /* Spacing */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
+  --f1-space-xs: 4px;
+  --f1-space-sm: 8px;
+  --f1-space-md: 16px;
+  --f1-space-lg: 24px;
+  --f1-space-xl: 32px;
 
   /* Border Radius */
-  --radius-lg: 12px;
+  --f1-radius: 12px;
 
   /* Transitions */
-  --transition: 300ms ease-in-out;
+  --f1-transition: 300ms ease-in-out;
 }
