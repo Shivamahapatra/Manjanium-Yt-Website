@@ -4,10 +4,10 @@
 
 Whenever you begin a task, and whenever you complete a task or make changes to the codebase, you are strictly required to execute the following steps in order:
 
-0. **Read Context Tracker First**: Before making any changes or proposing a plan, you MUST read `ping.txt` to understand the previous agent's context, progress, and open issues.
+1. **Read Context Tracker First**: Before making any changes or proposing a plan, you MUST read `ping.txt` to understand the previous agent's context, progress, and open issues.
 
-1. **Verify with Build**: Run `npm run build` to verify there are no compilation or type errors. Fix any errors before proceeding.
-2. **Update Context Tracker**: You MUST update `ping.txt` in the root directory to log your work. 
+2. **Verify with Build**: Run `npm run build` to verify there are no compilation or type errors. Fix any errors before proceeding.
+3. **Update Context Tracker**: You MUST update `ping.txt` in the root directory to log your work. 
    - **DO NOT** delete or overwrite the historical context in `ping.txt`. 
    - Append a new section at the very bottom using this exact format:
      ```
@@ -18,9 +18,11 @@ Whenever you begin a task, and whenever you complete a task or make changes to t
      Context:
      - [Any relevant state, open issues, or things the next agent should know]
      ```
-3. **Commit and Push**: Once the build passes and `ping.txt` is updated, run the following commands to save and push your work:
+4. **Commit and Push**: Once the build passes and `ping.txt` is updated, run the following commands to save and push your work:
    - `git add .`
    - `git commit -m "feat/fix/docs: [Brief description of changes]"`
    - `git push`
+
+5. **Maintain Functionality**: Ensure that your changes DO NOT break any existing features, layouts, or API endpoints. Always double-check API routes and types when modifying data structures.
 
 Failure to run the build, overwriting historical context in `ping.txt`, or forgetting to push are unacceptable.
