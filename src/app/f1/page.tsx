@@ -82,12 +82,12 @@ function F1HubContent() {
           </TabsContent>
 
           {/* ----- TELEMETRY ----- */}
-          <TabsContent value="telemetry" className={`mt-0 outline-none ${presetLayout.telemetryChartsClass}`}>
+          <TabsContent value="telemetry" className="mt-0 outline-none">
             {activeTab === 'telemetry' && <F1TelemetryTab />}
           </TabsContent>
 
           {/* ----- STANDINGS ----- */}
-          <TabsContent value="standings" className={`mt-0 outline-none ${presetLayout.standingsClass}`}>
+          <TabsContent value="standings" className="mt-0 outline-none">
             {activeTab === 'standings' && <F1StandingsTab />}
           </TabsContent>
 
