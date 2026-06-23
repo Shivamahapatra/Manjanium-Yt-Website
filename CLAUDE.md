@@ -2,7 +2,9 @@
 
 **CRITICAL WORKFLOW RULES - YOU MUST FOLLOW THESE STEPS FOR EVERY TASK:**
 
-Whenever you complete a task or make changes to the codebase, you are strictly required to execute the following steps in order before ending your turn:
+Whenever you begin a task, and whenever you complete a task or make changes to the codebase, you are strictly required to execute the following steps in order:
+
+0. **Read Context Tracker First**: Before making any changes or proposing a plan, you MUST read `ping.txt` to understand the previous agent's context, progress, and open issues.
 
 1. **Verify with Build**: Run `npm run build` to verify there are no compilation or type errors. Fix any errors before proceeding.
 2. **Update Context Tracker**: You MUST update `ping.txt` in the root directory to log your work. 
