@@ -18,6 +18,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { getTeamColor, formatGap } from '@/lib/f1-helpers';
+import { F1Card } from '@/components/f1/F1Card';
 
 // Helper to format lap time in seconds (e.g. 82.105) to m:ss.xxx
 function formatLapTimeSecs(secs: number | null | undefined): string {
@@ -323,7 +324,7 @@ export function LiveTimingTower() {
   }
 
   return (
-    <div className="w-full bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl shadow-2xl p-6 overflow-hidden select-none">
+    <F1Card className="w-full overflow-hidden select-none p-0 border-0 bg-transparent lg:border lg:bg-[#131313]">
       {/* Session Pill & Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-[#1f1f1f] pb-4">
         <div className="flex items-center gap-3">
@@ -761,6 +762,6 @@ export function LiveTimingTower() {
           </motion.div>
         </AnimatePresence>
       </div>
-    </div>
+    </F1Card>
   );
 }

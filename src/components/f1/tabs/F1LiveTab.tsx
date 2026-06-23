@@ -11,6 +11,7 @@ import { F1_PRESETS, F1PresetKey } from "@/lib/dashboard-presets";
 import { F1TelemetryTab } from "@/components/f1/tabs/F1TelemetryTab";
 import { F1StandingsTab } from "@/components/f1/tabs/F1StandingsTab";
 import { TerminalChat } from "@/components/chat/TerminalChat";
+import { F1Card } from "@/components/f1/F1Card";
 
 // Dynamic import for the 3D Live focus Globe
 const Globe = dynamic(
@@ -75,28 +76,30 @@ function WeatherWidget({ sessionKey }: { sessionKey: string }) {
   if (loading || !weatherData) return <div className="glass-panel p-4 rounded-xl flex items-center justify-center min-h-[100px]"><Spin size="small" /></div>;
 
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <div className="glass-panel p-4 rounded-xl flex flex-col gap-2 hover-lift">
-        <span className="font-bold text-xs uppercase text-text-primary opacity-80">AIR TEMP</span>
-        <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-bold">{weatherData.air_temperature}</span>
-          <span className="text-sm">°C</span>
+    <F1Card title="Weather">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-[#1F2937] p-4 rounded-xl flex flex-col gap-2 transition-all hover:border-[#FBBF24]">
+          <span className="font-bold text-xs uppercase text-[#6B7280]">AIR TEMP</span>
+          <div className="flex items-baseline gap-1">
+            <span className="text-3xl font-bold text-white">{weatherData.air_temperature}</span>
+            <span className="text-sm text-[#6B7280]">°C</span>
+          </div>
+          <div className="w-full bg-[#333333] h-1.5 rounded-2xl overflow-hidden">
+            <div className="bg-[#FBBF24] h-full transition-all" style={{ width: `${Math.min(weatherData.air_temperature * 2, 100)}%` }} />
+          </div>
         </div>
-        <div className="w-full bg-surface-container h-1.5 rounded-2xl overflow-hidden">
-          <div className="bg-primary h-full transition-all" style={{ width: `${Math.min(weatherData.air_temperature * 2, 100)}%` }} />
+        <div className="bg-[#1F2937] p-4 rounded-xl flex flex-col gap-2 transition-all hover:border-[#FBBF24]">
+          <span className="font-bold text-xs uppercase text-[#6B7280]">TRACK TEMP</span>
+          <div className="flex items-baseline gap-1">
+            <span className="text-3xl font-bold text-white">{weatherData.track_temperature}</span>
+            <span className="text-sm text-[#6B7280]">°C</span>
+          </div>
+          <div className="w-full bg-[#333333] h-1.5 rounded-2xl overflow-hidden">
+            <div className="bg-[#0EA5E9] h-full transition-all" style={{ width: `${Math.min(weatherData.track_temperature * 1.5, 100)}%` }} />
+          </div>
         </div>
       </div>
-      <div className="glass-panel p-4 rounded-xl flex flex-col gap-2 hover-lift">
-        <span className="font-bold text-xs uppercase text-text-primary opacity-80">TRACK TEMP</span>
-        <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-bold">{weatherData.track_temperature}</span>
-          <span className="text-sm">°C</span>
-        </div>
-        <div className="w-full bg-surface-container h-1.5 rounded-2xl overflow-hidden">
-          <div className="bg-secondary h-full transition-all" style={{ width: `${Math.min(weatherData.track_temperature * 1.5, 100)}%` }} />
-        </div>
-      </div>
-    </div>
+    </F1Card>
   );
 }
 
@@ -120,11 +123,7 @@ function RaceControlFeed({ sessionKey }: { sessionKey: string }) {
   }, [sessionKey]);
 
   return (
-    <div className="h-full glass-panel rounded-xl overflow-hidden flex flex-col p-4">
-      <div className="flex items-center gap-2 border-b border-border-default pb-3 mb-3">
-        <span className="material-symbols-outlined text-primary text-[18px]">flag</span>
-        <h4 className="font-bold uppercase tracking-widest text-sm text-text-primary">Race Control</h4>
-      </div>
+    <F1Card title="Race Control" className="h-full flex flex-col overflow-hidden">
       <div className="flex-1 overflow-y-auto space-y-3 pr-1" style={{ scrollbarWidth: 'none' }}>
         {messages.length === 0 ? (
           <div className="text-text-secondary text-sm opacity-50">No messages</div>
@@ -140,7 +139,7 @@ function RaceControlFeed({ sessionKey }: { sessionKey: string }) {
           ))
         )}
       </div>
-    </div>
+    </F1Card>
   );
 }
 
@@ -166,13 +165,13 @@ function TeamRadioPanel({ sessionKey }: { sessionKey: string }) {
   return (
     <>
       {radioMsgs.map((msg, idx) => (
-        <div key={idx} className="glass-panel p-4 rounded-xl flex flex-col gap-2 hover-lift">
+        <F1Card key={idx} className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">volume_up</span>
-            <span className="text-xs font-bold uppercase text-text-primary">CAR #{msg.driver_number}</span>
+            <span className="material-symbols-outlined text-[#FBBF24]">volume_up</span>
+            <span className="text-xs font-bold uppercase text-white">CAR #{msg.driver_number}</span>
           </div>
           <audio src={msg.recording_url} controls className="w-full h-8 scale-90 origin-left" />
-        </div>
+        </F1Card>
       ))}
     </>
   );
@@ -260,19 +259,19 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
 
         {/* Center Section: Globe & Weather */}
         <section className={`md:col-span-12 ${layout.mainGridCols} flex flex-col gap-6`}>
-          <div className={`relative h-[300px] md:h-[400px] glass-panel rounded-xl overflow-hidden flex items-center justify-center border-border-default ${layout.circuitFocusClass}`}>
+          <F1Card className={`relative h-[300px] md:h-[400px] overflow-hidden flex items-center justify-center p-0 border-border-default ${layout.circuitFocusClass}`}>
              <Globe globeConfig={globeConfig} data={globeArcs} />
              <div className="absolute top-6 left-6 z-10 pointer-events-none">
-                <h3 className="text-xs font-bold uppercase text-primary mb-1 tracking-widest">GLOBAL RACE TRACKER</h3>
-                <p className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-text-primary drop-shadow-md">
+                <h3 className="text-xs font-bold uppercase text-[#FBBF24] mb-1 tracking-widest">GLOBAL RACE TRACKER</h3>
+                <p className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white drop-shadow-md">
                    {currentVenue ? currentVenue.raceName : "AWAITING RACE"}
                 </p>
              </div>
              <div className="absolute bottom-6 right-6 text-right z-10 pointer-events-none">
-                <span className="text-xs text-text-secondary uppercase font-bold tracking-widest block mb-1">LOCAL TIME</span>
-                <span className="text-2xl text-primary font-mono font-bold drop-shadow-md">{localTime || "--:--:--"}</span>
+                <span className="text-xs text-[#6B7280] uppercase font-bold tracking-widest block mb-1">LOCAL TIME</span>
+                <span className="text-2xl text-[#0EA5E9] font-mono font-bold drop-shadow-md">{localTime || "--:--:--"}</span>
              </div>
-          </div>
+          </F1Card>
           <div className={layout.weatherClass}>
             <WeatherWidget sessionKey={sessionKey} />
           </div>
@@ -293,14 +292,12 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
       </div>
 
       <div className="mt-8 space-y-8 max-w-[1800px] px-4 lg:pl-8 lg:pr-[400px]">
-        <div className={`glass-panel rounded-xl p-4 md:p-6 ${layout.telemetryChartsClass}`}>
-          <h3 className="text-xl font-bold uppercase mb-4 text-primary tracking-wider">Live Telemetry</h3>
+        <F1Card title="Live Telemetry" className={layout.telemetryChartsClass}>
           <F1TelemetryTab />
-        </div>
-        <div className={`glass-panel rounded-xl p-4 md:p-6 ${layout.standingsClass}`}>
-          <h3 className="text-xl font-bold uppercase mb-4 text-primary tracking-wider">Championship Standings</h3>
+        </F1Card>
+        <F1Card title="Championship Standings" className={layout.standingsClass}>
           <F1StandingsTab />
-        </div>
+        </F1Card>
       </div>
     </div>
   );

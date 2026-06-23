@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 import { motion } from 'framer-motion';
 import { getTeamColor } from '@/lib/f1-helpers';
+import { F1Card } from '@/components/f1/F1Card';
 
 interface CalendarRound {
   round: string;
@@ -210,7 +211,7 @@ export function F1TelemetryTab() {
         </header>
 
         {/* Controls Bar */}
-        <div className="bg-[#111111] border border-[#1f1f1f] rounded-xl p-4 mb-8">
+        <F1Card className="mb-8 p-4 bg-[#131313] border-[#333333]">
           <div className="flex flex-wrap items-end gap-4">
             {/* Year */}
             <div className="flex flex-col gap-1.5">
@@ -334,7 +335,7 @@ export function F1TelemetryTab() {
               Compare
             </button>
           </div>
-        </div>
+        </F1Card>
 
         {/* Charts */}
         {!hasFetched && telemetry.length === 0 && (
@@ -363,8 +364,9 @@ export function F1TelemetryTab() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className="w-full rounded-2xl bg-[#111111] border border-[#1f1f1f] shadow-xl p-6"
+                className="w-full"
               >
+                <F1Card className="p-6">
                 <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                   {chart.icon} {chart.title}
                 </h3>
@@ -404,7 +406,7 @@ export function F1TelemetryTab() {
                       ))}
                     </LineChart>
                   </ResponsiveContainer>
-                </div>
+                </F1Card>
               </motion.div>
             ))}
 
@@ -413,8 +415,9 @@ export function F1TelemetryTab() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="w-full rounded-2xl bg-[#111111] border border-[#1f1f1f] shadow-xl p-6"
+              className="w-full"
             >
+              <F1Card className="p-6">
               <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 <GitCompareArrows className="w-5 h-5 text-cyan-400" /> Speed
                 Delta ({d1Name} - {d2Name})
@@ -451,8 +454,7 @@ export function F1TelemetryTab() {
                       isAnimationActive={false}
                     />
                   </LineChart>
-                </ResponsiveContainer>
-              </div>
+                </F1Card>
             </motion.div>
           </div>
         )}

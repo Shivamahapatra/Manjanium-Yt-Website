@@ -7,6 +7,7 @@ import { Trophy, AlertTriangle } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ReferenceLine, PieChart, Pie, Sector, ResponsiveContainer
 } from 'recharts';
+import { F1Card } from '@/components/f1/F1Card';
 
 const PieAny = Pie as any;
 
@@ -336,9 +337,9 @@ export function F1StandingsTab() {
           <div className="grid grid-cols-1 lg:grid-cols-[27%_43%_30%] gap-6 items-stretch">
             
             {/* COLUMN 1: STANDINGS LIST */}
-            <div className="bg-[#111111] border border-[#1f1f1f] rounded-2xl p-5 shadow-xl flex flex-col h-[780px] overflow-hidden">
-              <h2 className="text-sm font-black uppercase tracking-widest text-neutral-400 mb-4 border-b border-[#1f1f1f] pb-3 flex items-center gap-2">
-                <Trophy className="text-yellow-500 w-4 h-4" />
+            <F1Card className="flex flex-col h-[780px] p-0 overflow-hidden">
+              <h2 className="text-sm font-black uppercase tracking-widest text-[#6B7280] mb-4 border-b border-[#333333] pb-3 flex items-center gap-2 px-5 pt-5">
+                <Trophy className="text-[#FBBF24] w-4 h-4" />
                 {standingsTab === 'drivers' ? 'Driver Standings' : 'Constructor Standings'}
               </h2>
 
@@ -434,14 +435,14 @@ export function F1StandingsTab() {
                   </AnimatePresence>
                 </div>
               )}
-            </div>
+            </F1Card>
 
             {/* COLUMN 2: CHARTS */}
             <div className="flex flex-col justify-between h-[780px] gap-6">
               
               {/* TOP: RANKING EVOLUTION (BUMP CHART) */}
-              <div className="flex-1 flex flex-col min-h-[350px] relative">
-                <h3 className="text-sm font-black uppercase tracking-widest text-neutral-400 mb-4">
+              <F1Card className="flex-1 flex flex-col min-h-[350px] relative p-0">
+                <h3 className="text-sm font-black uppercase tracking-widest text-[#6B7280] mb-4 px-5 pt-5">
                   {standingsTab === 'drivers' ? 'Driver Ranking Evo' : 'Constructor Ranking Evo'}
                 </h3>
 
@@ -497,11 +498,11 @@ export function F1StandingsTab() {
                     </ResponsiveContainer>
                   </div>
                 )}
-              </div>
+              </F1Card>
 
               {/* BOTTOM: STATS BAR CHART */}
-              <div className="flex-1 flex flex-col min-h-[350px] relative">
-                <h3 className="text-sm font-black uppercase tracking-widest text-neutral-400 mb-4">
+              <F1Card className="flex-1 flex flex-col min-h-[350px] relative p-0">
+                <h3 className="text-sm font-black uppercase tracking-widest text-[#6B7280] mb-4 px-5 pt-5">
                   {standingsTab === 'drivers' ? 'Driver Stats' : 'Constructor Stats'}
                 </h3>
 
@@ -546,15 +547,15 @@ export function F1StandingsTab() {
                     </ResponsiveContainer>
                   </div>
                 )}
-              </div>
+              </F1Card>
             </div>
 
             {/* COLUMN 3: POINT SHARE PIE CHART & LEGEND */}
-            <div className="flex flex-col justify-between h-[780px] select-none">
+            <F1Card className="flex flex-col justify-between h-[780px] select-none p-0">
               
               {/* POINT SHARE */}
-              <div className="flex flex-col">
-                <h3 className="text-sm font-black uppercase tracking-widest text-neutral-400 mb-6">
+              <div className="flex flex-col px-5 pt-5">
+                <h3 className="text-sm font-black uppercase tracking-widest text-[#6B7280] mb-6">
                   Point Share
                 </h3>
 
@@ -629,7 +630,7 @@ export function F1StandingsTab() {
                   </div>
                 </div>
               </div>
-            </div>
+            </F1Card>
 
           </div>
         )}

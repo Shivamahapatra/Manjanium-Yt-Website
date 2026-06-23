@@ -5,6 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Spin } from 'antd';
 import { Tabs, TabsContent } from '@/components/ui/shadcn-tabs';
 import { useF1PresetLayout } from '@/hooks/usePresetLayout';
+import '@/styles/f1-design-tokens.css';
+import { F1Badge } from '@/components/f1/F1Badge';
 
 // Import our premium F1 tab components
 import { F1LiveTab } from "@/components/f1/tabs/F1LiveTab";
@@ -39,6 +41,17 @@ function F1HubContent() {
 
   return (
     <div className="w-full flex flex-col pt-4 px-4 sm:px-8 max-w-7xl mx-auto z-10 relative pb-32">
+      {/* Header - Styled with Stitch design system */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-white font-['Space_Grotesk'] tracking-tight">
+            ⚡ F1 Hub
+          </h1>
+          <p className="text-[#6B7280] text-sm font-['Inter'] mt-1">Professional Dashboard</p>
+        </div>
+        <F1Badge variant="live">🔴 LIVE</F1Badge>
+      </div>
+
       {/* Background glow tailored for F1 */}
       <div className="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen" style={{ filter: 'sepia(1) hue-rotate(330deg) saturate(5)' }}>
         <DarkVeil

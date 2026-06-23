@@ -21,3 +21,15 @@ Changes made:
 - Used React Portal `createPortal` to break the sidebar out of all CSS transform containers.
 Context:
 - The Manjanium OS Terminal Chat feature is live as a dedicated vertical sidebar on the right side.
+
+--- Update: F1 Hub UI Stitch Design System Upgrade (2026-06-23T21:04:00+05:30) ---
+Changes made:
+- Created src/styles/f1-design-tokens.css to define design tokens (colors, typography, spacing).
+- Created wrapper components F1Card.tsx and F1Badge.tsx in src/components/f1/.
+- Upgraded src/app/f1/page.tsx (F1 Hub main page) to use Stitch styling and new badges.
+- Upgraded src/components/f1/tabs/F1LiveTab.tsx by wrapping components in F1Card.
+- Upgraded src/components/f1/tabs/F1TelemetryTab.tsx and src/components/f1/tabs/F1StandingsTab.tsx to use F1Card wrappers, preserving all Recharts and data logic.
+- Upgraded src/components/f1/LiveTimingTower.tsx container.
+- Updated src/components/f1/F1SubNav.tsx to use framer-motion indicator and new accent colors.
+Context:
+- The entire F1 Hub UI now incorporates the premium Stitch design system aesthetics while keeping all backend data logic, websockets, and API calls fully intact.

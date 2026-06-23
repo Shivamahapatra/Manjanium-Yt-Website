@@ -1,0 +1,29 @@
+:root {
+  /* Colors */
+  --accent: #FBBF24;
+  --surface: #131313;
+  --on-surface: #FFFFFF;
+  --secondary: #0EA5E9;
+  --success: #10B981;
+  --alert: #EF4444;
+  --border: #333333;
+  --muted: #6B7280;
+  --surface-alt: #1F2937;
+
+  /* Typography */
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Border Radius */
+  --radius-lg: 12px;
+
+  /* Transitions */
+  --transition: 300ms ease-in-out;
+}
