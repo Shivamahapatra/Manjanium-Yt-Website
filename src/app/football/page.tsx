@@ -12,6 +12,7 @@ import { getTopScorers } from "@/lib/football-utils";
 import { Team, StandingsResponse } from "@/types/football";
 import { PastMatches } from "@/components/football/PastMatches";
 import { useFootballPresetLayout } from "@/hooks/usePresetLayout";
+import { TerminalChat } from "@/components/chat/TerminalChat";
 
 function FootballHubContent() {
   const searchParams = useSearchParams();
@@ -154,106 +155,113 @@ function FootballHubContent() {
           
           <TabsContent value="live" className="mt-0 outline-none">
             {activeTab === 'live' && (
-              <div className={`grid gap-6 ${presetLayout.gridLayout}`}>
-                
-                {/* Match Center */}
-                <div className={presetLayout.liveMatchesClass}>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between border-l-4 border-primary pl-3 mb-4">
-                      <h3 className="text-xl font-bold uppercase text-text-primary tracking-widest">Match Center</h3>
-                    </div>
-                    
-                    {loadingLive ? (
-                      <div className="flex justify-center p-8"><Spin size="large" /></div>
-                    ) : fixtures.length === 0 ? (
-                       <div className="glass-panel p-8 text-center text-text-secondary rounded-xl">No live matches currently.</div>
-                    ) : (
-                      fixtures.map((match) => (
-                        <div key={match.fixture.id} onClick={() => router.push(`/football/matches/${match.fixture.id}`)} className={`glass-panel p-4 hover-lift cursor-pointer flex items-center justify-between rounded-xl min-h-[88px] ${match.fixture.status.short === '1H' || match.fixture.status.short === '2H' ? 'border-l-4 border-l-primary bg-primary/5' : ''}`}>
-                          <div className="flex-1 grid grid-cols-3 items-center">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-2xl bg-surface p-1 border border-border-default flex items-center justify-center">
-                                <img src={match.teams.home.logo} className="w-6 h-6 object-contain" />
+              <>
+                <div className={`grid gap-6 ${presetLayout.gridLayout}`}>
+                  
+                  {/* Match Center */}
+                  <div className={presetLayout.liveMatchesClass}>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between border-l-4 border-primary pl-3 mb-4">
+                        <h3 className="text-xl font-bold uppercase text-text-primary tracking-widest">Match Center</h3>
+                      </div>
+                      
+                      {loadingLive ? (
+                        <div className="flex justify-center p-8"><Spin size="large" /></div>
+                      ) : fixtures.length === 0 ? (
+                         <div className="glass-panel p-8 text-center text-text-secondary rounded-xl">No live matches currently.</div>
+                      ) : (
+                        fixtures.map((match) => (
+                          <div key={match.fixture.id} onClick={() => router.push(`/football/matches/${match.fixture.id}`)} className={`glass-panel p-4 hover-lift cursor-pointer flex items-center justify-between rounded-xl min-h-[88px] ${match.fixture.status.short === '1H' || match.fixture.status.short === '2H' ? 'border-l-4 border-l-primary bg-primary/5' : ''}`}>
+                            <div className="flex-1 grid grid-cols-3 items-center">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-2xl bg-surface p-1 border border-border-default flex items-center justify-center">
+                                  <img src={match.teams.home.logo} className="w-6 h-6 object-contain" />
+                                </div>
+                                <span className="font-bold text-sm hidden sm:block uppercase">{match.teams.home.name}</span>
                               </div>
-                              <span className="font-bold text-sm hidden sm:block uppercase">{match.teams.home.name}</span>
-                            </div>
-                            <div className="flex flex-col items-center">
-                              {match.fixture.status.short === '1H' || match.fixture.status.short === '2H' ? (
-                                <span className="text-xs font-bold text-error animate-pulse mb-1">LIVE</span>
-                              ) : (
-                                <span className="text-xs font-bold text-text-secondary mb-1 uppercase">{match.fixture.status.short}</span>
-                              )}
-                              <span className="font-mono text-xl md:text-2xl font-bold text-text-primary">
-                                {match.goals.home ?? 0} - {match.goals.away ?? 0}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-3 justify-end">
-                              <span className="font-bold text-sm hidden sm:block uppercase">{match.teams.away.name}</span>
-                              <div className="w-10 h-10 rounded-2xl bg-surface p-1 border border-border-default flex items-center justify-center">
-                                <img src={match.teams.away.logo} className="w-6 h-6 object-contain" />
+                              <div className="flex flex-col items-center">
+                                {match.fixture.status.short === '1H' || match.fixture.status.short === '2H' ? (
+                                  <span className="text-xs font-bold text-error animate-pulse mb-1">LIVE</span>
+                                ) : (
+                                  <span className="text-xs font-bold text-text-secondary mb-1 uppercase">{match.fixture.status.short}</span>
+                                )}
+                                <span className="font-mono text-xl md:text-2xl font-bold text-text-primary">
+                                  {match.goals.home ?? 0} - {match.goals.away ?? 0}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-3 justify-end">
+                                <span className="font-bold text-sm hidden sm:block uppercase">{match.teams.away.name}</span>
+                                <div className="w-10 h-10 rounded-2xl bg-surface p-1 border border-border-default flex items-center justify-center">
+                                  <img src={match.teams.away.logo} className="w-6 h-6 object-contain" />
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))
-                    )}
+                        ))
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Standings */}
-                <div className={presetLayout.standingsClass}>
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-bold border-l-4 border-secondary pl-3 uppercase tracking-widest text-text-primary mb-4">Standings</h3>
-                    {loadingStandings ? (
-                      <div className="flex justify-center p-8"><Spin /></div>
-                    ) : standingsData && standingsData.groups && standingsData.groups.length > 0 ? (
-                      <div className="glass-panel overflow-hidden rounded-xl">
-                        <table className="w-full text-left text-sm">
-                          <thead className="bg-surface-container border-b border-border-variant">
-                            <tr>
-                              <th className="p-3 text-xs font-bold text-primary">POS</th>
-                              <th className="p-3 text-xs font-bold text-primary">CLUB</th>
-                              <th className="p-3 text-xs font-bold text-primary text-center">PTS</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {standingsData.groups[0].teams.slice(0, 5).map((team, idx) => (
-                              <tr key={team.id} className="hover:bg-primary/5 transition-colors border-b border-border-variant last:border-0 min-h-[44px]">
-                                <td className="p-3 font-mono text-primary font-bold">0{idx + 1}</td>
-                                <td className="p-3">
-                                  <div className="flex items-center gap-2">
-                                    <img src={team.logo} className="w-5 h-5 object-contain" />
-                                    <span className="font-bold text-text-primary">{team.name}</span>
-                                  </div>
-                                </td>
-                                <td className="p-3 font-mono text-center font-bold">{team.points}</td>
+                  {/* Standings */}
+                  <div className={presetLayout.standingsClass}>
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-bold border-l-4 border-secondary pl-3 uppercase tracking-widest text-text-primary mb-4">Standings</h3>
+                      {loadingStandings ? (
+                        <div className="flex justify-center p-8"><Spin /></div>
+                      ) : standingsData && standingsData.groups && standingsData.groups.length > 0 ? (
+                        <div className="glass-panel overflow-hidden rounded-xl">
+                          <table className="w-full text-left text-sm">
+                            <thead className="bg-surface-container border-b border-border-variant">
+                              <tr>
+                                <th className="p-3 text-xs font-bold text-primary">POS</th>
+                                <th className="p-3 text-xs font-bold text-primary">CLUB</th>
+                                <th className="p-3 text-xs font-bold text-primary text-center">PTS</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-
-                {/* Top Scorers */}
-                <div className={presetLayout.playerStatsClass}>
-                  <div className="glass-panel p-4 space-y-3 rounded-xl border border-border-default">
-                    <div className="flex items-center justify-between border-b border-border-variant pb-2">
-                      <h4 className="text-xs font-bold text-primary uppercase">Top Scorers</h4>
-                    </div>
-                    <div className="space-y-2">
-                      {topScorers.slice(0, 3).map((scorer, idx) => (
-                        <div key={idx} className="flex items-center justify-between px-2 py-1 hover:bg-surface-container rounded cursor-pointer">
-                          <span className="text-sm font-medium text-text-primary">{scorer.name}</span>
-                          <span className="font-mono text-primary font-bold text-base">{scorer.goals}</span>
+                            </thead>
+                            <tbody>
+                              {standingsData.groups[0].teams.slice(0, 5).map((team, idx) => (
+                                <tr key={team.id} className="hover:bg-primary/5 transition-colors border-b border-border-variant last:border-0 min-h-[44px]">
+                                  <td className="p-3 font-mono text-primary font-bold">0{idx + 1}</td>
+                                  <td className="p-3">
+                                    <div className="flex items-center gap-2">
+                                      <img src={team.logo} className="w-5 h-5 object-contain" />
+                                      <span className="font-bold text-text-primary">{team.name}</span>
+                                    </div>
+                                  </td>
+                                  <td className="p-3 font-mono text-center font-bold">{team.points}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                      ))}
+                      ) : null}
                     </div>
                   </div>
+
+                  {/* Top Scorers */}
+                  <div className={presetLayout.playerStatsClass}>
+                    <div className="glass-panel p-4 space-y-3 rounded-xl border border-border-default">
+                      <div className="flex items-center justify-between border-b border-border-variant pb-2">
+                        <h4 className="text-xs font-bold text-primary uppercase">Top Scorers</h4>
+                      </div>
+                      <div className="space-y-2">
+                        {topScorers.slice(0, 3).map((scorer, idx) => (
+                          <div key={idx} className="flex items-center justify-between px-2 py-1 hover:bg-surface-container rounded cursor-pointer">
+                            <span className="text-sm font-medium text-text-primary">{scorer.name}</span>
+                            <span className="font-mono text-primary font-bold text-base">{scorer.goals}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
 
-              </div>
+                {/* Terminal Chat Widget for Football */}
+                <div className="mt-8">
+                   <TerminalChat context="football" />
+                </div>
+              </>
             )}
           </TabsContent>
 

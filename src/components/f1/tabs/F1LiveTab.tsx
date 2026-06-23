@@ -10,6 +10,7 @@ import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { F1_PRESETS, F1PresetKey } from "@/lib/dashboard-presets";
 import { F1TelemetryTab } from "@/components/f1/tabs/F1TelemetryTab";
 import { F1StandingsTab } from "@/components/f1/tabs/F1StandingsTab";
+import { TerminalChat } from "@/components/chat/TerminalChat";
 
 // Dynamic import for the 3D Live focus Globe
 const Globe = dynamic(
@@ -285,6 +286,11 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
         {/* Supplementary Feed (Team Radio) */}
         <section className="md:col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
            <TeamRadioPanel sessionKey={sessionKey} />
+        </section>
+
+        {/* Terminal Chat Widget */}
+        <section className="md:col-span-12 mt-4">
+           <TerminalChat context="f1" />
         </section>
       </div>
 
