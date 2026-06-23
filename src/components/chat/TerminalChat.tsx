@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useUser } from "@clerk/nextjs";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,7 +35,12 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
   const [inputValue, setInputValue] = useState("");
   const [showCommands, setShowCommands] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const username = isLoaded && user ? user.username || user.firstName?.toLowerCase() || "user" : "guest";
   const promptText = `${username}@manjanium-core:~$`;
@@ -189,8 +195,8 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
     }
   };
 
-  return (
-    <div className={`fixed top-24 right-6 z-50 flex flex-col items-end ${className}`}>
+  const chatWidget = (
+    <div className={`fixed top-20 right-4 z-[100] flex flex-col items-end ${className}`}>
       <AnimatePresence>
         {!isExpanded && (
           <motion.button
@@ -296,4 +302,7 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
       </AnimatePresence>
     </div>
   );
+
+  if (!mounted) return null;
+  return createPortal(chatWidget, document.body);
 }
