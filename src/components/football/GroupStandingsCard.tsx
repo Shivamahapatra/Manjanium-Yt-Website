@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Team, Group as GroupData } from '@/types/football';
+import { FootballCard } from './FootballCard';
 
 export interface GroupStandingsCardProps {
   groupData: GroupData;
@@ -54,18 +55,18 @@ export function GroupStandingsCard({
   };
 
   return (
-    <div className="bg-surface border border-border-color rounded-xl overflow-hidden flex flex-col w-full shadow-medium transition-colors">
+    <FootballCard className="w-full p-0 overflow-hidden" variant="default">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex justify-between items-center px-4 py-3 bg-bg-primary/40 hover:bg-bg-primary/80 transition-colors"
+        className="w-full flex justify-between items-center px-4 py-3 bg-[var(--football-surface-alt)] hover:bg-[#333333] transition-colors rounded-t-[var(--football-radius)]"
       >
-        <h3 className="text-lg font-bold text-text-primary uppercase tracking-wider">
+        <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'var(--football-font-heading)' }}>
           {groupData.groupName}
         </h3>
         {isExpanded ? (
-          <ChevronUp className="w-5 h-5 text-text-secondary" />
+          <ChevronUp className="w-5 h-5 text-[#6B7280]" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-text-secondary" />
+          <ChevronDown className="w-5 h-5 text-[#6B7280]" />
         )}
       </button>
 
@@ -79,8 +80,8 @@ export function GroupStandingsCard({
             className="overflow-hidden"
           >
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left text-text-secondary">
-                <thead className="text-[11px] text-text-secondary uppercase bg-bg-primary/50 border-b border-border-color">
+              <table className="w-full text-sm text-left text-[#6B7280]">
+                <thead className="text-[11px] text-[#6B7280] uppercase bg-[var(--football-surface-alt)]/50 border-b border-[var(--football-border)]">
                   <tr>
                     <th scope="col" className="px-3 py-2 w-8 text-center font-semibold tracking-wider">#</th>
                     <th scope="col" className="px-3 py-2 font-semibold tracking-wider">Team</th>
@@ -91,10 +92,10 @@ export function GroupStandingsCard({
                     <th scope="col" className="px-2 py-2 text-center font-semibold tracking-wider hidden sm:table-cell">GF</th>
                     <th scope="col" className="px-2 py-2 text-center font-semibold tracking-wider hidden sm:table-cell">GA</th>
                     <th scope="col" className="px-2 py-2 text-center font-semibold tracking-wider">GD</th>
-                    <th scope="col" className="px-3 py-2 text-center font-bold tracking-wider text-text-primary">Pts</th>
+                    <th scope="col" className="px-3 py-2 text-center font-bold tracking-wider text-white">Pts</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border-color">
+                <tbody className="divide-y divide-[var(--football-border)]">
                   {groupData?.teams && groupData.teams.length > 0 ? (
                     groupData.teams.map((team, index) => (
                       <motion.tr
@@ -145,6 +146,6 @@ export function GroupStandingsCard({
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </FootballCard>
   );
 }

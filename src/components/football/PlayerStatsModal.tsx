@@ -162,10 +162,10 @@ export function PlayerStatsModal({
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-x-0 bottom-0 md:inset-x-auto md:right-0 md:top-0 h-[90vh] md:h-full w-full md:w-[800px] bg-neutral-900 border-t md:border-t-0 md:border-l border-neutral-800 z-50 flex flex-col shadow-2xl rounded-t-2xl md:rounded-none overflow-hidden"
+            className="fixed inset-x-0 bottom-0 md:inset-x-auto md:right-0 md:top-0 h-[90vh] md:h-full w-full md:w-[800px] bg-[var(--football-surface)] border-t md:border-t-0 md:border-l border-[var(--football-border)] z-50 flex flex-col shadow-2xl rounded-t-2xl md:rounded-none overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 md:p-6 border-b border-neutral-800 bg-neutral-900 shrink-0">
+            <div className="flex items-center justify-between p-4 md:p-6 border-b border-[var(--football-border)] bg-[var(--football-surface)] shrink-0">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 flex items-center justify-center bg-neutral-950 border border-neutral-800 rounded-2xl shadow-inner overflow-hidden">
                   {team?.logo ? (
@@ -181,25 +181,25 @@ export function PlayerStatsModal({
               </div>
               <button 
                 onClick={onClose}
-                className="p-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-2xl transition-colors"
+                className="p-2 bg-[#333333] hover:bg-[#444444] text-white rounded-2xl transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col bg-neutral-950">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col bg-[var(--football-surface)]">
               
               {/* Position Filters */}
-              <div className="p-4 flex gap-2 overflow-x-auto scrollbar-none shrink-0 border-b border-neutral-800/50 bg-neutral-900/50">
+              <div className="p-4 flex gap-2 overflow-x-auto scrollbar-none shrink-0 border-b border-[var(--football-border)] bg-[var(--football-surface-alt)]">
                 {['All', 'GK', 'DEF', 'MID', 'FWD'].map(pos => (
                   <button
                     key={pos}
                     onClick={() => setFilterPos(pos)}
                     className={`px-4 py-1.5 rounded-2xl text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2
                       ${filterPos === pos 
-                        ? 'bg-white text-black' 
-                        : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-200'
+                        ? 'bg-[var(--football-accent)] text-[var(--football-surface)]' 
+                        : 'bg-[#333333] text-[#6B7280] hover:bg-[#444444] hover:text-white'
                       }
                     `}
                   >
@@ -212,9 +212,9 @@ export function PlayerStatsModal({
               </div>
 
               {/* Table */}
-              <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-800 scrollbar-track-transparent flex-1">
-                <table className="w-full text-sm text-left text-neutral-300 min-w-[600px]">
-                  <thead className="text-[11px] text-neutral-400 uppercase bg-neutral-900 sticky top-0 z-10 shadow-sm border-b border-neutral-800">
+              <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-[#333333] scrollbar-track-transparent flex-1">
+                <table className="w-full text-sm text-left text-white min-w-[600px]">
+                  <thead className="text-[11px] text-[#6B7280] uppercase bg-[var(--football-surface-alt)] sticky top-0 z-10 shadow-sm border-b border-[var(--football-border)]">
                     <tr>
                       <th scope="col" className="px-4 py-3 w-10 text-center font-semibold cursor-pointer group" onClick={() => handleSort('number')}>
                         # <span className="group-hover:opacity-100"><SortIcon field="number" /></span>
@@ -242,13 +242,13 @@ export function PlayerStatsModal({
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-neutral-800/50">
+                  <tbody className="divide-y divide-[var(--football-border)]">
                     {filteredAndSortedPlayers.map((player) => (
                       <React.Fragment key={player.id}>
                         <motion.tr 
                           variants={rowVariants}
                           onClick={() => setExpandedPlayerId(expandedPlayerId === player.id ? null : player.id)}
-                          className={`cursor-pointer hover:bg-neutral-800/60 transition-colors ${expandedPlayerId === player.id ? 'bg-neutral-800/40' : ''}`}
+                          className={`cursor-pointer hover:bg-[#333333] transition-colors ${expandedPlayerId === player.id ? 'bg-[#333333]/50' : ''}`}
                         >
                           <td className="px-4 py-3 text-center text-xs font-mono text-neutral-500">
                             {player.number > 0 ? player.number : '-'}
@@ -338,9 +338,9 @@ export function PlayerStatsModal({
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-neutral-800 bg-neutral-900 shrink-0 text-center md:text-left">
-              <p className="text-xs text-neutral-500 flex items-center justify-center md:justify-start gap-1">
-                <span className="w-1.5 h-1.5 rounded-2xl bg-emerald-500 inline-block animate-pulse"></span>
+            <div className="p-4 border-t border-[var(--football-border)] bg-[var(--football-surface)] shrink-0 text-center md:text-left">
+              <p className="text-xs text-[#6B7280] flex items-center justify-center md:justify-start gap-1">
+                <span className="w-1.5 h-1.5 rounded-2xl bg-[var(--football-upcoming)] inline-block animate-pulse"></span>
                 Last updated: 1 hour ago
               </p>
             </div>

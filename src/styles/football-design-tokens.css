@@ -1,0 +1,39 @@
+:root {
+  /* Colors - Circuit Dark Theme (same as F1 for consistency) */
+  --football-accent: #FBBF24;
+  --football-surface: #131313;
+  --football-surface-alt: #1F2937;
+  --football-on-surface: #FFFFFF;
+  --football-secondary: #0EA5E9;
+  --football-success: #10B981;
+  --football-alert: #EF4444;
+  --football-border: #333333;
+  --football-muted: #6B7280;
+
+  /* Team Colors */
+  --football-home-color: #0EA5E9;
+  --football-away-color: #EF4444;
+  --football-neutral-color: #6B7280;
+
+  /* Status Colors */
+  --football-live: #EF4444;
+  --football-finished: #6B7280;
+  --football-upcoming: #10B981;
+
+  /* Typography */
+  --football-font-heading: 'Space Grotesk', sans-serif;
+  --football-font-body: 'Inter', sans-serif;
+
+  /* Spacing */
+  --football-space-xs: 4px;
+  --football-space-sm: 8px;
+  --football-space-md: 16px;
+  --football-space-lg: 24px;
+  --football-space-xl: 32px;
+
+  /* Border Radius */
+  --football-radius: 12px;
+
+  /* Transitions */
+  --football-transition: 300ms ease-in-out;
+}

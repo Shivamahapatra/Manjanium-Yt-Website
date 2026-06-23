@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Clock, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Player as BasePlayer } from '@/types/football';
+import { FootballCard } from './FootballCard';
 
 export interface ScorerPlayer extends BasePlayer {
   teamName?: string;
@@ -91,14 +92,14 @@ export function TopScorersWidget({
   };
 
   return (
-    <div className="flex flex-col bg-neutral-950 border border-neutral-800 rounded-2xl shadow-xl overflow-hidden w-full max-w-2xl">
+    <FootballCard className="w-full max-w-2xl p-0 overflow-hidden" variant="default">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 md:p-5 bg-neutral-900 border-b border-neutral-800">
-        <h2 className={`font-bold text-white flex items-center gap-2 ${isCompact ? 'text-lg' : 'text-xl md:text-2xl'}`}>
+      <div className="flex items-center justify-between p-4 md:p-5 bg-[var(--football-surface-alt)] border-b border-[var(--football-border)] rounded-t-[var(--football-radius)]">
+        <h2 className={`font-bold text-white flex items-center gap-2 ${isCompact ? 'text-lg' : 'text-xl md:text-2xl'}`} style={{ fontFamily: 'var(--football-font-heading)' }}>
           <span>🏆</span> Top Scorers
         </h2>
-        <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-medium bg-neutral-950 px-3 py-1.5 rounded-2xl border border-neutral-800/50">
-          <Clock className="w-3.5 h-3.5 text-emerald-500" />
+        <div className="flex items-center gap-1.5 text-xs text-[#6B7280] font-medium bg-[var(--football-surface)] px-3 py-1.5 rounded-2xl border border-[var(--football-border)]">
+          <Clock className="w-3.5 h-3.5 text-[var(--football-accent)]" />
           <span>Updated: {getRelativeTime(lastUpdated)}</span>
         </div>
       </div>
@@ -196,6 +197,6 @@ export function TopScorersWidget({
           </motion.div>
         )}
       </div>
-    </div>
+    </FootballCard>
   );
 }

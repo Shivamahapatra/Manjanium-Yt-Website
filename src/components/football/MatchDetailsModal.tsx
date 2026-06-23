@@ -5,6 +5,7 @@ import { LiveTimeline } from '@/components/football/LiveTimeline';
 import { TeamLineup } from '@/components/football/TeamLineup';
 import { MatchStatistics } from '@/components/football/MatchStatistics';
 import DecryptedText from "@/components/ui/DecryptedText";
+import { FootballBadge } from './FootballBadge';
 
 export interface MatchDetailsModalProps {
   matchId: string;
@@ -80,9 +81,9 @@ export function MatchDetailsModal({ matchId, isLive, onClose }: MatchDetailsModa
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-neutral-100 dark:bg-neutral-950 overflow-y-auto"
+      className="fixed inset-0 z-50 bg-[var(--football-surface)]/95 backdrop-blur-md overflow-y-auto"
     >
-      <div className="min-h-screen pb-20 font-sans text-neutral-900 dark:text-neutral-100">
+      <div className="min-h-screen pb-20 font-sans text-white">
         {children}
       </div>
     </motion.div>
@@ -119,31 +120,26 @@ export function MatchDetailsModal({ matchId, isLive, onClose }: MatchDetailsModa
   return (
     <Overlay>
       {/* Header Area */}
-      <div className="sticky top-0 z-20 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 pt-6 pb-6 px-4 md:px-8 shadow-sm">
+      <div className="sticky top-0 z-20 bg-[var(--football-surface-alt)]/80 backdrop-blur-md border-b border-[var(--football-border)] pt-6 pb-6 px-4 md:px-8 shadow-sm">
         <div className="max-w-7xl mx-auto relative">
           
           <button 
             onClick={onClose}
-            className="absolute -top-2 right-0 md:-right-4 p-2 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-2xl transition-colors"
+            className="absolute -top-2 right-0 md:-right-4 p-2 bg-[#333333] hover:bg-[#444444] rounded-2xl transition-colors"
           >
-            <X className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
+            <X className="w-5 h-5 text-white" />
           </button>
 
           <div className="flex flex-col items-center mt-2">
             <div className="flex items-center gap-3 mb-6">
               {isLive ? (
-                <motion.div
-                  animate={{ opacity: [1, 0.5, 1] }}
-                  transition={{ repeat: Infinity, duration: 1.5 }}
-                  className="bg-red-500 text-white px-3 py-1 rounded-md text-xs font-bold flex items-center gap-2 shadow-sm"
-                >
-                  <div className="w-2 h-2 bg-white rounded-2xl"></div>
-                  LIVE {match.elapsedTime > 0 ? `${match.elapsedTime}'` : ''}
-                </motion.div>
+                <FootballBadge variant="live">
+                  🔴 LIVE {match.elapsedTime > 0 ? `${match.elapsedTime}'` : ''}
+                </FootballBadge>
               ) : (
-                <div className="bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 px-3 py-1 rounded-md text-xs font-bold">
+                <FootballBadge variant="finished">
                   {isFinished ? 'FULL TIME' : 'UPCOMING'}
-                </div>
+                </FootballBadge>
               )}
             </div>
 
@@ -192,10 +188,10 @@ export function MatchDetailsModal({ matchId, isLive, onClose }: MatchDetailsModa
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 mt-6">
         {/* Mobile Tabs */}
-        <div className="lg:hidden flex overflow-x-auto scrollbar-none gap-2 mb-6 bg-white dark:bg-neutral-900 p-1.5 rounded-xl border border-neutral-200 dark:border-neutral-800">
-          <button onClick={() => setActiveTab('lineups')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${activeTab === 'lineups' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-neutral-500'}`}>Lineups</button>
-          <button onClick={() => setActiveTab('timeline')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${activeTab === 'timeline' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-neutral-500'}`}>Timeline</button>
-          <button onClick={() => setActiveTab('stats')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${activeTab === 'stats' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-neutral-500'}`}>Stats</button>
+        <div className="lg:hidden flex overflow-x-auto scrollbar-none gap-2 mb-6 bg-[var(--football-surface-alt)] p-1.5 rounded-xl border border-[var(--football-border)]">
+          <button onClick={() => setActiveTab('lineups')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${activeTab === 'lineups' ? 'bg-[#0EA5E9] text-white' : 'text-[#6B7280]'}`}>Lineups</button>
+          <button onClick={() => setActiveTab('timeline')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${activeTab === 'timeline' ? 'bg-[#0EA5E9] text-white' : 'text-[#6B7280]'}`}>Timeline</button>
+          <button onClick={() => setActiveTab('stats')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${activeTab === 'stats' ? 'bg-[#0EA5E9] text-white' : 'text-[#6B7280]'}`}>Stats</button>
         </div>
 
         {/* Desktop Grid / Mobile Stack */}
@@ -228,7 +224,7 @@ export function MatchDetailsModal({ matchId, isLive, onClose }: MatchDetailsModa
                  onEventClick={(e) => console.log('Event', e)} 
                />
             ) : (
-               <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl text-center text-neutral-500 border border-neutral-200 dark:border-neutral-800">
+               <div className="bg-[var(--football-surface-alt)] p-6 rounded-2xl text-center text-[#6B7280] border border-[var(--football-border)]">
                  Timeline unavailable
                </div>
             )}
@@ -245,7 +241,7 @@ export function MatchDetailsModal({ matchId, isLive, onClose }: MatchDetailsModa
                  awayTeamLogo={match.awayTeam.logo}
                />
             ) : (
-               <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl text-center text-neutral-500 border border-neutral-200 dark:border-neutral-800">
+               <div className="bg-[var(--football-surface-alt)] p-6 rounded-2xl text-center text-[#6B7280] border border-[var(--football-border)]">
                  Stats unavailable
                </div>
             )}
