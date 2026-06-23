@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { AuroraBackground } from "@/components/ui/aurora-background";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   IconBrandYoutube, 
@@ -17,15 +17,27 @@ import {
 import Link from "next/link";
 import { ChannelsGrid } from "@/components/social/ChannelsGrid";
 import { Activity, BarChart2, Trophy, Calendar, Rss, MapPin } from "lucide-react";
-import SideRays from "@/components/ui/SideRays";
 import { HeroSection } from "@/components/home/HeroSection";
 import { DashboardGrid } from "@/components/home/DashboardGrid";
 import { SectionTitle } from "@/components/home/SectionTitle";
 import { Card } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
 import { Button } from "@/components/common/Button";
-import { Globe } from "@/components/ui/Globe";
 import { GroupStandingsCard } from "@/components/football/GroupStandingsCard";
+
+// Dynamically import client-side only components to fix SSR window error
+const Globe = dynamic(() => import("@/components/ui/Globe").then((mod) => mod.Globe), { 
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-bg-secondary/20 animate-pulse rounded-full" />
+});
+
+const AuroraBackground = dynamic(() => import("@/components/ui/aurora-background").then((mod) => mod.AuroraBackground), { 
+  ssr: false 
+});
+
+const SideRays = dynamic(() => import("@/components/ui/SideRays"), { 
+  ssr: false 
+});
 
 const globeConfig = {
   pointLight: "#ffffff",
