@@ -33,3 +33,13 @@ Changes made:
 - Updated src/components/f1/F1SubNav.tsx to use framer-motion indicator and new accent colors.
 Context:
 - The entire F1 Hub UI now incorporates the premium Stitch design system aesthetics while keeping all backend data logic, websockets, and API calls fully intact.
+
+--- Update: Align Design Tokens with Stitch Spec (2026-06-23T21:30:00+05:30) ---
+Changes made:
+- Updated src/styles/f1-design-tokens.css: switched to --f1-* prefixed CSS variables matching the Stitch spec (--f1-accent, --f1-surface, --f1-border, etc.)
+- Updated src/components/f1/F1Card.tsx: added inline style references to CSS vars (backgroundColor: var(--f1-surface), borderColor: var(--f1-border)), heading now uses var(--f1-font-heading); kept cn utility for class merging
+- Updated src/components/f1/F1Badge.tsx: added 'info' variant (bg-[#0EA5E9]/20 text-[#0EA5E9] border-[#0EA5E9]/50); kept 'live' variant for backwards compatibility; aligned all variant border styles to use /50 opacity
+Context:
+- All data logic (useEffect hooks, API calls, Clerk auth, Supabase subscriptions, Terminal Chat sidebar) preserved
+- Build passes with 0 errors
+- Ready for visual QA of F1 Hub tabs on live/preview
