@@ -23,6 +23,6 @@ Whenever you begin a task, and whenever you complete a task or make changes to t
    - `git commit -m "feat/fix/docs: [Brief description of changes]"`
    - `git push`
 
-5. **Maintain Functionality**: Ensure that your changes DO NOT break any existing features, layouts, or API endpoints. Always double-check API routes and types when modifying data structures.
+5. **Maintain Functionality**: Ensure that your changes DO NOT break any existing features or API endpoints. Always double-check API routes and types when modifying data structures.
 
 Failure to run the build, overwriting historical context in `ping.txt`, or forgetting to push are unacceptable.
