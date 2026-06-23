@@ -34,7 +34,6 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
   const [messages, setMessages] = useState<TerminalMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [showCommands, setShowCommands] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [mounted, setMounted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -76,35 +75,8 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
       )
       .subscribe();
 
-    // Mock System Data Generator
-    const systemInterval = setInterval(() => {
-      const mockSystemMsgs = context === 'f1' ? [
-        "WARNING: Track Limits - Car 4 (NOR).",
-        "INFO: Pit Window Open.",
-        "DRS ENABLED."
-      ] : [
-        "GOAL: ARG 1 - 0 BRA (Messi 45')",
-        "VAR CHECK: Possible Penalty.",
-        "SUB: IN - #10, OUT - #8."
-      ];
-      
-      const randomMsg = mockSystemMsgs[Math.floor(Math.random() * mockSystemMsgs.length)];
-      
-      const newSysMsg: TerminalMessage = {
-        id: crypto.randomUUID(),
-        created_at: new Date().toISOString(),
-        username: "SYSTEM",
-        message_text: randomMsg,
-        context: context,
-        type: "system"
-      };
-
-      setMessages(prev => [...prev, newSysMsg]);
-    }, 45000); // every 45s a system log appears for effect
-
     return () => {
       supabase.removeChannel(subscription);
-      clearInterval(systemInterval);
     };
   }, [context]);
 
@@ -196,110 +168,84 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
   };
 
   const chatWidget = (
-    <div className={`fixed top-20 right-4 z-[100] flex flex-col items-end ${className}`}>
-      <AnimatePresence>
-        {!isExpanded && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            onClick={() => setIsExpanded(true)}
-            className="bg-black/90 border border-primary/40 text-primary p-4 rounded-full shadow-[0_0_20px_rgba(var(--color-primary),0.4)] hover:bg-primary/20 transition-colors flex items-center justify-center gap-2"
-          >
-            <Terminal className="w-6 h-6" />
-          </motion.button>
-        )}
-      </AnimatePresence>
+    <div className={`fixed top-24 right-4 z-[100] flex flex-col w-[320px] sm:w-[380px] h-[calc(100vh-110px)] bg-[#0a0a0a]/95 backdrop-blur-md border border-primary/20 rounded-xl overflow-hidden font-mono text-xs sm:text-sm shadow-[0_0_30px_rgba(0,0,0,0.8)] ${className}`}>
+      
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-primary/20 shrink-0">
+        <div className="flex items-center gap-2 text-primary font-bold tracking-widest uppercase text-xs">
+          <span>{`>_`}</span>
+          <span>Manjanium OS Terminal</span>
+        </div>
+        <div className="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(var(--color-success),0.8)]"></div>
+      </div>
 
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="flex flex-col w-[320px] sm:w-[400px] bg-black/90 border border-primary/20 rounded-xl overflow-hidden font-mono text-xs sm:text-sm shadow-[0_0_25px_rgba(var(--color-primary),0.3)] origin-top-right"
-          >
-            <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 border-b border-primary/20 text-primary cursor-pointer" onClick={() => setIsExpanded(false)}>
-              <Terminal className="w-4 h-4" />
-              <span className="font-bold tracking-widest uppercase text-[10px] sm:text-xs">Manjanium OS Terminal</span>
-              <div className="ml-auto flex gap-1.5 items-center">
-                <button 
-                  onClick={(e) => { e.stopPropagation(); setIsExpanded(false); }} 
-                  className="w-3 h-3 rounded-full bg-warning/80 hover:bg-warning transition-colors"
-                  title="Minimize"
-                />
-                <div className="w-3 h-3 rounded-full bg-success/80"></div>
-              </div>
-            </div>
+      {/* Messages */}
+      <div 
+        ref={scrollRef}
+        className="flex-1 p-4 overflow-y-auto space-y-3"
+        style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(var(--color-primary), 0.3) transparent" }}
+      >
+        {messages.map((msg, idx) => (
+          <div key={msg.id || idx} className="break-words leading-relaxed">
+            {msg.type === "system" ? (
+              <span className="text-[#ff5555] font-semibold">[{msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}) : 'SYS'}]: {msg.message_text}</span>
+            ) : msg.type === "command_response" ? (
+              <span className="text-secondary/90 font-bold">{'>'} {msg.message_text}</span>
+            ) : (
+              <span>
+                <span className="text-success">{msg.username}@manjanium-core:~$</span>{" "}
+                <span className="text-gray-300">{msg.message_text}</span>
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
 
-            <div 
-              ref={scrollRef}
-              className="flex-1 p-3 overflow-y-auto space-y-2 h-[300px] sm:h-[400px]"
-              style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(var(--color-primary), 0.3) transparent" }}
+      {/* Input Area */}
+      <div className="relative p-4 border-t border-primary/20 shrink-0 bg-[#0a0a0a]">
+        <AnimatePresence>
+          {showCommands && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="absolute bottom-full left-0 w-full bg-[#0f0f0f] border-t border-primary/30 p-2 z-10 shadow-lg"
             >
-              {messages.map((msg, idx) => (
-                <div key={msg.id || idx} className="break-words">
-                  {msg.type === "system" ? (
-                    <span className="text-error/90 font-semibold">[{msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}) : 'SYS'}]: {msg.message_text}</span>
-                  ) : msg.type === "command_response" ? (
-                    <span className="text-secondary/90 font-bold">{'>'} {msg.message_text}</span>
-                  ) : (
-                    <span>
-                      <span className="text-success">{msg.username}@manjanium-core:~$</span>{" "}
-                      <span className="text-gray-300">{msg.message_text}</span>
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="relative p-3 bg-black border-t border-primary/20">
-              <AnimatePresence>
-                {showCommands && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute bottom-full left-0 w-full bg-black/95 border-t border-primary/30 p-2 z-10"
+              <div className="text-primary/70 text-xs mb-2 font-bold px-2 uppercase tracking-wider">Available Commands</div>
+              <div className="space-y-1">
+                {SLASH_COMMANDS.map((cmd) => (
+                  <div 
+                    key={cmd.command} 
+                    className="flex items-center gap-2 px-2 py-1.5 hover:bg-primary/20 rounded cursor-pointer text-gray-300 transition-colors"
+                    onClick={() => {
+                      setInputValue(cmd.command + " ");
+                      setShowCommands(false);
+                    }}
                   >
-                    <div className="text-primary/70 text-xs mb-2 font-bold px-2 uppercase tracking-wider">Available Commands</div>
-                    <div className="space-y-1">
-                      {SLASH_COMMANDS.map((cmd) => (
-                        <div 
-                          key={cmd.command} 
-                          className="flex items-center gap-2 px-2 py-1 hover:bg-primary/20 cursor-pointer text-gray-300 transition-colors"
-                          onClick={() => {
-                            setInputValue(cmd.command + " ");
-                            setShowCommands(false);
-                          }}
-                        >
-                          <span className="text-secondary">{cmd.icon}</span>
-                          <span className="text-success font-bold">{cmd.command}</span>
-                          <span className="text-[10px] sm:text-xs text-gray-500">- {cmd.desc}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <div className="flex items-center">
-                <span className="text-success mr-2 shrink-0 hidden sm:inline">{promptText}</span>
-                <span className="text-success mr-2 shrink-0 sm:hidden">~$:</span>
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder={user ? "Type a message..." : "Login to chat..."}
-                  disabled={!user}
-                  className="flex-1 bg-transparent text-gray-200 outline-none caret-success placeholder:text-gray-600"
-                />
+                    <span className="text-secondary">{cmd.icon}</span>
+                    <span className="text-success font-bold">{cmd.command}</span>
+                    <span className="text-[10px] sm:text-xs text-gray-500">- {cmd.desc}</span>
+                  </div>
+                ))}
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex items-center">
+          <span className="text-success mr-2 shrink-0 hidden sm:inline">{promptText}</span>
+          <span className="text-success mr-2 shrink-0 sm:hidden">~$:</span>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            placeholder={user ? "Type a message..." : "Login to chat..."}
+            disabled={!user}
+            className="flex-1 bg-transparent text-gray-200 outline-none caret-success placeholder:text-gray-600"
+          />
+        </div>
+      </div>
     </div>
   );
 
