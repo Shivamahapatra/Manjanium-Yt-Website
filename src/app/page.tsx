@@ -17,9 +17,61 @@ import {
 import Link from "next/link";
 import { ChannelsGrid } from "@/components/social/ChannelsGrid";
 import { Activity, BarChart2, Trophy, Calendar, Rss, MapPin } from "lucide-react";
-import { Terminal } from "@/components/ui/terminal";
 import SideRays from "@/components/ui/SideRays";
-import Ferrofluid from "@/components/ui/Ferrofluid";
+import { HeroSection } from "@/components/home/HeroSection";
+import { DashboardGrid } from "@/components/home/DashboardGrid";
+import { SectionTitle } from "@/components/home/SectionTitle";
+import { Card } from "@/components/common/Card";
+import { Badge } from "@/components/common/Badge";
+import { Button } from "@/components/common/Button";
+import { Globe } from "@/components/ui/Globe";
+import { GroupStandingsCard } from "@/components/football/GroupStandingsCard";
+
+const globeConfig = {
+  pointLight: "#ffffff",
+  ambientLight: "#ffffff",
+  directionalLeftLight: "#ffffff",
+  directionalTopLight: "#ffffff",
+  showAtmosphere: true,
+  atmosphereColor: "#0ea5e9",
+  atmosphereAltitude: 0.1,
+  polygonColor: "rgba(14, 165, 233, 0.4)",
+  globeColor: "#0f172a",
+  autoRotate: true,
+  autoRotateSpeed: 1,
+};
+
+const globeData = [
+  {
+    order: 1,
+    startLat: 51.5074,
+    startLng: -0.1278,
+    endLat: 48.8566,
+    endLng: 2.3522,
+    arcAlt: 0.2,
+    color: "#0ea5e9",
+  },
+  {
+    order: 2,
+    startLat: 48.8566,
+    startLng: 2.3522,
+    endLat: 41.9028,
+    endLng: 12.4964,
+    arcAlt: 0.2,
+    color: "#10b981",
+  },
+];
+
+const mockGroupData = {
+  id: "group-a",
+  groupName: "A" as const,
+  teams: [
+    { id: "t1", name: "USA", flag: "🇺🇸", logo: "", players: [], played: 3, wins: 2, draws: 1, losses: 0, goalsFor: 5, goalsAgainst: 2, goalDifference: 3, points: 7, qualification: "qualified" as const },
+    { id: "t2", name: "Mexico", flag: "🇲🇽", logo: "", players: [], played: 3, wins: 2, draws: 0, losses: 1, goalsFor: 4, goalsAgainst: 3, goalDifference: 1, points: 6, qualification: "qualified" as const },
+    { id: "t3", name: "Canada", flag: "🇨🇦", logo: "", players: [], played: 3, wins: 1, draws: 1, losses: 1, goalsFor: 3, goalsAgainst: 3, goalDifference: 0, points: 4, qualification: "contending" as const },
+    { id: "t4", name: "Panama", flag: "🇵🇦", logo: "", players: [], played: 3, wins: 0, draws: 0, losses: 3, goalsFor: 1, goalsAgainst: 5, goalDifference: -4, points: 0, qualification: "eliminated" as const },
+  ]
+};
 
 // --- HOVER EFFECT COMPONENT ---
 const FeaturesHoverEffect = ({ items }: { items: any[] }) => {
@@ -113,31 +165,28 @@ const MockTimingTower = () => {
   }, []);
 
   return (
-    <div className="bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden relative font-mono text-sm h-full flex flex-col w-full max-w-sm mx-auto">
-      <div className="absolute top-2 right-2 px-2 py-0.5 bg-zinc-200/50 dark:bg-zinc-800/50 rounded text-[10px] font-sans font-bold text-zinc-600 dark:text-zinc-400 z-10">
-        SIMULATED DATA
-      </div>
-      <div className="flex bg-zinc-100 dark:bg-zinc-900 p-3 text-xs text-zinc-600 dark:text-zinc-400 font-bold border-b border-zinc-200 dark:border-zinc-800">
+    <div className="bg-bg-secondary/30 backdrop-blur-md border border-border-primary/50 rounded-xl overflow-hidden relative font-mono text-sm h-full flex flex-col w-full">
+      <div className="flex bg-bg-tertiary/50 p-3 text-xs text-text-tertiary font-bold border-b border-border-primary/50">
         <div className="w-8">POS</div>
         <div className="flex-1">DRIVER</div>
         <div className="w-20 text-right">GAP</div>
       </div>
       <div className="p-2 flex flex-col gap-1.5 flex-1 justify-center">
-        {data.map((d, i) => (
+        {data.slice(0, 8).map((d, i) => (
           <motion.div
             key={d.acronym}
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ delay: i * 0.08 }}
-            className="flex items-center px-3 py-2 bg-zinc-50 dark:bg-zinc-800/50 rounded border border-transparent transition-colors"
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.05 }}
+            className="flex items-center px-3 py-2 bg-card-bg/50 rounded border border-border-primary/30 transition-colors"
           >
-            <div className="w-8 text-zinc-500 font-bold">{d.pos}</div>
+            <div className="w-8 text-text-tertiary font-bold">{d.pos}</div>
             <div className="flex-1 flex items-center gap-3">
               <div className="w-1.5 h-4 rounded-full shadow-sm" style={{ backgroundColor: d.color }} />
-              <span className="font-bold text-zinc-900 dark:text-zinc-100 tracking-wider">{d.acronym}</span>
+              <span className="font-bold text-text-primary tracking-wider">{d.acronym}</span>
             </div>
-            <div className={`w-20 text-right font-bold ${i === 0 ? "text-blue-500 dark:text-blue-400" : "text-zinc-600 dark:text-zinc-300"}`}>
+            <div className={`w-20 text-right font-bold ${i === 0 ? "text-brand-primary" : "text-text-secondary"}`}>
               {d.gap}
             </div>
           </motion.div>
@@ -149,27 +198,14 @@ const MockTimingTower = () => {
 
 // --- MAIN PAGE ---
 export default function HomePage() {
-  const telemetryCommands = [
-    "manjanium config --env=production",
-    "npm run connect --api=f1 --realtime",
-    "Fetching driver data: VER, NOR, LEC...",
-    "Syncing World Cup 2026 data stream..."
-  ];
-  const telemetryOutputs = {
-    0: ["[OK] Environment loaded."],
-    1: ["Starting secure websocket connection to OpenF1...", "Connected: port 8080", "10hz data stream established."],
-    2: ["VER gap to LEADER: 0.000", "NOR gap to LEADER: +1.432", "[Pipeline active]"],
-    3: ["Group A fixtures synced.", "Match Center ready."]
-  };
-
   const features = [
     {
       title: "Live Timing Tower",
       description: "Real-time intervals and gap data during every session.",
       icon: <Activity className="w-8 h-8" />,
       accent: "blue",
-      textColor: "text-blue-500",
-      hoverBg: "bg-blue-500/[0.1]",
+      textColor: "text-brand-primary",
+      hoverBg: "bg-brand-primary/10",
       path: "/f1?tab=live",
     },
     {
@@ -177,8 +213,8 @@ export default function HomePage() {
       description: "Compare speed, throttle, brake and gear between any two drivers.",
       icon: <BarChart2 className="w-8 h-8" />,
       accent: "blue",
-      textColor: "text-blue-500",
-      hoverBg: "bg-blue-500/[0.1]",
+      textColor: "text-brand-primary",
+      hoverBg: "bg-brand-primary/10",
       path: "/f1?tab=telemetry",
     },
     {
@@ -186,8 +222,8 @@ export default function HomePage() {
       description: "Driver and Constructor tables updated after every race.",
       icon: <Trophy className="w-8 h-8" />,
       accent: "amber",
-      textColor: "text-amber-500",
-      hoverBg: "bg-amber-500/[0.1]",
+      textColor: "text-brand-accent",
+      hoverBg: "bg-brand-accent/10",
       path: "/f1?tab=standings",
     },
     {
@@ -195,8 +231,8 @@ export default function HomePage() {
       description: "Live scores and World Cup 2026 group standings.",
       icon: <MapPin className="w-8 h-8" />,
       accent: "green",
-      textColor: "text-green-500",
-      hoverBg: "bg-green-500/[0.1]",
+      textColor: "text-brand-secondary",
+      hoverBg: "bg-brand-secondary/10",
       path: "/football",
     },
     {
@@ -204,8 +240,8 @@ export default function HomePage() {
       description: "Full 2026 F1 season schedule in your local timezone.",
       icon: <Calendar className="w-8 h-8" />,
       accent: "blue",
-      textColor: "text-blue-500",
-      hoverBg: "bg-blue-500/[0.1]",
+      textColor: "text-brand-primary",
+      hoverBg: "bg-brand-primary/10",
       path: "/f1?tab=calendar",
     },
     {
@@ -213,8 +249,8 @@ export default function HomePage() {
       description: "Latest car upgrades and regulation news aggregated from top sources.",
       icon: <Rss className="w-8 h-8" />,
       accent: "neutral",
-      textColor: "text-neutral-500 dark:text-neutral-400",
-      hoverBg: "bg-neutral-500/[0.1]",
+      textColor: "text-text-secondary",
+      hoverBg: "bg-interactive-hover",
       path: "/f1?tab=updates",
     },
   ];
@@ -294,260 +330,139 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 overflow-hidden selection:bg-blue-500/30 relative">
+    <div className="flex flex-col min-h-screen bg-bg-primary overflow-hidden selection:bg-brand-primary/30 relative">
       
       {/* NOISE BACKGROUND */}
       <div 
-        className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-20 mix-blend-overlay"
+        className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-10 mix-blend-overlay"
         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
       />
 
-      {/* SECTION 1 — HERO */}
-      <div className="relative">
-        <AuroraBackground showRadialGradient className="min-h-screen w-full relative pb-20 pt-10 lg:pt-0 bg-transparent">
-          
-          {/* Side Rays Effect */}
-          <div className="absolute inset-0 pointer-events-none z-0">
-            <SideRays
-              speed={1.8}
-              rayColor1="#E10600"
-              rayColor2="#3671C6"
-              intensity={1.2}
-              spread={1.8}
-              origin="top-right"
-              tilt={0}
-              saturation={1.2}
-              blend={0.5}
-              falloff={2.0}
-              opacity={0.6}
-            />
-          </div>
-
-          <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-16 min-h-screen w-full relative z-10 pt-20 lg:pt-0">
-            {/* Hero Left Text Column */}
-            <div className="flex flex-col gap-8 items-center lg:items-start text-center lg:text-left max-w-2xl">
-              <div className="flex flex-col gap-4 items-center lg:items-start">
-                {/* Headline */}
-                <motion.h1
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4, duration: 0.7 }}
-                  className="text-5xl md:text-7xl font-serif font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-[1.1] mb-2"
-                >
-                  Manjanium <br className="hidden lg:block"/> 
-                  <span className="text-zinc-900 dark:text-zinc-50 drop-shadow-sm">On Softs</span>
-                </motion.h1>
-
-                {/* Subheadline */}
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6, duration: 0.7 }}
-                  className="text-lg md:text-xl text-zinc-900 dark:text-zinc-50 font-medium"
-                >
-                  The Ultimate F1 & Football Hub. Track every session and match in real-time.
-                </motion.p>
-              </div>
-
-              {/* Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.7 }}
-                className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full"
-              >
-                <Link
-                  href="/f1"
-                  className="bg-stitch-secondary hover:bg-stitch-secondary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer"
-                >
-                  Enter F1 Hub <IconArrowRight className="w-5 h-5" />
-                </Link>
-
-                <Link
-                  href="/football"
-                  className="bg-stitch-primary hover:bg-stitch-primary-container text-white dark:text-zinc-950 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer"
-                >
-                  Enter Football Center <IconArrowRight className="w-5 h-5" />
-                </Link>
-              </motion.div>
-            </div>
-
-            {/* Hero Right Terminal Column */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.6, duration: 0.8 }}
-              className="flex-1 w-full max-w-xl hidden lg:block"
-            >
-              <Terminal 
-                commands={telemetryCommands} 
-                outputs={telemetryOutputs} 
-                username="manjanium-core" 
-                enableSound={false}
-              />
-            </motion.div>
-          </div>
-        </AuroraBackground>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* SECTION 2 — LIVE TELEMETRY PREVIEW */}
-        <div className="w-full relative z-10 py-12 mb-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            
-            <motion.div 
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className="text-blue-600 dark:text-blue-500 text-xs font-bold tracking-widest uppercase mb-4">F1 HUB</div>
-              <h2 className="text-4xl md:text-5xl font-serif font-black text-zinc-900 dark:text-zinc-50 leading-tight mb-2">
-                Live Sports Telemetry<br/>
-                <span className="text-blue-600 dark:text-blue-500 italic">Uninterrupted.</span>
-              </h2>
-              <p className="text-lg text-zinc-600 dark:text-zinc-400 my-8 leading-relaxed max-w-lg font-medium">
-                Track every gap, interval, and sector time as it happens. Built for fans who want more than a broadcast.
-              </p>
-              <Link href="/f1" className="text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 font-bold flex items-center gap-2 group transition-colors">
-                Go to F1 Hub 
-                <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-              className="w-full h-full"
-            >
-               <MockTimingTower />
-            </motion.div>
-
-          </div>
-        </div>
-
-        {/* SECTION 3 — FEATURES GRID */}
-        <div className="w-full relative z-10 py-12 mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-zinc-50 mb-6">Platform Features</h2>
-            <p className="text-zinc-600 dark:text-zinc-400 text-lg max-w-2xl mx-auto font-medium">Everything you need to track the sport, completely engineered from scratch.</p>
-          </motion.div>
-
-          <motion.div
-             initial={{ opacity: 0, y: 40 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true, margin: "-100px" }}
-             transition={{ duration: 0.8 }}
-          >
-             <FeaturesHoverEffect items={features} />
-          </motion.div>
-        </div>
-
-        {/* SECTION 4 — SOCIAL CHANNELS */}
-        <div className="w-full relative z-10 py-12 mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <div className="inline-block px-4 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 mb-4">
-              <span className="text-xs font-bold text-blue-600 dark:text-blue-500 tracking-widest uppercase">Community</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-zinc-50 mb-6">Follow Us on Social Media</h2>
-            <p className="text-zinc-600 dark:text-zinc-400 text-lg max-w-2xl mx-auto font-medium">
-              Join thousands of fans across our platforms. Live streams, updates, and community discussions.
-            </p>
-          </motion.div>
-
-          <ChannelsGrid channels={socialChannels} />
-        </div>
-
-        {/* SECTION 5 — FOOTBALL STRIP */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
-          className="w-full bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm dark:shadow-2xl rounded-3xl p-8 md:p-12 relative z-10 mb-12 overflow-hidden"
-      >
-        <div className="absolute inset-0 z-0 opacity-40 mix-blend-screen pointer-events-none">
-          <Ferrofluid
-            colors={["#22c55e", "#16a34a", "#15803d"]}
-            speed={0.4}
-            scale={1.2}
-            turbulence={1.5}
-            fluidity={0.2}
-            rimWidth={0.3}
-            sharpness={2}
-            shimmer={1}
-            glow={1.5}
-            flowDirection="right"
-            opacity={1}
-            mouseInteraction={true}
-            mouseStrength={1}
-            mouseRadius={0.3}
+      <AuroraBackground showRadialGradient className="min-h-screen w-full relative pb-20 pt-10 lg:pt-0 bg-transparent">
+        {/* Side Rays Effect */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <SideRays
+            speed={1.8}
+            rayColor1="var(--brand-primary)"
+            rayColor2="var(--brand-secondary)"
+            intensity={1.2}
+            spread={1.8}
+            origin="top-right"
+            tilt={0}
+            saturation={1.2}
+            blend={0.5}
+            falloff={2.0}
+            opacity={0.4}
           />
         </div>
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-            <div className="text-center md:text-left">
-              <h2 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-zinc-50 mb-3 flex items-center justify-center md:justify-start gap-3">
-                <span className="text-2xl">⚽</span> FIFA World Cup 2026
-              </h2>
-              <p className="text-zinc-600 dark:text-zinc-400 text-lg font-medium">Live scores and group standings — updated in real time.</p>
-            </div>
-            <Link href="/football">
-              <button
-                className="bg-green-600 text-white hover:bg-green-700 font-semibold px-8 py-3.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto"
-              >
-                Enter Football Center <IconArrowRight className="w-5 h-5" />
-              </button>
-            </Link>
-          </div>
-        </motion.div>
 
+        <HeroSection />
+      </AuroraBackground>
+
+      {/* DASHBOARD SECTION */}
+      <div className="py-24 max-w-7xl mx-auto px-6 w-full">
+        <SectionTitle 
+          title="Live Dashboard" 
+          subtitle="Real-time telemetry and statistics from across the world of F1 and Football."
+        />
+
+        <DashboardGrid>
+          {/* Timing Tower Card */}
+          <Card 
+            title="Live Timing Tower" 
+            headerAction={<Badge variant="alert" pulse>Live</Badge>}
+            className="lg:col-span-1"
+          >
+            <MockTimingTower />
+          </Card>
+
+          {/* 3D Globe Card */}
+          <Card 
+            title="Circuit Locations" 
+            className="lg:col-span-2 min-h-[400px]"
+          >
+            <div className="h-[350px] w-full relative">
+              <Globe globeConfig={globeConfig} data={globeData} />
+            </div>
+          </Card>
+
+          {/* Football Standings Card */}
+          <Card 
+            title="World Cup 2026 Standings" 
+            className="lg:col-span-1"
+          >
+            <GroupStandingsCard groupData={mockGroupData} onTeamClick={() => {}} />
+          </Card>
+
+          {/* Telemetry Card */}
+          <Card 
+            title="Live Telemetry" 
+            className="lg:col-span-2"
+          >
+            <div className="h-[300px] w-full flex items-center justify-center bg-bg-secondary/50 rounded-lg border border-dashed border-border-primary">
+              <div className="text-center">
+                <Activity className="w-12 h-12 text-brand-primary mx-auto mb-4 opacity-50" />
+                <p className="text-text-secondary font-medium">Real-time Telemetry Stream Active</p>
+                <p className="text-text-tertiary text-sm mt-1">Syncing with OpenF1 servers...</p>
+              </div>
+            </div>
+          </Card>
+        </DashboardGrid>
       </div>
 
-      {/* SECTION 6 — FOOTER */}
-      <footer className="w-full bg-white dark:bg-zinc-950 py-12 border-t border-zinc-200 dark:border-zinc-800 relative z-10">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-            <div className="text-center md:text-left">
-              <div className="text-zinc-900 dark:text-zinc-50 font-serif font-black text-xl mb-1">Manjanium On Softs</div>
-              <div className="text-zinc-500 text-sm font-medium">Built for fans, by fans.</div>
-            </div>
-            
-            <div className="flex items-center gap-6 text-sm font-semibold text-zinc-600 dark:text-zinc-400">
-              <Link href="/f1" className="hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors">F1 Hub</Link>
-              <Link href="/football" className="hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors">Football</Link>
-              <Link href="/f1?tab=calendar" className="hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors">Calendar</Link>
-              <Link href="/f1?tab=standings" className="hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors">Standings</Link>
-            </div>
+      {/* FEATURES SECTION */}
+      <div className="py-24 bg-bg-secondary/50">
+        <div className="max-w-7xl mx-auto px-6">
+          <SectionTitle 
+            title="Platform Features" 
+            subtitle="Everything you need to track the sport, completely engineered from scratch."
+          />
+          <FeaturesHoverEffect items={features} />
+        </div>
+      </div>
 
-            <div>
-              <Link href="https://www.youtube.com/@manjaniumonsofts67" target="_blank" rel="noopener noreferrer">
-                <button className="bg-transparent border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-4 py-2 rounded-lg flex items-center gap-2 transition-all text-xs font-bold">
-                  <IconBrandYoutube className="w-4 h-4 text-[#E10600]" /> Subscribe
-                </button>
-              </Link>
+      {/* SOCIAL SECTION */}
+      <div className="py-24">
+        <div className="max-w-7xl mx-auto px-6">
+          <SectionTitle 
+            title="Join the Community" 
+            subtitle="Follow us across our platforms for live updates, deep dives, and discussions."
+          />
+          <ChannelsGrid channels={socialChannels} />
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <footer className="py-16 bg-bg-secondary border-t border-border-primary">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12">
+          <div className="flex flex-col gap-4 items-center md:items-start">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-gradient-to-br from-brand-primary to-brand-secondary rounded-lg flex items-center justify-center font-bold text-white text-xs shadow-md">MN</div>
+              <span className="font-serif font-bold text-text-primary text-lg">Manjanium On Softs</span>
             </div>
+            <p className="text-text-tertiary text-sm">Built for fans, by fans. © 2026</p>
           </div>
-          
-          <div className="text-center text-xs text-zinc-500 pt-8 border-t border-zinc-200 dark:border-zinc-800 font-medium">
-            Data sourced from OpenF1, Jolpica & ESPN. Not affiliated with Formula 1 or FIFA.
+          <div className="flex gap-8">
+            <Link href="/f1" className="text-text-secondary hover:text-brand-primary transition-colors font-bold text-sm">F1 Hub</Link>
+            <Link href="/football" className="text-text-secondary hover:text-brand-secondary transition-colors font-bold text-sm">Football</Link>
+            <Link href="/f1?tab=calendar" className="text-text-secondary hover:text-text-primary transition-colors font-bold text-sm">Calendar</Link>
+            <Link href="/f1?tab=standings" className="text-text-secondary hover:text-text-primary transition-colors font-bold text-sm">Standings</Link>
           </div>
+          <Button 
+            variant="danger" 
+            size="sm"
+            onClick={() => window.open('https://www.youtube.com/@manjaniumonsofts67', '_blank')}
+          >
+            <IconBrandYoutube className="w-4 h-4" /> Subscribe
+          </Button>
+        </div>
+        <div className="max-w-7xl mx-auto px-6 mt-12 pt-12 border-t border-border-primary/50 text-center">
+          <p className="text-text-tertiary text-[10px] uppercase tracking-widest leading-relaxed">
+            Data sourced from OpenF1, Jolpica & ESPN. <br />
+            Not affiliated with Formula 1 or FIFA.
+          </p>
         </div>
       </footer>
-
     </div>
   );
 }
