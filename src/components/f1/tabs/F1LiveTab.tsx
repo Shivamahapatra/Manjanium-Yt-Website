@@ -289,9 +289,7 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
         </section>
 
         {/* Terminal Chat Widget */}
-        <section className="md:col-span-12 mt-4">
-           <TerminalChat context="f1" />
-        </section>
+        <TerminalChat context="f1" />
       </div>
 
       <div className="mt-8 space-y-8">

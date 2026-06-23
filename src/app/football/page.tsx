@@ -258,9 +258,7 @@ function FootballHubContent() {
                 </div>
 
                 {/* Terminal Chat Widget for Football */}
-                <div className="mt-8">
-                   <TerminalChat context="football" />
-                </div>
+                <TerminalChat context="football" />
               </>
             )}
           </TabsContent>
