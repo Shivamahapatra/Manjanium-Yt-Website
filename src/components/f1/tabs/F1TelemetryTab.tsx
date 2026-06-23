@@ -406,6 +406,7 @@ export function F1TelemetryTab() {
                       ))}
                     </LineChart>
                   </ResponsiveContainer>
+                </div>
                 </F1Card>
               </motion.div>
             ))}
@@ -454,7 +455,9 @@ export function F1TelemetryTab() {
                       isAnimationActive={false}
                     />
                   </LineChart>
-                </F1Card>
+                </ResponsiveContainer>
+              </div>
+              </F1Card>
             </motion.div>
           </div>
         )}
