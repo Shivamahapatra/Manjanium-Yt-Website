@@ -93,3 +93,20 @@ Context:
 - The preset selection is now successfully moved to the Settings page.
 - Selection is persisted and automatically applies to F1 Hub.
 - Next.js build passes with 0 errors.
+
+--- Update: F1 Dashboard Presets Redesign - Clean & Spacious (2026-06-24T11:49:00+05:30) ---
+Changes made:
+- Redesigned F1PresetLiveFocused: 70% Timing Tower + 30% Globe (2 components)
+- Redesigned F1PresetStatsDetailed: Tab-switched view (Standings/Telemetry/Weather/Race Log)
+- Redesigned F1PresetCompactOverview: 3 sections (Session/Globe/Top10) with better spacing
+- Increased padding (p-8) and gaps (gap-6) for whitespace
+- Removed clutter by showing fewer components at once
+- Added tab switcher to Stats Detailed for focused viewing
+- Larger fonts and more breathing room
+- Full-width layouts instead of cramped side-by-side
+Context:
+- Presets are now cleaner and less overwhelming
+- Users can focus on one metric at a time (especially Stats Detailed)
+- More professional, spacious appearance
+- Build passes with 0 errors
+- Settings control still intact
