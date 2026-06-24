@@ -1,3 +1,14 @@
+# Project Preview
+**Manjanium On Softs** is a high-performance, multi-sport telemetry and fan engagement platform. It delivers real-time data, news, and interactive experiences for Formula 1 and Football (Soccer) fans, characterized by a premium "telemetry" aesthetic, advanced motion layers, and dual-mode accessibility.
+
+# Features
+- **F1 Hub (Racing Telemetry)**: Live Timing Tower, Race Tracker, Pit Wall Simulation, Interactive Track Guides.
+- **Football Center**: Score Center, League Standings, Top Scorers, Latest Updates.
+- **Control Center**: Dual-Theme Toggle, Telemetry Settings, Profile Management.
+- **Manjanium OS Terminal Chat**: Inline CLI Interface, Blended Data Stream, Clerk Authentication, Slash Commands, Real-Time Supabase Synchronization.
+
+---
+
 This is a placeholder file added to allow pushing to origin.
 Revert 1
 Revert 2
@@ -53,4 +64,3 @@ Changes made:
 Context:
 - The Football Hub UI now incorporates the premium Stitch design system aesthetics while keeping all backend data logic, websockets, and API calls fully intact.
 - Verified build with 0 errors.
-
