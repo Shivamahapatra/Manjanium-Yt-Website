@@ -4,23 +4,25 @@ import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Spin } from "antd";
 import { motion } from "framer-motion";
-import { RefreshCw, Trophy, Activity, Users, History, Medal } from "lucide-react";
+import { Trophy, Activity, History, Medal } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/shadcn-tabs";
 import { GroupStandingsCard } from "@/components/football/GroupStandingsCard";
 import { TopScorersWidget } from "@/components/football/TopScorersWidget";
 import { getTopScorers } from "@/lib/football-utils";
 import { Team, StandingsResponse } from "@/types/football";
 import { PastMatches } from "@/components/football/PastMatches";
-import { useFootballPresetLayout } from "@/hooks/usePresetLayout";
+import { useFootballDashboardPreset } from "@/hooks/useFootballDashboardPreset";
+import { FootballPresetLiveMatches } from "@/components/football/presets/FootballPresetLiveMatches";
+import { FootballPresetStandingsFocus } from "@/components/football/presets/FootballPresetStandingsFocus";
+import { FootballPresetCompactStats } from "@/components/football/presets/FootballPresetCompactStats";
 import { TerminalChat } from "@/components/chat/TerminalChat";
 import { FootballBadge } from "@/components/football/FootballBadge";
-import { LiveMatchCard } from "@/components/football/LiveMatchCard";
 import "@/styles/football-design-tokens.css";
 
 function FootballHubContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const presetLayout = useFootballPresetLayout();
+  const { preset, loading: presetLoading } = useFootballDashboardPreset();
   
   const defaultTab = searchParams.get("tab") || "live";
   const [activeTab, setActiveTab] = useState<string>(defaultTab);
@@ -159,83 +161,26 @@ function FootballHubContent() {
           <TabsContent value="live" className="mt-0 outline-none">
             {activeTab === 'live' && (
               <>
-                <div className={`grid gap-6 ${presetLayout.gridLayout}`}>
-                  
-                  {/* Match Center */}
-                  <div className={presetLayout.liveMatchesClass}>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between border-l-4 border-[#0EA5E9] pl-3 mb-4">
-                        <h3 className="text-xl font-bold uppercase text-white tracking-widest" style={{ fontFamily: 'var(--football-font-heading)' }}>Match Center</h3>
-                      </div>
-                      
-                      {loadingLive ? (
-                        <div className="flex justify-center p-8"><Spin size="large" /></div>
-                      ) : fixtures.length === 0 ? (
-                         <div className="bg-[var(--football-surface)] border border-[var(--football-border)] p-8 text-center text-[#6B7280] rounded-[12px]">No live matches currently.</div>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                          {fixtures.map((match) => (
-                            <LiveMatchCard key={match.fixture.id} match={match} />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Standings */}
-                  <div className={presetLayout.standingsClass}>
-                    <div className="space-y-4">
-                      <h3 className="text-xl font-bold border-l-4 border-secondary pl-3 uppercase tracking-widest text-text-primary mb-4">Standings</h3>
-                      {loadingStandings ? (
-                        <div className="flex justify-center p-8"><Spin /></div>
-                      ) : standingsData && standingsData.groups && standingsData.groups.length > 0 ? (
-                        <div className="glass-panel overflow-hidden rounded-xl">
-                          <table className="w-full text-left text-sm">
-                            <thead className="bg-surface-container border-b border-border-variant">
-                              <tr>
-                                <th className="p-3 text-xs font-bold text-primary">POS</th>
-                                <th className="p-3 text-xs font-bold text-primary">CLUB</th>
-                                <th className="p-3 text-xs font-bold text-primary text-center">PTS</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {standingsData.groups[0].teams.slice(0, 5).map((team, idx) => (
-                                <tr key={team.id} className="hover:bg-primary/5 transition-colors border-b border-border-variant last:border-0 min-h-[44px]">
-                                  <td className="p-3 font-mono text-primary font-bold">0{idx + 1}</td>
-                                  <td className="p-3">
-                                    <div className="flex items-center gap-2">
-                                      <img src={team.logo} className="w-5 h-5 object-contain" />
-                                      <span className="font-bold text-text-primary">{team.name}</span>
-                                    </div>
-                                  </td>
-                                  <td className="p-3 font-mono text-center font-bold">{team.points}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  {/* Top Scorers */}
-                  <div className={presetLayout.playerStatsClass}>
-                    <div className="glass-panel p-4 space-y-3 rounded-xl border border-border-default">
-                      <div className="flex items-center justify-between border-b border-border-variant pb-2">
-                        <h4 className="text-xs font-bold text-primary uppercase">Top Scorers</h4>
-                      </div>
-                      <div className="space-y-2">
-                        {topScorers.slice(0, 3).map((scorer, idx) => (
-                          <div key={idx} className="flex items-center justify-between px-2 py-1 hover:bg-surface-container rounded cursor-pointer">
-                            <span className="text-sm font-medium text-text-primary">{scorer.name}</span>
-                            <span className="font-mono text-primary font-bold text-base">{scorer.goals}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
+                {preset === 'live-matches' && (
+                  <FootballPresetLiveMatches
+                    fixtures={fixtures}
+                    loadingLive={loadingLive}
+                  />
+                )}
+                {preset === 'standings-focus' && (
+                  <FootballPresetStandingsFocus
+                    standingsData={standingsData}
+                    loadingStandings={loadingStandings}
+                  />
+                )}
+                {preset === 'compact-stats' && (
+                  <FootballPresetCompactStats
+                    fixtures={fixtures}
+                    loadingLive={loadingLive}
+                    standingsData={standingsData}
+                    loadingStandings={loadingStandings}
+                  />
+                )}
 
                 {/* Terminal Chat Widget for Football */}
                 <TerminalChat context="football" />

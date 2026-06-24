@@ -1,5 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
+import { motion } from 'framer-motion';
 import { F1Card } from '@/components/f1/F1Card';
 import { LiveTimingTower } from '@/components/f1/LiveTimingTower';
 
@@ -19,60 +20,62 @@ export interface F1PresetProps {
 
 export function F1PresetLiveFocused({ session, localTime, currentVenue, globeArcs, globeConfig }: F1PresetProps) {
   return (
-    <div className="h-[calc(100vh-200px)] flex flex-col gap-6">
-      {/* TOP: Session Status - Compact */}
-      <div className="flex gap-4">
-        <F1Card className="w-full lg:w-[400px]">
-          <div className="flex items-center justify-between p-2">
-            <div>
-              <p className="text-[#6B7280] text-xs font-bold tracking-widest mb-1">SESSION</p>
-              <p className="text-xl font-bold text-white uppercase">
-                {currentVenue?.sessionName || session?.session_name || "LIVE"}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-[#6B7280] text-xs font-bold tracking-widest mb-1">LOCAL TIME</p>
-              <p className="text-2xl font-bold text-[#FBBF24] font-mono">
-                {localTime || "--:--:--"}
-              </p>
-            </div>
+    <div className="h-[calc(100vh-200px)] flex flex-col gap-4 px-6 pb-6">
+      {/* Session status - minimal */}
+      <div className="flex gap-3 items-center">
+        <div className="flex gap-2">
+          <div className="px-3 py-1.5 bg-[#1F2937] rounded-lg">
+            <p className="text-[#6B7280] text-xs">SESSION</p>
+            <p className="text-sm font-bold text-white">{currentVenue?.sessionName || session?.session_name || 'LIVE'}</p>
           </div>
-        </F1Card>
+          <div className="px-3 py-1.5 bg-[#1F2937] rounded-lg">
+            <p className="text-[#6B7280] text-xs">TIME</p>
+            <p className="text-sm font-bold text-[#FBBF24]">{localTime || '--:--:--'}</p>
+          </div>
+          <div className="px-3 py-1.5 bg-[#1F2937] rounded-lg">
+            <p className="text-[#6B7280] text-xs">CIRCUIT</p>
+            <p className="text-sm font-bold text-white">{currentVenue?.circuitName || 'TBC'}</p>
+          </div>
+        </div>
       </div>
 
-      {/* MAIN CONTENT: Timing + Globe */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-6 pb-6 h-full">
-        {/* LEFT: Timing Tower (70%) */}
-        <div className="flex-[0.7] h-full">
-          <F1Card title="Live Timing Tower" className="h-full flex flex-col p-4 lg:p-8">
+      {/* Main content: Use available space */}
+      <div className="flex-1 flex gap-4">
+        {/* TIMING TOWER - 65% (expanded) */}
+        <div className="flex-[0.65]">
+          <F1Card title="Live Timing Tower" className="h-full flex flex-col">
             <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
               <LiveTimingTower />
             </div>
           </F1Card>
         </div>
 
-        {/* RIGHT: Globe (30%) */}
-        <div className="flex-[0.3] h-full">
-          <F1Card title="Global Tracker" className="h-full flex flex-col p-4 lg:p-8">
-            <div className="flex-1 flex items-center justify-center min-h-[300px]">
-              <Globe globeConfig={globeConfig} data={globeArcs} />
-            </div>
-            
-            <div className="mt-4 pt-6 border-t border-[#333333] space-y-4">
-              <div>
-                <p className="text-[#6B7280] text-xs font-bold tracking-widest mb-1">CIRCUIT</p>
-                <p className="text-lg font-bold text-white">
-                  {currentVenue?.circuitName || "TBC"}
-                </p>
+        {/* GLOBE + Stats - 35% */}
+        <div className="flex-[0.35] flex flex-col gap-4">
+          {/* Globe */}
+          <div className="flex-1 min-h-0">
+            <F1Card className="h-full flex flex-col p-4">
+              <div className="flex-1 flex items-center justify-center">
+                <Globe globeConfig={globeConfig} data={globeArcs} />
               </div>
-              <div>
-                <p className="text-[#6B7280] text-xs font-bold tracking-widest mb-1">STATUS</p>
-                <p className="text-lg font-bold text-[#FBBF24] uppercase">
-                  {session?.session_type || "PRACTICE"}
-                </p>
-              </div>
+            </F1Card>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="flex gap-2">
+            <div className="flex-1 p-3 bg-[#1F2937] rounded-lg border border-[#333333]">
+              <p className="text-[#6B7280] text-xs">STATUS</p>
+              <p className="text-lg font-bold text-[#FBBF24]">
+                {session?.session_type || 'PRACTICE'}
+              </p>
             </div>
-          </F1Card>
+            <div className="flex-1 p-3 bg-[#1F2937] rounded-lg border border-[#333333]">
+              <p className="text-[#6B7280] text-xs">CIRCUIT</p>
+              <p className="text-lg font-bold text-white">
+                {currentVenue?.circuitName || 'TBC'}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

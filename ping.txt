@@ -1,0 +1,16 @@
+--- Update: Preset Refinements - F1 & Football (2026-06-24T16:00:00+00:00) ---
+Changes made:
+- Applied preset system to Football Hub (3 presets with sidebar)
+- Refined F1 Preset 1: 65/35 split (Timing/Globe) with better space utilization
+- Redesigned F1 Preset 2: Single "Live" tab with Timing + Team Radio + Race Control + Live Track Map
+- Reorganized F1 Preset 3: Globe moved to RIGHT, 3-column layout
+- Created LiveTrackMap component for real-time race visualization
+- Removed tab switcher from Preset 2 (all content visible)
+- All presets controlled via Settings (not shown in hubs)
+- Football presets mirror F1 structure
+Context:
+- F1 and Football both use preset system
+- Settings expands sidebar for preset selection
+- Live data flowing correctly in all presets
+- Track map updates with race progress
+- Build passes with 0 errors
