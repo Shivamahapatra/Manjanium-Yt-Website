@@ -64,3 +64,19 @@ Changes made:
 Context:
 - The Football Hub UI now incorporates the premium Stitch design system aesthetics while keeping all backend data logic, websockets, and API calls fully intact.
 - Verified build with 0 errors.
+
+--- Update: F1 Hub Preset Layouts (2026-06-24T09:00:00+05:30) ---
+Changes made:
+- Created F1PresetLiveFocused.tsx with real-time focus layout
+- Created F1PresetStatsDetailed.tsx with analytical focus layout
+- Created F1PresetCompactOverview.tsx with balanced overview layout
+- Updated F1LiveTab.tsx with preset selector
+- All components stretched to fill available space
+- Each preset shows different data/insights
+- Terminal Chat sidebar preserved and fixed
+Context:
+- Users can now switch between 3 different preset layouts
+- Each preset optimized for different use cases
+- All data fetching preserved
+- Build passes with 0 errors
+- Ready for visual testing and refinement

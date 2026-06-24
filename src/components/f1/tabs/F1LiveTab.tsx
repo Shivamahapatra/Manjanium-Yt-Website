@@ -12,6 +12,10 @@ import { F1TelemetryTab } from "@/components/f1/tabs/F1TelemetryTab";
 import { F1StandingsTab } from "@/components/f1/tabs/F1StandingsTab";
 import { TerminalChat } from "@/components/chat/TerminalChat";
 import { F1Card } from "@/components/f1/F1Card";
+import { motion } from "framer-motion";
+import { F1PresetLiveFocused } from "@/components/f1/presets/F1PresetLiveFocused";
+import { F1PresetStatsDetailed } from "@/components/f1/presets/F1PresetStatsDetailed";
+import { F1PresetCompactOverview } from "@/components/f1/presets/F1PresetCompactOverview";
 
 // Dynamic import for the 3D Live focus Globe
 const Globe = dynamic(
@@ -50,7 +54,7 @@ const globeConfig = {
   autoRotateSpeed: 0.6,
 };
 
-function WeatherWidget({ sessionKey }: { sessionKey: string }) {
+export function WeatherWidget({ sessionKey }: { sessionKey: string }) {
   const [weatherData, setWeatherData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -103,7 +107,7 @@ function WeatherWidget({ sessionKey }: { sessionKey: string }) {
   );
 }
 
-function RaceControlFeed({ sessionKey }: { sessionKey: string }) {
+export function RaceControlFeed({ sessionKey }: { sessionKey: string }) {
   const [messages, setMessages] = useState<any[]>([]);
 
   useEffect(() => {
@@ -143,7 +147,7 @@ function RaceControlFeed({ sessionKey }: { sessionKey: string }) {
   );
 }
 
-function TeamRadioPanel({ sessionKey }: { sessionKey: string }) {
+export function TeamRadioPanel({ sessionKey }: { sessionKey: string }) {
   const [radioMsgs, setRadioMsgs] = useState<any[]>([]);
 
   useEffect(() => {
@@ -180,9 +184,7 @@ function TeamRadioPanel({ sessionKey }: { sessionKey: string }) {
 import { useF1PresetLayout } from "@/hooks/usePresetLayout";
 
 export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
-  const { preferences } = useUserPreferences();
-  const localPresetLayout = useF1PresetLayout();
-  const layout = presetLayout || localPresetLayout;
+  const [preset, setPreset] = useState('live-focused');
 
   const [session, setSession] = useState<any>(null);
   const [sessionKey, setSessionKey] = useState<string>("latest");
@@ -240,64 +242,70 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
 
   if (loading) return <div className="flex items-center justify-center min-h-[400px]"><Spin size="large" /></div>;
 
+  const presetProps = {
+    sessionKey,
+    session,
+    localTime,
+    currentVenue,
+    globeArcs,
+    globeConfig
+  };
+
   return (
     <div className="w-full relative animate-fade-in-up">
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 w-full max-w-[1800px] px-4 lg:pl-8 lg:pr-[400px] pb-10">
+      <div className="max-w-[1800px] px-4 lg:pl-8 lg:pr-[400px] pb-10 space-y-6">
         
-        {/* Live Timing Tower */}
-        <section className={`md:col-span-12 ${layout.timingTowerCols} flex flex-col gap-4 ${layout.timingTowerClass}`}>
-          <div className="flex items-center justify-between px-2">
-            <h2 className="text-xs font-bold uppercase text-primary flex items-center gap-2">
-              <span className="w-2.5 h-2.5 bg-primary rounded-2xl animate-pulse shadow-[0_0_8px_var(--color-primary)]"></span>
-              LIVE TIMING TOWER
-            </h2>
-          </div>
-          <div className={`rounded-xl overflow-y-auto ${layout.timingTowerHeight || 'h-[600px]'}`} style={{ scrollbarWidth: 'thin' }}>
-             <LiveTimingTower />
-          </div>
-        </section>
+        {/* Preset Selector */}
+        <div className="flex flex-wrap gap-3 mb-4">
+          <motion.button
+            onClick={() => setPreset('live-focused')}
+            className={`px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all ${
+              preset === 'live-focused'
+                ? 'bg-[#FBBF24] text-black shadow-[0_0_15px_rgba(251,191,36,0.3)]'
+                : 'bg-[#1F2937] text-white hover:border-[#FBBF24] border border-[#333333]'
+            }`}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            ⚡ LIVE FOCUSED
+          </motion.button>
 
-        {/* Center Section: Globe & Weather */}
-        <section className={`md:col-span-12 ${layout.mainGridCols} flex flex-col gap-6`}>
-          <F1Card className={`relative h-[300px] md:h-[400px] overflow-hidden flex items-center justify-center p-0 border-border-default ${layout.circuitFocusClass}`}>
-             <Globe globeConfig={globeConfig} data={globeArcs} />
-             <div className="absolute top-6 left-6 z-10 pointer-events-none">
-                <h3 className="text-xs font-bold uppercase text-[#FBBF24] mb-1 tracking-widest">GLOBAL RACE TRACKER</h3>
-                <p className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white drop-shadow-md">
-                   {currentVenue ? currentVenue.raceName : "AWAITING RACE"}
-                </p>
-             </div>
-             <div className="absolute bottom-6 right-6 text-right z-10 pointer-events-none">
-                <span className="text-xs text-[#6B7280] uppercase font-bold tracking-widest block mb-1">LOCAL TIME</span>
-                <span className="text-2xl text-[#0EA5E9] font-mono font-bold drop-shadow-md">{localTime || "--:--:--"}</span>
-             </div>
-          </F1Card>
-          <div className={layout.weatherClass}>
-            <WeatherWidget sessionKey={sessionKey} />
-          </div>
-        </section>
+          <motion.button
+            onClick={() => setPreset('stats-detailed')}
+            className={`px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all ${
+              preset === 'stats-detailed'
+                ? 'bg-[#FBBF24] text-black shadow-[0_0_15px_rgba(251,191,36,0.3)]'
+                : 'bg-[#1F2937] text-white hover:border-[#FBBF24] border border-[#333333]'
+            }`}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            📊 STATS DETAILED
+          </motion.button>
 
-        {/* Circuit Focus / Race Control Card */}
-        <section className="md:col-span-12 flex flex-col gap-6 h-full">
-           <RaceControlFeed sessionKey={sessionKey} />
-        </section>
+          <motion.button
+            onClick={() => setPreset('compact-overview')}
+            className={`px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all ${
+              preset === 'compact-overview'
+                ? 'bg-[#FBBF24] text-black shadow-[0_0_15px_rgba(251,191,36,0.3)]'
+                : 'bg-[#1F2937] text-white hover:border-[#FBBF24] border border-[#333333]'
+            }`}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            🎯 COMPACT OVERVIEW
+          </motion.button>
+        </div>
 
-        {/* Supplementary Feed (Team Radio) */}
-        <section className="md:col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
-           <TeamRadioPanel sessionKey={sessionKey} />
-        </section>
-
+        {/* Preset Content */}
+        <div className="w-full">
+          {preset === 'live-focused' && <F1PresetLiveFocused {...presetProps} />}
+          {preset === 'stats-detailed' && <F1PresetStatsDetailed {...presetProps} />}
+          {preset === 'compact-overview' && <F1PresetCompactOverview {...presetProps} />}
+        </div>
+        
         {/* Terminal Chat Widget */}
         <TerminalChat context="f1" />
-      </div>
-
-      <div className="mt-8 space-y-8 max-w-[1800px] px-4 lg:pl-8 lg:pr-[400px]">
-        <F1Card title="Live Telemetry" className={layout.telemetryChartsClass}>
-          <F1TelemetryTab />
-        </F1Card>
-        <F1Card title="Championship Standings" className={layout.standingsClass}>
-          <F1StandingsTab />
-        </F1Card>
       </div>
     </div>
   );
