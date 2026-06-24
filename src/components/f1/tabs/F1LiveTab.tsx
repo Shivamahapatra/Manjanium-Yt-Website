@@ -182,9 +182,10 @@ export function TeamRadioPanel({ sessionKey }: { sessionKey: string }) {
 }
 
 import { useF1PresetLayout } from "@/hooks/usePresetLayout";
+import { useDashboardPreset } from "@/hooks/useDashboardPreset";
 
 export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
-  const [preset, setPreset] = useState('live-focused');
+  const { preset, loading: presetLoading } = useDashboardPreset();
 
   const [session, setSession] = useState<any>(null);
   const [sessionKey, setSessionKey] = useState<string>("latest");
@@ -240,7 +241,7 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
     return () => clearInterval(interval);
   }, [currentVenue]);
 
-  if (loading) return <div className="flex items-center justify-center min-h-[400px]"><Spin size="large" /></div>;
+  if (loading || presetLoading) return <div className="flex items-center justify-center min-h-[400px]"><Spin size="large" /></div>;
 
   const presetProps = {
     sessionKey,
@@ -255,47 +256,7 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
     <div className="w-full relative animate-fade-in-up">
       <div className="max-w-[1800px] px-4 lg:pl-8 lg:pr-[400px] pb-10 space-y-6">
         
-        {/* Preset Selector */}
-        <div className="flex flex-wrap gap-3 mb-4">
-          <motion.button
-            onClick={() => setPreset('live-focused')}
-            className={`px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all ${
-              preset === 'live-focused'
-                ? 'bg-[#FBBF24] text-black shadow-[0_0_15px_rgba(251,191,36,0.3)]'
-                : 'bg-[#1F2937] text-white hover:border-[#FBBF24] border border-[#333333]'
-            }`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            ⚡ LIVE FOCUSED
-          </motion.button>
-
-          <motion.button
-            onClick={() => setPreset('stats-detailed')}
-            className={`px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all ${
-              preset === 'stats-detailed'
-                ? 'bg-[#FBBF24] text-black shadow-[0_0_15px_rgba(251,191,36,0.3)]'
-                : 'bg-[#1F2937] text-white hover:border-[#FBBF24] border border-[#333333]'
-            }`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            📊 STATS DETAILED
-          </motion.button>
-
-          <motion.button
-            onClick={() => setPreset('compact-overview')}
-            className={`px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all ${
-              preset === 'compact-overview'
-                ? 'bg-[#FBBF24] text-black shadow-[0_0_15px_rgba(251,191,36,0.3)]'
-                : 'bg-[#1F2937] text-white hover:border-[#FBBF24] border border-[#333333]'
-            }`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            🎯 COMPACT OVERVIEW
-          </motion.button>
-        </div>
+        {/* Preset Selector Removed */}
 
         {/* Preset Content */}
         <div className="w-full">

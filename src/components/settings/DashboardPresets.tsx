@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUserPreferences } from '@/hooks/useUserPreferences'
-import { Layout, Gauge, BarChart3, Minimize2, Trophy, Columns2, Columns3, Monitor } from 'lucide-react'
+import { Layout, Columns2, Columns3, Monitor } from 'lucide-react'
+import { F1DashboardPresets } from './F1DashboardPresets'
 
 interface Preset {
   id: string
@@ -13,29 +14,7 @@ interface Preset {
   features: string[]
 }
 
-const F1_PRESETS: Preset[] = [
-  {
-    id: 'f1_live_focused',
-    name: 'Live Focused',
-    description: 'Maximized live timing tower with full driver data. Best for race day.',
-    icon: <Gauge className="w-5 h-5" />,
-    features: ['Full Timing Tower', 'Race Control', 'Team Radio']
-  },
-  {
-    id: 'f1_data_heavy',
-    name: 'Data Heavy',
-    description: 'Everything visible — timing, telemetry, standings, and weather.',
-    icon: <BarChart3 className="w-5 h-5" />,
-    features: ['Timing Tower', 'Telemetry', 'Standings', 'Weather', 'Strategy']
-  },
-  {
-    id: 'f1_minimal',
-    name: 'Minimal',
-    description: 'Compact timing tower only. Clean and distraction-free.',
-    icon: <Minimize2 className="w-5 h-5" />,
-    features: ['Compact Timing']
-  }
-]
+// F1 presets are handled in F1DashboardPresets component
 
 const FOOTBALL_PRESETS: Preset[] = [
   {
@@ -64,13 +43,9 @@ const FOOTBALL_PRESETS: Preset[] = [
 export function DashboardPresets() {
   const { preferences, updatePreferences } = useUserPreferences()
   const [saveMessage, setSaveMessage] = useState('')
-  const [selectedF1Preset, setSelectedF1Preset] = useState(preferences?.f1_dashboard_preset || 'f1_live_focused')
   const [selectedFootballPreset, setSelectedFootballPreset] = useState(preferences?.football_dashboard_preset || 'fb_live_matches')
 
   useEffect(() => {
-    if (preferences?.f1_dashboard_preset) {
-      setSelectedF1Preset(preferences.f1_dashboard_preset)
-    }
     if (preferences?.football_dashboard_preset) {
       setSelectedFootballPreset(preferences.football_dashboard_preset)
     }
@@ -79,17 +54,6 @@ export function DashboardPresets() {
   const showSave = (msg: string) => {
     setSaveMessage(msg)
     setTimeout(() => setSaveMessage(''), 2500)
-  }
-
-  const handleF1PresetChange = async (presetId: string) => {
-    setSelectedF1Preset(presetId)
-    try {
-      await updatePreferences({ f1_dashboard_preset: presetId })
-      showSave('✓ F1 preset applied')
-    } catch (error) {
-      console.error('Failed to save F1 preset:', error)
-      showSave('✗ Failed to save')
-    }
   }
 
   const handleFootballPresetChange = async (presetId: string) => {
@@ -177,21 +141,7 @@ export function DashboardPresets() {
 
       {/* F1 Presets */}
       <section className="space-y-5">
-        <div className="flex items-center gap-2 border-l-4 pl-3" style={{ borderColor: '#ef4444' }}>
-          <h3 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#ef4444' }}>
-            F1 Hub Layout
-          </h3>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {F1_PRESETS.map(preset =>
-            renderPresetCard(
-              preset,
-              selectedF1Preset === preset.id,
-              () => handleF1PresetChange(preset.id),
-              '#ef4444'
-            )
-          )}
-        </div>
+        <F1DashboardPresets />
       </section>
 
       {/* Football Presets */}

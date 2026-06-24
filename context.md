@@ -80,3 +80,16 @@ Context:
 - All data fetching preserved
 - Build passes with 0 errors
 - Ready for visual testing and refinement
+
+--- Update: Move F1 Preset Selector to Settings (2026-06-24T05:50:00Z) ---
+Changes made:
+- Updated src/hooks/useDashboardPreset.ts to support persisting new presets to Supabase/localStorage.
+- Created src/lib/preset-utils.ts for utility functions.
+- Created src/components/settings/PresetSidebar.tsx for an expanding sidebar preset selector.
+- Created src/components/settings/F1DashboardPresets.tsx to display F1 preset options.
+- Updated src/components/settings/DashboardPresets.tsx to embed F1DashboardPresets while keeping football presets.
+- Updated src/components/f1/tabs/F1LiveTab.tsx to use the hook and removed local selector buttons.
+Context:
+- The preset selection is now successfully moved to the Settings page.
+- Selection is persisted and automatically applies to F1 Hub.
+- Next.js build passes with 0 errors.
