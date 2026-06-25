@@ -12,6 +12,7 @@ import { getTopScorers } from "@/lib/football-utils";
 import { Team, StandingsResponse } from "@/types/football";
 import { PastMatches } from "@/components/football/PastMatches";
 import { useFootballDashboardPreset } from "@/hooks/useFootballDashboardPreset";
+import { useFootballRealtime } from "@/hooks/useFootballRealtime";
 import { FootballPresetLiveMatches } from "@/components/football/presets/FootballPresetLiveMatches";
 import { FootballPresetStandingsFocus } from "@/components/football/presets/FootballPresetStandingsFocus";
 import { FootballPresetCompactStats } from "@/components/football/presets/FootballPresetCompactStats";
@@ -44,6 +45,24 @@ function FootballHubContent() {
   const [pastMatches, setPastMatches] = useState<any[]>([]);
   const [standingsData, setStandingsData] = useState<StandingsResponse | null>(null);
   const [loadingStandings, setLoadingStandings] = useState(true);
+
+  useFootballRealtime((payload) => {
+    const row = payload.new;
+    const fixtureId =
+      (row.fixture as { id?: string } | undefined)?.id ??
+      (row.id as string | undefined);
+    if (!fixtureId) return;
+
+    setFixtures((prev) => {
+      const idx = prev.findIndex((f) => (f?.fixture?.id ?? f?.id) === fixtureId);
+      if (idx === -1) {
+        return payload.eventType === 'INSERT' ? [...prev, row] : prev;
+      }
+      const next = [...prev];
+      next[idx] = { ...next[idx], ...row };
+      return next;
+    });
+  });
 
   useEffect(() => {
     const fetchLiveMatches = async () => {
