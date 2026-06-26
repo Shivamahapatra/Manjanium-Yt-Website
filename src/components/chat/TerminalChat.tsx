@@ -231,7 +231,7 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
         }}
       >
         {messages.map((msg, idx) => (
-          <div key={msg.id || idx} className="break-words leading-relaxed">
+          <div key={msg.id || idx} className="wrap-break-word leading-relaxed">
             {msg.type === "system" ? (
               <span className="text-[#ff5555] font-semibold text-xs">
                 [
@@ -325,9 +325,9 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
       <div
         className={`
           hidden lg:flex
-          fixed top-24 right-4 z-[100]
+          fixed top-24 right-4 z-100
           flex-col
-          w-[320px] xl:w-[380px]
+          w-80 xl:w-95
           h-[calc(100vh-110px)]
           bg-[#0a0a0a]/95 backdrop-blur-md
           border border-primary/20
@@ -354,7 +354,7 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
         onClick={() => setMobileOpen(true)}
         className="
           lg:hidden
-          fixed bottom-6 right-6 z-[100]
+          fixed bottom-6 right-6 z-100
           w-14 h-14
           bg-primary text-background
           rounded-full
@@ -370,10 +370,10 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
       {/* ── MOBILE: vaul bottom drawer (below lg) ────────────────────────── */}
       <Drawer.Root open={mobileOpen} onOpenChange={setMobileOpen}>
         <Drawer.Portal>
-          <Drawer.Overlay className="fixed inset-0 bg-black/50 z-[110] backdrop-blur-sm" />
+          <Drawer.Overlay className="fixed inset-0 bg-black/50 z-110 backdrop-blur-sm" />
           <Drawer.Content
             className="
-              fixed bottom-0 left-0 right-0 z-[120]
+              fixed bottom-0 left-0 right-0 z-120
               bg-[#0a0a0a]
               border-t border-primary/20
               rounded-t-2xl

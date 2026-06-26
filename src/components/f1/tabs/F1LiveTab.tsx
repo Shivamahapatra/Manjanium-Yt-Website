@@ -23,7 +23,7 @@ const Globe = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-[320px] h-[320px] rounded-2xl bg-neutral-900 animate-pulse mx-auto border border-neutral-800" />
+      <div className="w-80 h-80 rounded-2xl bg-neutral-900 animate-pulse mx-auto border border-neutral-800" />
     ),
   }
 );
@@ -77,7 +77,7 @@ export function WeatherWidget({ sessionKey }: { sessionKey: string }) {
     return () => clearInterval(interval);
   }, [sessionKey]);
 
-  if (loading || !weatherData) return <div className="glass-panel p-4 rounded-xl flex items-center justify-center min-h-[100px]"><Spin size="small" /></div>;
+  if (loading || !weatherData) return <div className="glass-panel p-4 rounded-xl flex items-center justify-center min-h-25"><Spin size="small" /></div>;
 
   return (
     <F1Card title="Weather">
@@ -248,7 +248,7 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
 
   if (loading || presetLoading || !presetHydrated)
     return (
-      <div className="w-full h-[400px] bg-[#131313] animate-pulse rounded-xl" />
+      <div className="w-full h-100 bg-surface animate-pulse rounded-xl" />
     );
 
   const presetProps = {
@@ -262,7 +262,7 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
 
   return (
     <div className="w-full relative animate-fade-in-up">
-      <div className="max-w-[1800px] px-4 lg:pl-8 lg:pr-[400px] pb-10 space-y-6">
+      <div className="max-w-[1800px] px-4 lg:pl-8 lg:pr-100 pb-10 space-y-6">
         
         {/* Preset Selector Removed */}
 

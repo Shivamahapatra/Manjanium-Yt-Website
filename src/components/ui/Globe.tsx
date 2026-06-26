@@ -749,7 +749,7 @@ export const Globe = React.memo(function Globe({
   // Viewports under 320px render a static/animated SVG representation to save resources and look better
   if (isTiny) {
     return (
-      <div className={`flex flex-col items-center justify-center p-4 border rounded-xl text-center w-[200px] h-[200px] mx-auto aspect-square ${
+      <div className={`flex flex-col items-center justify-center p-4 border rounded-xl text-center w-50 h-50 mx-auto aspect-square ${
         resolvedTheme === "light"
           ? "bg-neutral-50/20 border-neutral-200"
           : "bg-neutral-900/20 border-neutral-850"
@@ -796,7 +796,7 @@ export const Globe = React.memo(function Globe({
     >
       <div 
         ref={containerRef} 
-        className={`${containerClasses} focus-visible:outline focus-visible:outline-3 focus-visible:outline-[#fbbf24] focus-visible:outline-offset-2 rounded-2xl outline-none`}
+        className={`${containerClasses} focus-visible:outline-3 focus-visible:outline-[#fbbf24] focus-visible:outline-offset-2 rounded-2xl outline-none`}
         tabIndex={0}
         onKeyDown={handleKeyDown}
         onMouseMove={handleMouseMove}
@@ -949,7 +949,7 @@ export const Globe = React.memo(function Globe({
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 220 }}
-              className={`absolute right-0 top-0 bottom-0 w-[240px] sm:w-[280px] border-l shadow-2xl backdrop-blur-md z-50 p-4 flex flex-col text-left overflow-y-auto rounded-r-2xl ${
+              className={`absolute right-0 top-0 bottom-0 w-60 sm:w-70 border-l shadow-2xl backdrop-blur-md z-50 p-4 flex flex-col text-left overflow-y-auto rounded-r-2xl ${
                 resolvedTheme === "light"
                   ? "bg-white/95 border-neutral-200 text-neutral-900"
                   : "bg-[#070913]/98 border-[#1f2937]/80 text-white"
@@ -1060,7 +1060,7 @@ export const Globe = React.memo(function Globe({
                 <div className={`pt-3 border-t space-y-1.5 ${
                   resolvedTheme === "light" ? "border-neutral-200" : "border-[#1f2937]/30"
                 }`}>
-                  <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block flex items-center gap-1">
+                  <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider flex items-center gap-1">
                     <Trophy className="w-3.5 h-3.5 text-yellow-500" /> Previous Podium
                   </span>
                   <p className={`text-[10px] font-mono p-2 rounded border leading-relaxed ${
