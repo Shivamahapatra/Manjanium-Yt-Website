@@ -10,12 +10,12 @@ import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { F1_PRESETS, F1PresetKey } from "@/lib/dashboard-presets";
 import { F1TelemetryTab } from "@/components/f1/tabs/F1TelemetryTab";
 import { F1StandingsTab } from "@/components/f1/tabs/F1StandingsTab";
-import { TerminalChat } from "@/components/chat/TerminalChat";
 import { F1Card } from "@/components/f1/F1Card";
 import { motion } from "framer-motion";
 import { F1PresetLiveFocused } from "@/components/f1/presets/F1PresetLiveFocused";
 import { F1PresetStatsDetailed } from "@/components/f1/presets/F1PresetStatsDetailed";
 import { F1PresetCompactOverview } from "@/components/f1/presets/F1PresetCompactOverview";
+import { usePresetWithHydration } from "@/hooks/usePresetWithHydration";
 
 // Dynamic import for the 3D Live focus Globe
 const Globe = dynamic(
@@ -241,7 +241,15 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
     return () => clearInterval(interval);
   }, [currentVenue]);
 
-  if (loading || presetLoading) return <div className="flex items-center justify-center min-h-[400px]"><Spin size="large" /></div>;
+  // Hydration guard: show skeleton until localStorage has been read on the client.
+  // This prevents the SSR default ('live-focused') from flashing before the real
+  // persisted value is applied.
+  const { isMounted: presetHydrated } = usePresetWithHydration();
+
+  if (loading || presetLoading || !presetHydrated)
+    return (
+      <div className="w-full h-[400px] bg-[#131313] animate-pulse rounded-xl" />
+    );
 
   const presetProps = {
     sessionKey,
@@ -264,9 +272,11 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
           {preset === 'stats-detailed' && <F1PresetStatsDetailed {...presetProps} />}
           {preset === 'compact-overview' && <F1PresetCompactOverview {...presetProps} />}
         </div>
-        
-        {/* Terminal Chat Widget */}
-        <TerminalChat context="f1" />
+
+        {/*
+          TerminalChat removed from here – it is now mounted once at app root
+          level (src/app/layout.tsx) to prevent orphan subscriptions.
+        */}
       </div>
     </div>
   );

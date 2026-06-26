@@ -20,8 +20,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Manjanium On Softs",
-  description: "Live F1 Telemetry & Football Match Center",
+  title: "Manjanium Sports Network",
+  description: "F1 Live Telemetry & FIFA World Cup 2026 Coverage",
 };
 
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -29,6 +29,9 @@ import { SettingsProvider } from "@/lib/settings-context";
 import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { ClerkProvider } from "@clerk/nextjs";
 import AppearanceProvider from "@/components/providers/AppearanceProvider";
+import { GlobeProvider } from "@/components/providers/GlobeProvider";
+import { TerminalChatProvider } from "@/components/providers/TerminalChatProvider";
+import { TerminalChat } from "@/components/chat/TerminalChat";
 
 export default function RootLayout({
   children,
@@ -47,14 +50,27 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col relative" style={{ backgroundColor: 'var(--color-background)', color: 'var(--color-text-primary)' }}>
         <ClerkProvider>
-          <AppearanceProvider>
-            <SettingsProvider>
-              <OnboardingModal />
-              <AntdRegistry>
-                <MainLayout>{children}</MainLayout>
-              </AntdRegistry>
-            </SettingsProvider>
-          </AppearanceProvider>
+          {/* TerminalChatProvider: opens the realtime channel once at app level */}
+          <TerminalChatProvider>
+            {/* GlobeProvider: keeps Globe Canvas alive across preset switches */}
+            <GlobeProvider>
+              <AppearanceProvider>
+                <SettingsProvider>
+                  <OnboardingModal />
+                  <AntdRegistry>
+                    <MainLayout>{children}</MainLayout>
+                  </AntdRegistry>
+                  {/*
+                    TerminalChat is mounted here at app root so it never
+                    unmounts during page navigation. The fixed-position sidebar
+                    and mobile drawer are rendered via a portal inside the
+                    component itself.
+                  */}
+                  <TerminalChat context="f1" />
+                </SettingsProvider>
+              </AppearanceProvider>
+            </GlobeProvider>
+          </TerminalChatProvider>
         </ClerkProvider>
       </body>
     </html>

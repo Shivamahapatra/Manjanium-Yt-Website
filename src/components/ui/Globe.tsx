@@ -19,6 +19,7 @@ import { VenueTooltip } from "@/components/globe/VenueTooltip";
 import { getCountryFlag } from "@/lib/f1-helpers";
 import { useSettings } from "@/lib/settings-context";
 import { GLOBE_THEMES, getThemeArcColor } from "@/lib/globe-themes";
+import { useGlobeKeepAlive } from "@/hooks/useGlobeKeepAlive";
 
 extend({ ThreeGlobe });
 
@@ -335,6 +336,17 @@ export const Globe = React.memo(function Globe({
   onArcClick,
   onHoverRoundChange,
 }: WorldProps): React.JSX.Element {
+  // ── GlobeKeepAlive: hide via CSS instead of unmounting ──────────────────
+  // If the GlobeProvider is not present in the tree (e.g. standalone usage)
+  // we default to always-visible so the Globe still works without the provider.
+  let isVisible = true;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const ctx = useGlobeKeepAlive();
+    isVisible = ctx.isVisible;
+  } catch {
+    // GlobeProvider not in tree – render normally
+  }
   const { settings } = useSettings();
   const themeSetting = settings?.appearance?.theme || "dark";
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("dark");
@@ -772,6 +784,10 @@ export const Globe = React.memo(function Globe({
   } max-w-full`;
 
   return (
+    // CSS visibility wrapper: keeps the Canvas (and its WebGL context) alive
+    // when this Globe instance is not the active preset. The Canvas is never
+    // unmounted, so the GPU context is never lost.
+    <div style={{ display: isVisible ? undefined : "none" }} aria-hidden={!isVisible}>
     <figure
       role="figure"
       aria-label="F1 Racing Venues Interactive Globe"
@@ -1090,5 +1106,6 @@ export const Globe = React.memo(function Globe({
         Space to pause or resume auto-rotation, and Escape to stop rotation. Number keys 1 to 8 focus specific venues.
       </figcaption>
     </figure>
+    </div>
   );
 });
