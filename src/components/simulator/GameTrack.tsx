@@ -53,14 +53,14 @@ export default function GameTrack() {
     <>
       {/* Ground/Asphalt */}
       <RigidBody type="fixed" colliders="cuboid">
-        <mesh position={[0, 0, 0]} receiveShadow>
+        <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
           <planeGeometry args={[400, 400]} />
           <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
         </mesh>
       </RigidBody>
 
       {/* Grass/Pit area */}
-      <mesh position={[0, 0.01, 0]}>
+      <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[400, 400]} />
         <meshStandardMaterial color="#0a4d0a" transparent opacity={0.3} />
       </mesh>
