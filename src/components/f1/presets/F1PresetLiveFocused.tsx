@@ -16,6 +16,9 @@ export interface F1PresetProps {
   currentVenue: any;
   globeArcs: any;
   globeConfig: any;
+  weatherData?: any;
+  raceControlMsgs?: any[];
+  radioMsgs?: any[];
 }
 
 export function F1PresetLiveFocused({ session, localTime, currentVenue, globeArcs, globeConfig }: F1PresetProps) {

@@ -3,19 +3,14 @@
 import React, { useEffect, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Spin } from "antd";
-import { CloudRain, Radio, Flag, Wind, Thermometer, Volume2, AlertCircle } from "lucide-react";
-import { LiveTimingTower } from "@/components/f1/LiveTimingTower";
-import { F1_VENUES_2026, getCountryFlag, getTimezoneForVenue } from "@/lib/f1-helpers";
-import { useUserPreferences } from "@/hooks/useUserPreferences";
-import { F1_PRESETS, F1PresetKey } from "@/lib/dashboard-presets";
-import { F1TelemetryTab } from "@/components/f1/tabs/F1TelemetryTab";
-import { F1StandingsTab } from "@/components/f1/tabs/F1StandingsTab";
+import { getTimezoneForVenue, F1_VENUES_2026 } from "@/lib/f1-helpers";
 import { F1Card } from "@/components/f1/F1Card";
-import { motion } from "framer-motion";
 import { F1PresetLiveFocused } from "@/components/f1/presets/F1PresetLiveFocused";
 import { F1PresetStatsDetailed } from "@/components/f1/presets/F1PresetStatsDetailed";
 import { F1PresetCompactOverview } from "@/components/f1/presets/F1PresetCompactOverview";
 import { usePresetWithHydration } from "@/hooks/usePresetWithHydration";
+import { HUDSkeleton } from "@/components/ui/LoadingSkeleton";
+import { useDashboardPreset } from "@/hooks/useDashboardPreset";
 
 // Dynamic import for the 3D Live focus Globe
 const Globe = dynamic(
@@ -54,29 +49,7 @@ const globeConfig = {
   autoRotateSpeed: 0.6,
 };
 
-export function WeatherWidget({ sessionKey }: { sessionKey: string }) {
-  const [weatherData, setWeatherData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        const res = await fetch(`/api/f1/weather?session_key=${sessionKey}`);
-        const json = await res.json();
-        if (json.weather && json.weather.length > 0) {
-          setWeatherData(json.weather[json.weather.length - 1]);
-        }
-      } catch (err) {
-        console.error("Failed to fetch weather", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchWeather();
-    const interval = setInterval(fetchWeather, 30000);
-    return () => clearInterval(interval);
-  }, [sessionKey]);
-
+export function WeatherWidget({ weatherData, loading }: { weatherData: any; loading: boolean }) {
   if (loading || !weatherData) return <div className="glass-panel p-4 rounded-xl flex items-center justify-center min-h-25"><Spin size="small" /></div>;
 
   return (
@@ -85,21 +58,21 @@ export function WeatherWidget({ sessionKey }: { sessionKey: string }) {
         <div className="bg-[#1F2937] p-4 rounded-xl flex flex-col gap-2 transition-all hover:border-[#FBBF24]">
           <span className="font-bold text-xs uppercase text-[#6B7280]">AIR TEMP</span>
           <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-bold text-white">{weatherData.air_temperature}</span>
+            <span className="text-3xl font-bold text-white">{weatherData?.air_temperature ?? '--'}</span>
             <span className="text-sm text-[#6B7280]">°C</span>
           </div>
           <div className="w-full bg-[#333333] h-1.5 rounded-2xl overflow-hidden">
-            <div className="bg-[#FBBF24] h-full transition-all" style={{ width: `${Math.min(weatherData.air_temperature * 2, 100)}%` }} />
+            <div className="bg-[#FBBF24] h-full transition-all" style={{ width: `${Math.min((weatherData?.air_temperature || 0) * 2, 100)}%` }} />
           </div>
         </div>
         <div className="bg-[#1F2937] p-4 rounded-xl flex flex-col gap-2 transition-all hover:border-[#FBBF24]">
           <span className="font-bold text-xs uppercase text-[#6B7280]">TRACK TEMP</span>
           <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-bold text-white">{weatherData.track_temperature}</span>
+            <span className="text-3xl font-bold text-white">{weatherData?.track_temperature ?? '--'}</span>
             <span className="text-sm text-[#6B7280]">°C</span>
           </div>
           <div className="w-full bg-[#333333] h-1.5 rounded-2xl overflow-hidden">
-            <div className="bg-[#0EA5E9] h-full transition-all" style={{ width: `${Math.min(weatherData.track_temperature * 1.5, 100)}%` }} />
+            <div className="bg-[#0EA5E9] h-full transition-all" style={{ width: `${Math.min((weatherData?.track_temperature || 0) * 1.5, 100)}%` }} />
           </div>
         </div>
       </div>
@@ -107,38 +80,20 @@ export function WeatherWidget({ sessionKey }: { sessionKey: string }) {
   );
 }
 
-export function RaceControlFeed({ sessionKey }: { sessionKey: string }) {
-  const [messages, setMessages] = useState<any[]>([]);
-
-  useEffect(() => {
-    const fetchControl = async () => {
-      try {
-        const res = await fetch(`/api/f1/racecontrol?session_key=${sessionKey}`);
-        const json = await res.json();
-        if (json.racecontrol) {
-          const sorted = [...json.racecontrol].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-          setMessages(sorted.slice(0, 8));
-        }
-      } catch (err) {}
-    };
-    fetchControl();
-    const interval = setInterval(fetchControl, 10000);
-    return () => clearInterval(interval);
-  }, [sessionKey]);
-
+export function RaceControlFeed({ messages }: { messages: any[] }) {
   return (
     <F1Card title="Race Control" className="h-full flex flex-col overflow-hidden">
       <div className="flex-1 overflow-y-auto space-y-3 pr-1" style={{ scrollbarWidth: 'none' }}>
-        {messages.length === 0 ? (
+        {messages?.length === 0 ? (
           <div className="text-text-secondary text-sm opacity-50">No messages</div>
         ) : (
-          messages.map((msg, idx) => (
+          messages?.map((msg, idx) => (
             <div key={idx} className="text-sm border-b border-border-variant pb-2 last:border-0">
               <div className="flex justify-between items-center text-[10px] text-text-secondary font-mono mb-1">
-                <span>{new Date(msg.date).toLocaleTimeString("en-GB", { hour12: false })}</span>
-                <span className="uppercase">{msg.category}</span>
+                <span>{msg?.date ? new Date(msg.date).toLocaleTimeString("en-GB", { hour12: false }) : ''}</span>
+                <span className="uppercase">{msg?.category}</span>
               </div>
-              <p className="font-medium text-xs text-text-primary leading-tight">{msg.message}</p>
+              <p className="font-medium text-xs text-text-primary leading-tight">{msg?.message}</p>
             </div>
           ))
         )}
@@ -147,66 +102,86 @@ export function RaceControlFeed({ sessionKey }: { sessionKey: string }) {
   );
 }
 
-export function TeamRadioPanel({ sessionKey }: { sessionKey: string }) {
-  const [radioMsgs, setRadioMsgs] = useState<any[]>([]);
-
-  useEffect(() => {
-    const fetchRadio = async () => {
-      try {
-        const res = await fetch(`/api/f1/radio?session_key=${sessionKey}`);
-        const json = await res.json();
-        if (json.radio) {
-          const sorted = [...json.radio].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-          setRadioMsgs(sorted.slice(0, 4));
-        }
-      } catch (err) {}
-    };
-    fetchRadio();
-    const interval = setInterval(fetchRadio, 15000);
-    return () => clearInterval(interval);
-  }, [sessionKey]);
-
+export function TeamRadioPanel({ radioMsgs }: { radioMsgs: any[] }) {
   return (
     <>
-      {radioMsgs.map((msg, idx) => (
+      {radioMsgs?.map((msg, idx) => (
         <F1Card key={idx} className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-[#FBBF24]">volume_up</span>
-            <span className="text-xs font-bold uppercase text-white">CAR #{msg.driver_number}</span>
+            <span className="text-xs font-bold uppercase text-white">CAR #{msg?.driver_number}</span>
           </div>
-          <audio src={msg.recording_url} controls className="w-full h-8 scale-90 origin-left" />
+          <audio src={msg?.recording_url} controls className="w-full h-8 scale-90 origin-left" />
         </F1Card>
       ))}
     </>
   );
 }
 
-import { useF1PresetLayout } from "@/hooks/usePresetLayout";
-import { useDashboardPreset } from "@/hooks/useDashboardPreset";
-
-export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
+export function F1LiveTab() {
   const { preset, loading: presetLoading } = useDashboardPreset();
-
   const [session, setSession] = useState<any>(null);
   const [sessionKey, setSessionKey] = useState<string>("latest");
   const [loading, setLoading] = useState(true);
   const [localTime, setLocalTime] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+
+  const [weatherData, setWeatherData] = useState<any>(null);
+  const [raceControlMsgs, setRaceControlMsgs] = useState<any[]>([]);
+  const [radioMsgs, setRadioMsgs] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchSessionInfo = async () => {
+    const fetchAllData = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const res = await fetch("/api/f1/live");
-        const data = await res.json();
-        if (data.session) {
-          setSession(data.session);
-          setSessionKey(String(data.session.session_key || "latest"));
+        if (res.status === 429) {
+          setError('API rate limited. Retrying in 30s...');
+          setTimeout(fetchAllData, 30000);
+          return;
         }
-      } catch (err) {} finally {
+        if (res.status >= 500) {
+          setError('Server error. Please try again later.');
+          return;
+        }
+        const data = await res.json();
+        
+        const currentSessionKey = data?.session?.session_key || "latest";
+        
+        if (data?.session) {
+          setSession(data.session);
+          setSessionKey(String(currentSessionKey));
+        }
+
+        // Fetch dependent data concurrently
+        const [weatherRes, controlRes, radioRes] = await Promise.allSettled([
+          fetch(`/api/f1/weather?session_key=${currentSessionKey}`).then(r => r.json()),
+          fetch(`/api/f1/racecontrol?session_key=${currentSessionKey}`).then(r => r.json()),
+          fetch(`/api/f1/radio?session_key=${currentSessionKey}`).then(r => r.json())
+        ]);
+
+        if (weatherRes.status === 'fulfilled' && weatherRes.value?.weather?.length > 0) {
+          setWeatherData(weatherRes.value.weather[weatherRes.value.weather.length - 1]);
+        }
+        if (controlRes.status === 'fulfilled' && controlRes.value?.racecontrol) {
+          const sorted = [...controlRes.value.racecontrol].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          setRaceControlMsgs(sorted.slice(0, 8));
+        }
+        if (radioRes.status === 'fulfilled' && radioRes.value?.radio) {
+          const sorted = [...radioRes.value.radio].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          setRadioMsgs(sorted.slice(0, 4));
+        }
+
+      } catch (err) {
+        console.error("F1 fetch error:", err);
+        setError('Network error');
+      } finally {
         setLoading(false);
       }
     };
-    fetchSessionInfo();
-    const interval = setInterval(fetchSessionInfo, 10000);
+    fetchAllData();
+    const interval = setInterval(fetchAllData, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -246,9 +221,24 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
   // persisted value is applied.
   const { isMounted: presetHydrated } = usePresetWithHydration();
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-96 text-[#EF4444]">
+        <div className="text-center space-y-4">
+          <div className="text-lg">⚠️ {error}</div>
+          <button onClick={() => window.location.reload()} className="px-4 py-2 bg-[#FBBF24] text-black font-bold rounded-lg">
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (loading || presetLoading || !presetHydrated)
     return (
-      <div className="w-full h-100 bg-surface animate-pulse rounded-xl" />
+      <div className="max-w-[1800px] px-4 lg:pl-8 pb-10 space-y-6">
+        <HUDSkeleton />
+      </div>
     );
 
   const presetProps = {
@@ -257,7 +247,10 @@ export function F1LiveTab({ presetLayout }: { presetLayout?: any }) {
     localTime,
     currentVenue,
     globeArcs,
-    globeConfig
+    globeConfig,
+    weatherData,
+    raceControlMsgs,
+    radioMsgs
   };
 
   return (

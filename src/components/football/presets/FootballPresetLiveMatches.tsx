@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FootballCard } from '@/components/football/FootballCard';
 import { FootballBadge } from '@/components/football/FootballBadge';
@@ -14,15 +14,11 @@ interface FootballPresetLiveMatchesProps {
 
 export function FootballPresetLiveMatches({ fixtures, loadingLive }: FootballPresetLiveMatchesProps) {
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
-  const liveCount = fixtures.filter((f: any) =>
-    f.fixture?.status?.short === '1H' || f.fixture?.status?.short === '2H'
-  ).length;
+  const liveCount = fixtures?.filter((f: any) =>
+    f?.fixture?.status?.short === '1H' || f?.fixture?.status?.short === '2H'
+  ).length || 0;
 
-  useEffect(() => {
-    if (fixtures.length > 0 && !selectedMatch) {
-      setSelectedMatch(fixtures[0]);
-    }
-  }, [fixtures]);
+  const displayMatch = selectedMatch || (fixtures?.length > 0 ? fixtures[0] : null);
 
   return (
     <div className="flex flex-col gap-6">
@@ -32,7 +28,7 @@ export function FootballPresetLiveMatches({ fixtures, loadingLive }: FootballPre
           🔴 {liveCount} LIVE MATCHES
         </FootballBadge>
         <span className="text-[#6B7280] text-sm">
-          {fixtures.length} total matches today
+          {fixtures?.length || 0} total matches today
         </span>
       </div>
 
@@ -45,18 +41,18 @@ export function FootballPresetLiveMatches({ fixtures, loadingLive }: FootballPre
               <div className="flex justify-center p-8">
                 <div className="animate-spin w-8 h-8 border-2 border-[#0EA5E9] border-t-transparent rounded-full" />
               </div>
-            ) : fixtures.length === 0 ? (
+            ) : !fixtures || fixtures.length === 0 ? (
               <div className="p-8 text-center text-[#6B7280]">No live matches currently.</div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {fixtures.map((match: any) => (
+                {fixtures?.map((match: any) => (
                   <motion.div
-                    key={match.fixture.id}
+                    key={match?.fixture?.id}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedMatch(match)}
                     className={`cursor-pointer transition-all ${
-                      selectedMatch?.fixture?.id === match.fixture.id
+                      displayMatch?.fixture?.id === match?.fixture?.id
                         ? 'ring-2 ring-[#0EA5E9] rounded-xl'
                         : ''
                     }`}

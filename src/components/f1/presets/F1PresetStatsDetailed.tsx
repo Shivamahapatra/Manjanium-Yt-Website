@@ -9,7 +9,7 @@ const LiveTrackMap = dynamic(
   { ssr: false, loading: () => <div className="w-full h-full rounded-lg bg-neutral-900 animate-pulse" /> }
 );
 
-export function F1PresetStatsDetailed({ sessionKey }: F1PresetProps) {
+export function F1PresetStatsDetailed({ weatherData, raceControlMsgs, radioMsgs }: F1PresetProps) {
   return (
     <div className="h-[calc(100vh-200px)] flex flex-col gap-4 px-6 pb-6">
       {/* Tab label - just "Live" */}
@@ -36,7 +36,7 @@ export function F1PresetStatsDetailed({ sessionKey }: F1PresetProps) {
                     <th className="text-right p-1">Time</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="bg-surface">
                   {/* Placeholder - LiveTimingTower data flows through */}
                 </tbody>
               </table>
@@ -48,7 +48,7 @@ export function F1PresetStatsDetailed({ sessionKey }: F1PresetProps) {
         <div>
           <F1Card title="Team Radio" className="h-full flex flex-col p-4">
             <div className="flex-1 space-y-2 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-              <TeamRadioPanel sessionKey={sessionKey} />
+              <TeamRadioPanel radioMsgs={radioMsgs || []} />
             </div>
           </F1Card>
         </div>
@@ -57,7 +57,7 @@ export function F1PresetStatsDetailed({ sessionKey }: F1PresetProps) {
         <div>
           <F1Card title="Race Control" className="h-full flex flex-col p-4">
             <div className="flex-1 space-y-2 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-              <RaceControlFeed sessionKey={sessionKey} />
+              <RaceControlFeed messages={raceControlMsgs || []} />
             </div>
           </F1Card>
         </div>
@@ -70,7 +70,7 @@ export function F1PresetStatsDetailed({ sessionKey }: F1PresetProps) {
                 <LiveTrackMap />
               </div>
               <div className="flex gap-2">
-                <WeatherWidget sessionKey={sessionKey} />
+                <WeatherWidget weatherData={weatherData} loading={!weatherData} />
               </div>
             </div>
           </F1Card>
