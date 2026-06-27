@@ -48,7 +48,7 @@ export default function SimulatorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#131313] to-[#0a0a0a] pt-32 pb-12">
+    <div className="min-h-screen bg-linear-to-br from-surface to-[#0a0a0a] pt-32 pb-12">
       <div className="max-w-6xl mx-auto px-6 space-y-8">
         {/* Header */}
         <motion.div
@@ -167,7 +167,7 @@ export default function SimulatorPage() {
                 </motion.button>
                 <motion.button
                   onClick={handleStartRace}
-                  className="px-6 py-3 bg-[#10B981] text-white font-bold rounded-lg hover:bg-[#059669] transition-colors text-lg"
+                  className="px-6 py-3 bg-success text-white font-bold rounded-lg hover:bg-[#059669] transition-colors text-lg"
                   whileTap={{ scale: 0.95 }}
                 >
                   🏁 START RACE

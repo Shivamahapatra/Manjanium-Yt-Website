@@ -52,7 +52,7 @@ export default function HomePage() {
               <CommunityPollsCard />
               <Link href="/simulator">
                 <motion.div
-                  className="bg-gradient-to-br from-[#FBBF24]/20 to-[#131313] border border-[#FBBF24]/40 rounded-lg p-6 hover:border-[#FBBF24] transition-colors cursor-pointer h-full"
+                  className="bg-linear-to-br from-[#FBBF24]/20 to-surface border border-[#FBBF24]/40 rounded-lg p-6 hover:border-[#FBBF24] transition-colors cursor-pointer h-full"
                   whileHover={{ scale: 1.02, y: -4 }}
                 >
                   <div className="text-4xl mb-3">🏎️</div>
@@ -96,7 +96,7 @@ export default function HomePage() {
                 {/* Brand */}
                 <div>
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 bg-gradient-to-br from-accent to-secondary rounded-lg flex items-center justify-center text-surface font-black">
+                    <div className="w-8 h-8 bg-linear-to-br from-accent to-secondary rounded-lg flex items-center justify-center text-surface font-black">
                       M
                     </div>
                     <span className="font-heading font-bold text-lg">Manjanium</span>
@@ -110,9 +110,9 @@ export default function HomePage() {
                 <div>
                   <h4 className="font-bold mb-4 text-on-surface">Quick Links</h4>
                   <ul className="space-y-2 text-muted text-sm">
-                    <li><a href="/f1" className="hover:text-accent transition-standard">F1 Hub</a></li>
-                    <li><a href="/football" className="hover:text-accent transition-standard">Football</a></li>
-                    <li><a href="/settings" className="hover:text-accent transition-standard">Settings</a></li>
+                    <li><Link href="/f1" className="hover:text-accent transition-standard">F1 Hub</Link></li>
+                    <li><Link href="/football" className="hover:text-accent transition-standard">Football</Link></li>
+                    <li><Link href="/settings" className="hover:text-accent transition-standard">Settings</Link></li>
                   </ul>
                 </div>
 

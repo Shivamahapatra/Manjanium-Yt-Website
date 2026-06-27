@@ -22,7 +22,7 @@ export default function TrackCard({ track, onSelect, isSelected }: TrackCardProp
       whileTap={{ scale: 0.98 }}
     >
       {/* Track image placeholder */}
-      <div className="w-full h-32 bg-gradient-to-br from-[#1F2937] to-[#131313] flex items-center justify-center">
+      <div className="w-full h-32 bg-linear-to-br from-[#1F2937] to-surface flex items-center justify-center">
         <div className="text-4xl font-bold text-[#6B7280]">{track.shortCode}</div>
       </div>
 
