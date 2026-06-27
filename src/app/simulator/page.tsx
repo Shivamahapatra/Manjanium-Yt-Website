@@ -8,7 +8,7 @@ import TrackCard from '@/components/simulator/TrackCard'
 import GameSettings from '@/components/simulator/GameSettings'
 import { SIMULATOR_TRACKS } from '@/lib/tracks'
 import { useSimulatorGame } from '@/hooks/useSimulatorGame'
-import { GameMode, WeatherType, DifficultyLevel, Track } from '@/types/simulator'
+import type { GameMode, WeatherType, DifficultyLevel, Track } from '@/types/simulator'
 
 export default function SimulatorPage() {
   const router = useRouter()
@@ -51,18 +51,14 @@ export default function SimulatorPage() {
     <div className="min-h-screen bg-linear-to-br from-surface to-[#0a0a0a] pt-32 pb-12">
       <div className="max-w-6xl mx-auto px-6 space-y-8">
         {/* Header */}
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <div className="text-center">
           <h1 className="text-5xl font-bold text-[#FBBF24] font-heading mb-2">
             PADDOCK SIMULATOR
           </h1>
           <p className="text-[#6B7280] text-lg">
             Experience F1 racing at your fingertips
           </p>
-        </motion.div>
+        </div>
 
         {/* Progress indicator */}
         <div className="flex justify-center gap-2">
@@ -77,15 +73,9 @@ export default function SimulatorPage() {
         </div>
 
         {/* Step 1: Game Mode Selection */}
-        <AnimatePresence mode="wait">
+        <div>
           {step === 1 && (
-            <motion.div
-              key="step1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
-            >
+            <div className="space-y-6">
               <h2 className="text-2xl font-bold text-white">Select Game Mode</h2>
               <GameModeSelector selected={gameMode} onSelect={setGameMode} />
               <div className="flex justify-end">
@@ -97,18 +87,12 @@ export default function SimulatorPage() {
                   Next: Select Track
                 </motion.button>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* Step 2: Track Selection */}
           {step === 2 && (
-            <motion.div
-              key="step2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
-            >
+            <div className="space-y-6">
               <h2 className="text-2xl font-bold text-white">Choose Your Track</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 {SIMULATOR_TRACKS.map((track) => (
@@ -136,18 +120,12 @@ export default function SimulatorPage() {
                   Next: Settings
                 </motion.button>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* Step 3: Game Settings */}
           {step === 3 && (
-            <motion.div
-              key="step3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
-            >
+            <div className="space-y-6">
               <h2 className="text-2xl font-bold text-white">Game Settings</h2>
               <GameSettings
                 difficulty={difficulty}
@@ -173,9 +151,9 @@ export default function SimulatorPage() {
                   🏁 START RACE
                 </motion.button>
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        </div>
       </div>
     </div>
   )
