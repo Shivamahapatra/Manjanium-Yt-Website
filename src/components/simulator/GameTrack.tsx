@@ -71,11 +71,12 @@ export default function GameTrack() {
           <bufferGeometry>
             <bufferAttribute
               attach="attributes-position"
-              count={checkpoints.length}
-              array={new Float32Array(
-                checkpoints.flatMap((cp) => [cp.position[0], cp.position[1] + 0.1, cp.position[2]])
-              )}
-              itemSize={3}
+              args={[
+                new Float32Array(
+                  checkpoints.flatMap((cp) => [cp.position[0], cp.position[1] + 0.1, cp.position[2]])
+                ),
+                3
+              ]}
             />
           </bufferGeometry>
           <lineBasicMaterial color="#FBBF24" linewidth={2} />
