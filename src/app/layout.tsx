@@ -31,8 +31,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import AppearanceProvider from "@/components/providers/AppearanceProvider";
 import { GlobeProvider } from "@/components/providers/GlobeProvider";
 import { TerminalChatProvider } from "@/components/providers/TerminalChatProvider";
-import { TerminalChat } from "@/components/chat/TerminalChat";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -60,13 +58,6 @@ export default function RootLayout({
                   <AntdRegistry>
                     <MainLayout>{children}</MainLayout>
                   </AntdRegistry>
-                  {/*
-                    TerminalChat is mounted here at app root so it never
-                    unmounts during page navigation. The fixed-position sidebar
-                    and mobile drawer are rendered via a portal inside the
-                    component itself.
-                  */}
-                  <TerminalChat context="f1" />
                 </SettingsProvider>
               </AppearanceProvider>
             </GlobeProvider>

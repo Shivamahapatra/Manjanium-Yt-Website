@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { F1SubNav } from "@/components/f1/F1SubNav";
+import TerminalChat from "@/components/chat/TerminalChat";
 
 export default function F1Layout({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<any>(null);
@@ -113,6 +114,7 @@ export default function F1Layout({ children }: { children: React.ReactNode }) {
       <div className="flex-1 overflow-y-auto">
         {children}
       </div>
+      <TerminalChat context="f1" />
     </div>
   );
 }
