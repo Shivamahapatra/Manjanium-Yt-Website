@@ -1,7 +1,7 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { Physics, Debug } from '@react-three/rapier'
+import { Physics } from '@react-three/rapier'
 import { PerspectiveCamera, OrbitControls } from '@react-three/drei'
 import GameCar from './GameCar'
 import GameTrack from './GameTrack'
