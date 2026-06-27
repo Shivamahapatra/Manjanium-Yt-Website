@@ -223,15 +223,21 @@ export function F1LiveTab() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-96 text-alert">
-        <div className="text-center space-y-4">
-          <div className="text-lg">⚠️ {error}</div>
-          <button onClick={() => window.location.reload()} className="px-4 py-2 bg-[#FBBF24] text-black font-bold rounded-lg">
+      <div className="flex items-center justify-center h-96 text-[#FBBF24] text-center space-y-4">
+        <div>
+          <div className="text-lg font-bold">⚠️ F1 Data Unavailable</div>
+          <p className="text-sm text-[#6B7280] mt-2">
+            OpenF1 API is temporarily unavailable.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-[#FBBF24] text-black rounded font-bold"
+          >
             Retry
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   if (loading || presetLoading || !presetHydrated)
