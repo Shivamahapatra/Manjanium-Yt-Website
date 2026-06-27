@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Spin } from 'antd';
 import { Tabs, TabsContent } from '@/components/ui/shadcn-tabs';
@@ -25,12 +25,10 @@ function F1HubContent() {
   const defaultTab = searchParams.get('tab') || 'live';
   const [activeTab, setActiveTab] = useState<string>(defaultTab);
 
-  useEffect(() => {
-    const tab = searchParams.get('tab');
-    if (tab && tab !== activeTab) {
-      setActiveTab(tab);
-    }
-  }, [searchParams]);
+  const tabParam = searchParams.get('tab');
+  if (tabParam && tabParam !== activeTab) {
+    setActiveTab(tabParam);
+  }
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -62,12 +60,12 @@ function F1HubContent() {
           resolutionScale={1}
         />
       </div>
-      <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-[#e10600]/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
-      <div className="fixed top-1/4 left-1/4 w-[400px] h-[400px] bg-red-800/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
+      <div className="fixed top-0 right-1/4 w-125 h-125 bg-[#e10600]/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
+      <div className="fixed top-1/4 left-1/4 w-100 h-100 bg-red-800/10 rounded-2xl blur-[150px] pointer-events-none z-0" />
 
       {/* ===== TABS CONTENT ===== */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex flex-col relative z-10">
-        <div className="relative min-h-[500px] w-full mt-4">
+        <div className="relative min-h-125 w-full mt-4">
           
           {/* ----- LIVE ----- */}
           <TabsContent value="live" className="mt-0 outline-none">
