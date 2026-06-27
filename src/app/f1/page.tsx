@@ -4,7 +4,6 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Spin } from 'antd';
 import { Tabs, TabsContent } from '@/components/ui/shadcn-tabs';
-import { useF1PresetLayout } from '@/hooks/usePresetLayout';
 import '@/styles/f1-design-tokens.css';
 import { F1Badge } from '@/components/f1/F1Badge';
 
@@ -21,7 +20,6 @@ import DarkVeil from "@/components/ui/DarkVeil";
 function F1HubContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const presetLayout = useF1PresetLayout();
 
   // Tab State
   const defaultTab = searchParams.get('tab') || 'live';
@@ -73,7 +71,7 @@ function F1HubContent() {
           
           {/* ----- LIVE ----- */}
           <TabsContent value="live" className="mt-0 outline-none">
-            {activeTab === 'live' && <F1LiveTab presetLayout={presetLayout} />}
+            {activeTab === 'live' && <F1LiveTab />}
           </TabsContent>
 
           {/* ----- REPLAY ----- */}
