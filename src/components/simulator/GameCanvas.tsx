@@ -8,13 +8,11 @@ import GameTrack from './GameTrack'
 
 export default function GameCanvas() {
   return (
-    <Canvas shadows>
-      <PerspectiveCamera
-        makeDefault
-        position={[0, 15, 25]}
-        fov={60}
-      />
-
+    <Canvas 
+      shadows
+      style={{ width: '100%', height: '100%', display: 'block' }}
+      camera={{ position: [0, 15, 25], fov: 60 }}
+    >
       <Physics gravity={[0, -9.81, 0]} debug={false}>
         {/* Car */}
         <GameCar />
@@ -32,15 +30,16 @@ export default function GameCanvas() {
         autoRotateSpeed={0.5}
       />
 
-      {/* Lighting */}
-      <ambientLight intensity={0.8} />
+      {/* Lighting - BRIGHT */}
+      <ambientLight intensity={1.2} />
       <directionalLight
         position={[100, 100, 50]}
-        intensity={1.2}
+        intensity={2}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
       />
+      <pointLight position={[-50, 50, 50]} intensity={0.8} />
     </Canvas>
   )
 }

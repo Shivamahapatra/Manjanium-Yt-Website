@@ -66,20 +66,21 @@ export default function GameTrack() {
       </mesh>
 
       {/* Track centerline (visual only) */}
-      <lineSegments>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[
-              new Float32Array(
+      {checkpoints.length > 0 && (
+        <lineSegments>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              count={checkpoints.length}
+              array={new Float32Array(
                 checkpoints.flatMap((cp) => [cp.position[0], cp.position[1] + 0.1, cp.position[2]])
-              ),
-              3
-            ]}
-          />
-        </bufferGeometry>
-        <lineBasicMaterial color="#FBBF24" linewidth={2} />
-      </lineSegments>
+              )}
+              itemSize={3}
+            />
+          </bufferGeometry>
+          <lineBasicMaterial color="#FBBF24" linewidth={2} />
+        </lineSegments>
+      )}
 
       {/* Start/Finish Line */}
       {checkpoints.map((cp) => (
