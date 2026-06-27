@@ -49,3 +49,31 @@ export interface APIError {
   code: number;
   timestamp: string;
 }
+
+export interface LiveFixtureData {
+  id?: string;
+  fixture?: {
+    id?: string;
+    status?: {
+      short?: string;
+      elapsed?: number;
+    };
+  };
+  league?: {
+    name?: string;
+  };
+  teams?: {
+    home?: {
+      name?: string;
+      logo?: string;
+    };
+    away?: {
+      name?: string;
+      logo?: string;
+    };
+  };
+  goals?: {
+    home?: number;
+    away?: number;
+  };
+}

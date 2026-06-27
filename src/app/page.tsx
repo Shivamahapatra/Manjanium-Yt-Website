@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import { Navbar } from '@/components/layout/Navbar'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { HeroSection } from '@/components/home/HeroSection'
@@ -49,6 +50,23 @@ export default function HomePage() {
               <F1PreviewCard />
               <PlayerStatsCard />
               <CommunityPollsCard />
+              <Link href="/simulator">
+                <motion.div
+                  className="bg-gradient-to-br from-[#FBBF24]/20 to-[#131313] border border-[#FBBF24]/40 rounded-lg p-6 hover:border-[#FBBF24] transition-colors cursor-pointer h-full"
+                  whileHover={{ scale: 1.02, y: -4 }}
+                >
+                  <div className="text-4xl mb-3">🏎️</div>
+                  <h3 className="text-xl font-bold text-[#FBBF24] font-heading mb-2">
+                    PADDOCK SIMULATOR
+                  </h3>
+                  <p className="text-sm text-[#6B7280]">
+                    Experience F1 racing with advanced physics, multiplayer modes, and global leaderboards.
+                  </p>
+                  <div className="mt-4 text-xs text-[#FBBF24] font-bold">
+                    Enter Simulator →
+                  </div>
+                </motion.div>
+              </Link>
             </DashboardGrid>
           </motion.section>
 

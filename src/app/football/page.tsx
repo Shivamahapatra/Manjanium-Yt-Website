@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
+import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Spin } from "antd";
 import { motion } from "framer-motion";
@@ -9,8 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/shadcn
 import { GroupStandingsCard } from "@/components/football/GroupStandingsCard";
 import { TopScorersWidget } from "@/components/football/TopScorersWidget";
 import { getTopScorers } from "@/lib/football-utils";
-import { StandingsResponse } from "@/types/football";
+import { StandingsResponse, LiveFixtureData } from "@/types/football";
 import { PastMatches } from "@/components/football/PastMatches";
+import { MatchSummary } from "@/types/match";
 import { useFootballDashboardPreset } from "@/hooks/useFootballDashboardPreset";
 import { useFootballRealtime } from "@/hooks/useFootballRealtime";
 import { FootballPresetLiveMatches } from "@/components/football/presets/FootballPresetLiveMatches";
@@ -29,21 +31,19 @@ function FootballHubContent() {
   const defaultTab = searchParams.get("tab") || "live";
   const [activeTab, setActiveTab] = useState<string>(defaultTab);
 
-  useEffect(() => {
-    const tab = searchParams.get("tab");
-    if (tab && tab !== activeTab) {
-      setActiveTab(tab);
-    }
-  }, [searchParams]);
+  const tabParam = searchParams.get("tab");
+  if (tabParam && tabParam !== activeTab) {
+    setActiveTab(tabParam);
+  }
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     router.push(`/football?tab=${value}`, { scroll: false });
   };
 
-  const [fixtures, setFixtures] = useState<any[]>([]);
+  const [fixtures, setFixtures] = useState<LiveFixtureData[]>([]);
   const [loadingLive, setLoadingLive] = useState(true);
-  const [pastMatches, setPastMatches] = useState<any[]>([]);
+  const [pastMatches, setPastMatches] = useState<MatchSummary[]>([]);
   const [standingsData, setStandingsData] = useState<StandingsResponse | null>(null);
   const [loadingStandings, setLoadingStandings] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -202,7 +202,7 @@ function FootballHubContent() {
                   <p className="text-xs font-bold text-[#6B7280] uppercase">HOME</p>
                 </div>
                 <div className="w-16 h-16 md:w-24 md:h-24 bg-black/50 border border-[#333333] rounded-2xl p-3 flex items-center justify-center backdrop-blur-sm">
-                  <img src={fixtures[0]?.teams?.home?.logo} alt="Home" className="w-full h-full object-contain" />
+                  <Image src={fixtures[0]?.teams?.home?.logo || ''} alt="Home" width={96} height={96} className="w-full h-full object-contain" unoptimized />
                 </div>
               </div>
               
@@ -215,7 +215,7 @@ function FootballHubContent() {
               
               <div className="flex-1 flex items-center justify-end gap-6">
                 <div className="w-16 h-16 md:w-24 md:h-24 bg-black/50 border border-[#333333] rounded-2xl p-3 flex items-center justify-center backdrop-blur-sm">
-                  <img src={fixtures[0]?.teams?.away?.logo} alt="Away" className="w-full h-full object-contain" />
+                  <Image src={fixtures[0]?.teams?.away?.logo || ''} alt="Away" width={96} height={96} className="w-full h-full object-contain" unoptimized />
                 </div>
                 <div className="text-left hidden md:block">
                   <h2 className="text-2xl md:text-3xl font-black drop-shadow-md uppercase text-white" style={{ fontFamily: 'var(--football-font-heading)' }}>{fixtures[0]?.teams?.away?.name}</h2>

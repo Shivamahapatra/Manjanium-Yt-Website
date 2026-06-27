@@ -6,15 +6,16 @@ import { FootballCard } from '@/components/football/FootballCard';
 import { FootballBadge } from '@/components/football/FootballBadge';
 import { LiveMatchCard } from '@/components/football/LiveMatchCard';
 import { TerminalChat } from '@/components/chat/TerminalChat';
+import { LiveFixtureData } from '@/types/football';
 
 interface FootballPresetLiveMatchesProps {
-  fixtures: any[];
+  fixtures: LiveFixtureData[];
   loadingLive: boolean;
 }
 
 export function FootballPresetLiveMatches({ fixtures, loadingLive }: FootballPresetLiveMatchesProps) {
-  const [selectedMatch, setSelectedMatch] = useState<any>(null);
-  const liveCount = fixtures?.filter((f: any) =>
+  const [selectedMatch, setSelectedMatch] = useState<LiveFixtureData | null>(null);
+  const liveCount = fixtures?.filter((f: LiveFixtureData) =>
     f?.fixture?.status?.short === '1H' || f?.fixture?.status?.short === '2H'
   ).length || 0;
 
@@ -45,7 +46,7 @@ export function FootballPresetLiveMatches({ fixtures, loadingLive }: FootballPre
               <div className="p-8 text-center text-[#6B7280]">No live matches currently.</div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {fixtures?.map((match: any) => (
+                {fixtures?.map((match: LiveFixtureData) => (
                   <motion.div
                     key={match?.fixture?.id}
                     whileHover={{ scale: 1.02 }}

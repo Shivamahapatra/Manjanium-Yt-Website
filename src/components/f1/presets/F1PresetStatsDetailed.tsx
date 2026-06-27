@@ -29,7 +29,7 @@ export function F1PresetStatsDetailed({ weatherData, raceControlMsgs, radioMsgs 
           <F1Card title="Live Timing" className="h-full flex flex-col p-4">
             <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
               <table className="w-full text-xs">
-                <thead className="sticky top-0 bg-[#131313]">
+                <thead className="sticky top-0 bg-surface">
                   <tr className="text-[#6B7280] uppercase text-xs">
                     <th className="text-left p-1">Pos</th>
                     <th className="text-left p-1">Driver</th>

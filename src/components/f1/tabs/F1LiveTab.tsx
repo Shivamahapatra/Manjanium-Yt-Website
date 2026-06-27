@@ -223,7 +223,7 @@ export function F1LiveTab() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-96 text-[#EF4444]">
+      <div className="flex items-center justify-center h-96 text-alert">
         <div className="text-center space-y-4">
           <div className="text-lg">⚠️ {error}</div>
           <button onClick={() => window.location.reload()} className="px-4 py-2 bg-[#FBBF24] text-black font-bold rounded-lg">
