@@ -2,30 +2,22 @@
 
 import { useMemo, useRef, useEffect } from 'react'
 import { RigidBody, CuboidCollider } from '@react-three/rapier'
-import * as THREE from 'three'
 import { useGamePhysics } from '@/hooks/useGamePhysics'
 import { useSimulatorGame } from '@/hooks/useSimulatorGame'
 import { TRACK_CHECKPOINTS } from '@/lib/gamePhysicsConfig'
 
 export default function GameTrack() {
   const { session } = useSimulatorGame()
-  const { completeLap, lapData } = useGamePhysics()
+  const { completeLap } = useGamePhysics()
   const lastCheckpointRef = useRef<string | null>(null)
-  const lapStartTimeRef = useRef<number>(Date.now())
+  const lapStartTimeRef = useRef<number>(0)
 
   const trackId = session?.track.id || 'monza'
   const checkpoints = useMemo(() => TRACK_CHECKPOINTS[trackId as keyof typeof TRACK_CHECKPOINTS] || [], [trackId])
 
-  // Simple oval track curve
-  const trackCurve = useMemo(() => {
-    const points = []
-    for (let i = 0; i < 100; i++) {
-      const angle = (i / 100) * Math.PI * 2
-      const x = Math.cos(angle) * 100
-      const z = Math.sin(angle) * 150
-      points.push(new THREE.Vector3(x, 0.05, z))
-    }
-    return new THREE.CatmullRomCurve3(points)
+  // Initialize lap start time after mount (Date.now is impure during render)
+  useEffect(() => {
+    lapStartTimeRef.current = Date.now()
   }, [])
 
   // Lap detection - check if car crosses start/finish line
