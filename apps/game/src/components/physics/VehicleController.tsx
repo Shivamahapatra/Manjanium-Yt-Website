@@ -53,6 +53,14 @@ export function VehicleController() {
     
     // Update telemetry (approximate km/h)
     useTelemetryStore.getState().setTelemetry(Math.round(speed * 3.6), 1)
+    
+    // Broadcast to multiplayer
+    import('../../lib/multiplayer').then(m => {
+      m.broadcastPosition(
+        [body.translation().x, body.translation().y, body.translation().z],
+        [body.rotation().x, body.rotation().y, body.rotation().z, body.rotation().w]
+      );
+    });
 
     if (speed > 1) { // Only allow turning if moving
       let turnDirection = 0
