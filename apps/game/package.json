@@ -18,7 +18,8 @@
     "@react-three/drei": "^10.7.7",
     "zustand": "^4.5.0",
     "framer-motion": "^11.0.0",
-    "@supabase/supabase-js": "^2.108.0"
+    "@supabase/supabase-js": "^2.108.0",
+    "@manjanium/ui": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

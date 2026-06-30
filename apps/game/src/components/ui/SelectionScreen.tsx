@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@manjanium/ui';
 
 export function SelectionScreen({ onStart }: { onStart: () => void }) {
   const [mode, setMode] = useState<'single' | 'multi' | 'time'>('single');
@@ -19,7 +20,7 @@ export function SelectionScreen({ onStart }: { onStart: () => void }) {
                 <button
                   key={m}
                   onClick={() => setMode(m as any)}
-                  className={`flex-1 py-3 px-4 rounded-lg font-bold uppercase text-sm border transition-all ${
+                  className={`flex-1 py-3 px-4 rounded-lg font-bold uppercase text-sm border transition-all cursor-pointer ${
                     mode === m ? 'border-yellow-500 bg-yellow-500/10 text-yellow-500' : 'border-neutral-700 hover:border-neutral-500 text-neutral-300'
                   }`}
                 >
@@ -36,7 +37,7 @@ export function SelectionScreen({ onStart }: { onStart: () => void }) {
                 <button
                   key={t}
                   onClick={() => setTrack(t)}
-                  className={`py-2 px-3 rounded-lg font-bold uppercase text-xs border transition-all ${
+                  className={`py-2 px-3 rounded-lg font-bold uppercase text-xs border transition-all cursor-pointer ${
                     track === t ? 'border-blue-500 bg-blue-500/10 text-blue-400' : 'border-neutral-700 hover:border-neutral-500 text-neutral-400'
                   }`}
                 >
@@ -46,14 +47,17 @@ export function SelectionScreen({ onStart }: { onStart: () => void }) {
             </div>
           </div>
 
-          <button
+          <Button
             onClick={onStart}
-            className="w-full py-4 mt-4 bg-white text-black font-black italic text-xl uppercase rounded-lg hover:bg-neutral-200 transition-colors cursor-pointer"
+            variant="primary"
+            size="lg"
+            className="w-full mt-4"
           >
             Drive
-          </button>
+          </Button>
         </div>
       </div>
     </div>
   );
 }
+
