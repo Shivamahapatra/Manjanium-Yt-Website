@@ -1,8 +1,10 @@
 'use client'
 import React, { useState } from 'react'
-import { GameCanvas } from '@/components/GameCanvas'
+import dynamic from 'next/dynamic'
 import { GameHUD } from '@/components/ui/GameHUD'
 import { SelectionScreen } from '@/components/ui/SelectionScreen'
+
+const GameCanvas = dynamic(() => import('@/components/GameCanvas').then(mod => mod.GameCanvas), { ssr: false })
 
 export default function SimulatorPage() {
   const [inGame, setInGame] = useState(false);
