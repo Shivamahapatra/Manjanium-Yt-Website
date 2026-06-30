@@ -1,6 +1,10 @@
 import React from 'react';
+import { useTelemetryStore } from '../../store/telemetry';
 
 export function GameHUD() {
+  const speed = useTelemetryStore((state) => state.speed);
+  const gear = useTelemetryStore((state) => state.gear);
+
   return (
     <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-6">
       <div className="flex justify-between items-start">
@@ -31,12 +35,12 @@ export function GameHUD() {
         <div className="bg-black/50 backdrop-blur px-6 py-4 rounded border border-white/10 text-white font-mono text-center flex items-center gap-6">
           <div>
             <div className="text-xs text-neutral-400">SPEED</div>
-            <div className="text-4xl font-black italic">312 <span className="text-sm text-neutral-500">KM/H</span></div>
+            <div className="text-4xl font-black italic">{speed} <span className="text-sm text-neutral-500">KM/H</span></div>
           </div>
           <div className="w-px h-12 bg-white/20"></div>
           <div>
             <div className="text-xs text-neutral-400">GEAR</div>
-            <div className="text-5xl font-black italic text-yellow-500">7</div>
+            <div className="text-5xl font-black italic text-yellow-500">{gear}</div>
           </div>
         </div>
       </div>
