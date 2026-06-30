@@ -23,7 +23,8 @@ export function GameCanvas() {
           { name: 'backward', keys: ['ArrowDown', 'KeyS'] },
           { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
           { name: 'right', keys: ['ArrowRight', 'KeyD'] },
-          { name: 'brake', keys: ['Space'] },
+          { name: 'ers', keys: ['ShiftLeft', 'ShiftRight'] },
+          { name: 'drs', keys: ['Space'] },
         ]}
       >
         <Canvas shadows camera={{ position: [0, 5, -10], fov: 60 }}>

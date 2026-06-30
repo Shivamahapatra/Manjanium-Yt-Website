@@ -124,3 +124,15 @@ Context:
 - The project is now a monorepo (`apps/hub`, `apps/game`, `packages/ui`).
 - Game Simulator has working WASD physics, camera tracking, and basic multiplayer.
 - Build passes successfully with updated `pnpm-lock.yaml`.
+
+--- Update: Phase 5 Final Polish & Game Systems (2026-06-30T14:53:00Z) ---
+Changes made:
+- Added `SettingsModal.tsx` for real-time adjustments (Steering Sensitivity, Transmission, Mouse Steering).
+- Upgraded `GameHUD.tsx` to dynamically display current Lap, ERS Battery level, and DRS availability.
+- Created `PostRacePodium.tsx` overlay that triggers when a race is finished.
+- Modified `VehicleController.tsx` to include ERS/DRS physics multipliers and applied steering sensitivity settings.
+- Added finish line intersection logic to `Track.tsx` using Rapier sensors to detect and increment laps.
+- Expanded `useTelemetryStore` in Zustand to handle the full `GameState`.
+Context:
+- All phases for the Paddock Simulator are now complete.
+- Game loop is fully functional (Start, Drive, Deploy ERS/DRS, Finish Race, Podium).

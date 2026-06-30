@@ -20,8 +20,9 @@ export function VehicleController() {
   useFrame((state, delta) => {
     if (!chassisRef.current) return
     
-    const { forward, backward, left, right, brake } = getKeys()
+    const { forward, backward, left, right, ers, drs } = getKeys()
     const body = chassisRef.current
+    const telemetryStore = useTelemetryStore.getState()
     
     // Get current rotation to determine forward direction
     const rotation = body.rotation()
@@ -34,10 +35,27 @@ export function VehicleController() {
     body.setLinearDamping(1.5)
     body.setAngularDamping(2.0)
 
+    // ERS & DRS Logic
+    let currentAcceleration = ACCELERATION
+    const isErsActive = ers && telemetryStore.ersBattery > 0
+    const isDrsActive = drs
+
+    if (isErsActive) {
+      currentAcceleration *= 1.5 // 50% boost
+      telemetryStore.setSystems(Math.max(0, telemetryStore.ersBattery - 20 * delta), true, isDrsActive, true)
+    } else {
+      // Recharge ERS slowly
+      telemetryStore.setSystems(Math.min(100, telemetryStore.ersBattery + 5 * delta), false, isDrsActive, true)
+    }
+
+    if (isDrsActive) {
+      currentAcceleration *= 1.2 // 20% boost from less drag
+    }
+
     // Acceleration & Braking
     let engineForce = 0
-    if (forward) engineForce += ACCELERATION
-    if (backward) engineForce -= ACCELERATION
+    if (forward) engineForce += currentAcceleration
+    if (backward) engineForce -= currentAcceleration
     
     if (engineForce !== 0) {
       body.applyImpulse({
@@ -52,7 +70,7 @@ export function VehicleController() {
     const speed = Math.sqrt(velocity.x ** 2 + velocity.z ** 2)
     
     // Update telemetry (approximate km/h)
-    useTelemetryStore.getState().setTelemetry(Math.round(speed * 3.6), 1)
+    telemetryStore.setTelemetry(Math.round(speed * 3.6), 1)
     
     // Broadcast to multiplayer
     import('../../lib/multiplayer').then(m => {
@@ -64,8 +82,10 @@ export function VehicleController() {
 
     if (speed > 1) { // Only allow turning if moving
       let turnDirection = 0
-      if (left) turnDirection += TURN_SPEED
-      if (right) turnDirection -= TURN_SPEED
+      const sensitivity = telemetryStore.steeringSensitivity || 1.0
+      
+      if (left) turnDirection += TURN_SPEED * sensitivity
+      if (right) turnDirection -= TURN_SPEED * sensitivity
       
       // Invert steering when reversing
       const dot = velocity.x * forwardVector.x + velocity.z * forwardVector.z
