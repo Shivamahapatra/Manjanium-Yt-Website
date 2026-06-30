@@ -110,3 +110,17 @@ Context:
 - More professional, spacious appearance
 - Build passes with 0 errors
 - Settings control still intact
+
+--- Update: Monorepo & Game Simulator Setup (2026-06-30T16:25:00+05:30) ---
+Changes made:
+- Scaffolded `packages/ui` workspace for shared components (e.g., Button).
+- Setup Next.js in `apps/game` for the Paddock Simulator.
+- Implemented vehicle physics using `@react-three/rapier` and `three` in `apps/game/src/components/physics/VehicleController.tsx`.
+- Integrated a live telemetry HUD (`GameHUD.tsx`) with a Zustand store.
+- Configured Tailwind CSS v4 with `@source` directives to scan `packages/ui` across both `apps/hub` and `apps/game`.
+- Implemented Supabase Realtime Multiplayer Sync in `apps/game/src/lib/multiplayer.ts` with `MultiplayerCars.tsx` for ghost cars.
+- Addressed `@types/three` dependencies and lockfile sync for Vercel builds.
+Context:
+- The project is now a monorepo (`apps/hub`, `apps/game`, `packages/ui`).
+- Game Simulator has working WASD physics, camera tracking, and basic multiplayer.
+- Build passes successfully with updated `pnpm-lock.yaml`.
