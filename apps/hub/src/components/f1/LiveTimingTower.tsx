@@ -118,14 +118,11 @@ function StintBar({ stints, currentLap, totalLaps }: { stints: any[]; currentLap
   );
 }
 
-export function LiveTimingTower() {
-  const [drivers, setDrivers] = useState<any[]>([]);
+export function LiveTimingTower({ drivers = [], sessionInfo = null, loading = false }: { drivers?: any[], sessionInfo?: any, loading?: boolean }) {
   const [activeTab, setActiveTab] = useState<'LAP'|'SECTOR'|'TIRE'|'CAR'|'GRID'>('LAP');
   const [sessionType, setSessionType] = useState('');
   const [sessionName, setSessionName] = useState('');
   const [totalLaps, setTotalLaps] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [sessionInfo, setSessionInfo] = useState<any>(null);
 
   // Fallback states when no active session
   const [nextRace, setNextRace] = useState<any>(null);
@@ -135,64 +132,42 @@ export function LiveTimingTower() {
   const prevPositionsRef = useRef<Record<number, number>>({});
   const [positionChanges, setPositionChanges] = useState<Record<number, boolean>>({});
 
-  const fetchLiveTiming = async () => {
-    try {
-      const res = await fetch('/api/f1/live');
-      const json = await res.json();
-
-      if (json.drivers && Array.isArray(json.drivers) && json.drivers.length > 0) {
-        // Track position changes for animation flash
-        const newChanges: Record<number, boolean> = {};
-        json.drivers.forEach((drv: any) => {
-          const dNum = drv.driverNumber;
-          const newPos = drv.position;
-          const oldPos = prevPositionsRef.current[dNum];
-          if (oldPos !== undefined && oldPos !== newPos) {
-            newChanges[dNum] = true;
-          }
-          prevPositionsRef.current[dNum] = newPos;
-        });
-
-        if (Object.keys(newChanges).length > 0) {
-          setPositionChanges(newChanges);
-          // Clear animation after 1s
-          setTimeout(() => {
-            setPositionChanges({});
-          }, 1000);
-        }
-
-        setDrivers(json.drivers);
-        setErrorState(false);
-      }
-
-      if (json.session) {
-        setSessionInfo(json.session);
-        setSessionType(json.session.session_type || '');
-        setSessionName(json.session.session_name || '');
-        
-        const trackName = json.session.circuit_short_name || json.session.country_name || '';
-        const limitLaps = TOTAL_LAPS_MAP[trackName] || 70;
-        setTotalLaps(limitLaps);
-      }
-    } catch (err) {
-      console.error("Failed to fetch live timing tower data", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const [errorState, setErrorState] = useState(false);
-
-  // Initial fetch and session type tab selection
+  // Sync session props to state for consistency
   useEffect(() => {
-    const initFetch = async () => {
-      await fetchLiveTiming();
-    };
-    initFetch();
+    if (sessionInfo) {
+      setSessionType(sessionInfo.session_type || '');
+      setSessionName(sessionInfo.session_name || '');
+      
+      const trackName = sessionInfo.circuit_short_name || sessionInfo.country_name || '';
+      const limitLaps = TOTAL_LAPS_MAP[trackName] || 70;
+      setTotalLaps(limitLaps);
+    }
+  }, [sessionInfo]);
 
-    const interval = setInterval(fetchLiveTiming, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  // Track position changes for animation flash
+  useEffect(() => {
+    if (drivers && drivers.length > 0) {
+      const newChanges: Record<number, boolean> = {};
+      drivers.forEach((drv: any) => {
+        const dNum = drv.driverNumber;
+        const newPos = drv.position;
+        const oldPos = prevPositionsRef.current[dNum];
+        if (oldPos !== undefined && oldPos !== newPos) {
+          newChanges[dNum] = true;
+        }
+        prevPositionsRef.current[dNum] = newPos;
+      });
+
+      if (Object.keys(newChanges).length > 0) {
+        setPositionChanges(newChanges);
+        // Clear animation after 1s
+        const timer = setTimeout(() => {
+          setPositionChanges({});
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [drivers]);
 
   // Set default tab based on session type once loaded
   useEffect(() => {

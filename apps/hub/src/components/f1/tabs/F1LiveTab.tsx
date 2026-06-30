@@ -129,6 +129,7 @@ export function F1LiveTab() {
   const [weatherData, setWeatherData] = useState<any>(null);
   const [raceControlMsgs, setRaceControlMsgs] = useState<any[]>([]);
   const [radioMsgs, setRadioMsgs] = useState<any[]>([]);
+  const [drivers, setDrivers] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -152,6 +153,10 @@ export function F1LiveTab() {
         if (data?.session) {
           setSession(data.session);
           setSessionKey(String(currentSessionKey));
+        }
+        
+        if (data?.drivers) {
+          setDrivers(data.drivers);
         }
 
         // Fetch dependent data concurrently
@@ -256,7 +261,8 @@ export function F1LiveTab() {
     globeConfig,
     weatherData,
     raceControlMsgs,
-    radioMsgs
+    radioMsgs,
+    drivers
   };
 
   return (

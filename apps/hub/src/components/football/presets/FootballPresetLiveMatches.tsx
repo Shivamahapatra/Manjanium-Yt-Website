@@ -15,11 +15,12 @@ interface FootballPresetLiveMatchesProps {
 
 export function FootballPresetLiveMatches({ fixtures, loadingLive }: FootballPresetLiveMatchesProps) {
   const [selectedMatch, setSelectedMatch] = useState<LiveFixtureData | null>(null);
-  const liveCount = fixtures?.filter((f: LiveFixtureData) =>
+  const isArray = Array.isArray(fixtures);
+  const liveCount = isArray ? fixtures.filter((f: LiveFixtureData) =>
     f?.fixture?.status?.short === '1H' || f?.fixture?.status?.short === '2H'
-  ).length || 0;
+  ).length : 0;
 
-  const displayMatch = selectedMatch || (fixtures?.length > 0 ? fixtures[0] : null);
+  const displayMatch = selectedMatch || (isArray && fixtures.length > 0 ? fixtures[0] : null);
 
   return (
     <div className="flex flex-col gap-6">
@@ -42,8 +43,8 @@ export function FootballPresetLiveMatches({ fixtures, loadingLive }: FootballPre
               <div className="flex justify-center p-8">
                 <div className="animate-spin w-8 h-8 border-2 border-[#0EA5E9] border-t-transparent rounded-full" />
               </div>
-            ) : !fixtures || fixtures.length === 0 ? (
-              <div className="p-8 text-center text-[#6B7280]">No live matches currently.</div>
+            ) : !isArray || fixtures.length === 0 ? (
+              <div className="p-8 text-center text-[#6B7280]">No live matches currently or rate limited.</div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {fixtures?.map((match: LiveFixtureData) => (

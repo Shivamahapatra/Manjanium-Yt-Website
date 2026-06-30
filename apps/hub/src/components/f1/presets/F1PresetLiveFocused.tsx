@@ -19,9 +19,10 @@ export interface F1PresetProps {
   weatherData?: any;
   raceControlMsgs?: any[];
   radioMsgs?: any[];
+  drivers?: any[];
 }
 
-export function F1PresetLiveFocused({ session, localTime, currentVenue, globeArcs, globeConfig }: F1PresetProps) {
+export function F1PresetLiveFocused({ session, localTime, currentVenue, globeArcs, globeConfig, drivers }: F1PresetProps) {
   return (
     <div className="h-[calc(100vh-200px)] flex flex-col gap-4 px-6 pb-6">
       {/* Session status - minimal */}
@@ -48,7 +49,7 @@ export function F1PresetLiveFocused({ session, localTime, currentVenue, globeArc
         <div className="flex-[0.65]">
           <F1Card title="Live Timing Tower" className="h-full flex flex-col">
             <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-              <LiveTimingTower />
+              <LiveTimingTower drivers={drivers} sessionInfo={session} />
             </div>
           </F1Card>
         </div>
