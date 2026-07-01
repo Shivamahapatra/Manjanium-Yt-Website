@@ -26,3 +26,19 @@ Whenever you begin a task, and whenever you complete a task or make changes to t
 5. **Maintain Functionality**: Ensure that your changes DO NOT break any existing features or API endpoints. Always double-check API routes and types when modifying data structures.
 
 Failure to run the build, overwriting historical context in `context.md`, or forgetting to push are unacceptable.
+
+---
+
+## 🧠 LLMWiki Auto-Capture Rule
+
+After completing ANY of the following:
+- A major bug fix
+- A new feature implementation
+- A phase completion
+- An architectural decision
+
+Automatically:
+1. Write a session summary to LLMWiki/raw/session-[date]-[topic].md
+2. Prompt the user: "Session captured to LLMWiki/raw/. Ingest into wiki? (y/n)"
+
+Wiki location: O:\AI projects\Manjanium Sports UI\Manjanium Yt Website\LLMWiki

@@ -27,3 +27,16 @@ Context:
 - apps/hub: Next.js 14.2.35, fully working with Clerk auth and Supabase
 - apps/game: Next.js 14.2.35, placeholder page ready for game migration
 - Ready for Vercel Multi Zones setup
+
+--- Update: Game Physics + Camera Fix (2026-07-01) ---
+Changes:
+- Reduced throttle_force from ~50000 to 800 (car was hitting 7105 km/h)
+- Added speed cap at 300 km/h with force scaling
+- Increased linearDamping to 0.5 for realistic deceleration
+- Replaced static OrbitControls with follow camera in VehicleController
+- Camera smoothly lerps behind car (offset: 0, 8, 18)
+- Background changed to dark Stitch theme (#131313)
+Context:
+- Game renders correctly (ground, sky, car box all visible)
+- Physics now realistic, camera tracks player
+- Ready for track geometry and lap timing testing

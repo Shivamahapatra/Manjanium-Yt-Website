@@ -5,16 +5,27 @@ import { useKeyboardControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { useTelemetryStore } from '../../store/telemetry'
 
+export const PHYSICS_CONFIG = {
+  gravity: -9.81,
+  car_mass: 798,
+  max_speed_kmh: 300,
+  throttle_force: 800,
+  brake_force: 2000,
+  friction: 1.2,
+  wheel_radius: 0.35,
+  linear_damping: 0.5,
+  angular_damping: 0.8,
+}
+
 export function VehicleController() {
   const chassisRef = useRef<RapierRigidBody>(null)
   const [, getKeys] = useKeyboardControls()
   
   // Reusable vectors for calculations
   const forwardVector = new THREE.Vector3()
-  const cameraOffset = new THREE.Vector3()
+  const cameraOffset = new THREE.Vector3(0, 8, 18) // behind and above car
   const desiredCameraPos = new THREE.Vector3()
   
-  const ACCELERATION = 15000;
   const TURN_SPEED = 8000;
 
   useFrame((state, delta) => {
@@ -32,16 +43,24 @@ export function VehicleController() {
     forwardVector.set(0, 0, 1).applyQuaternion(quaternion)
 
     // Physics tuning
-    body.setLinearDamping(1.5)
-    body.setAngularDamping(2.0)
+    body.setLinearDamping(PHYSICS_CONFIG.linear_damping)
+    body.setAngularDamping(PHYSICS_CONFIG.angular_damping)
+
+    // Steering
+    const velocity = body.linvel()
+    const speed = Math.sqrt(velocity.x ** 2 + velocity.z ** 2)
+    const currentSpeedKmh = speed * 3.6
+    
+    // Update telemetry
+    telemetryStore.setTelemetry(Math.round(currentSpeedKmh), 1)
 
     // ERS & DRS Logic
-    let currentAcceleration = ACCELERATION
+    let baseForce = PHYSICS_CONFIG.throttle_force
     const isErsActive = ers && telemetryStore.ersBattery > 0
     const isDrsActive = drs
 
     if (isErsActive) {
-      currentAcceleration *= 1.5 // 50% boost
+      baseForce *= 1.5 // 50% boost
       telemetryStore.setSystems(Math.max(0, telemetryStore.ersBattery - 20 * delta), true, isDrsActive, true)
     } else {
       // Recharge ERS slowly
@@ -49,13 +68,25 @@ export function VehicleController() {
     }
 
     if (isDrsActive) {
-      currentAcceleration *= 1.2 // 20% boost from less drag
+      baseForce *= 1.2 // 20% boost from less drag
     }
 
-    // Acceleration & Braking
+    // Acceleration & Braking with Speed Cap
+    const maxSpeedMs = PHYSICS_CONFIG.max_speed_kmh / 3.6
+    
     let engineForce = 0
-    if (forward) engineForce += currentAcceleration
-    if (backward) engineForce -= currentAcceleration
+    if (forward) {
+       // Only apply throttle force if under max speed
+       if (currentSpeedKmh < PHYSICS_CONFIG.max_speed_kmh) {
+          const speedRatio = currentSpeedKmh / PHYSICS_CONFIG.max_speed_kmh
+          // Scale force down as we approach max speed (prevents runaway)
+          engineForce = baseForce * (1 - speedRatio * 0.8)
+       }
+    }
+    if (backward) {
+       // Braking force or reverse
+       engineForce = -PHYSICS_CONFIG.brake_force
+    }
     
     if (engineForce !== 0) {
       body.applyImpulse({
@@ -64,13 +95,16 @@ export function VehicleController() {
         z: forwardVector.z * engineForce * delta
       }, true)
     }
-    
-    // Steering
-    const velocity = body.linvel()
-    const speed = Math.sqrt(velocity.x ** 2 + velocity.z ** 2)
-    
-    // Update telemetry (approximate km/h)
-    telemetryStore.setTelemetry(Math.round(speed * 3.6), 1)
+
+    // Hard velocity cap
+    if (speed > maxSpeedMs) {
+      const scale = maxSpeedMs / speed
+      const currentVel = body.linvel()
+      body.setLinvel(
+        { x: currentVel.x * scale, y: currentVel.y, z: currentVel.z * scale },
+        true
+      )
+    }
     
     // Broadcast to multiplayer
     import('../../lib/multiplayer').then(m => {
@@ -102,18 +136,29 @@ export function VehicleController() {
       }
     }
 
-    // Camera Follow (Trailing behind the car)
-    const position = body.translation()
-    // Offset camera behind (-Z) and above (+Y)
-    cameraOffset.set(0, 3, -10).applyQuaternion(quaternion)
-    desiredCameraPos.set(position.x, position.y, position.z).add(cameraOffset)
+    // Camera follow
+    const pos = body.translation()
+    // Calculate camera position (behind car, relative to car's rotation)
+    const offset = cameraOffset.clone().applyQuaternion(quaternion)
+    desiredCameraPos.set(pos.x + offset.x, pos.y + offset.y, pos.z + offset.z)
     
-    state.camera.position.lerp(desiredCameraPos, 0.1)
-    state.camera.lookAt(position.x, position.y + 1, position.z)
+    // Smooth camera movement (lerp)
+    state.camera.position.lerp(desiredCameraPos, 0.08)
+    
+    // Camera looks at car
+    state.camera.lookAt(pos.x, pos.y + 1, pos.z)
   })
 
   return (
-    <RigidBody ref={chassisRef} position={[0, 2, 0]} mass={800} colliders="cuboid" type="dynamic">
+    <RigidBody 
+      ref={chassisRef} 
+      position={[0, 2, 0]} 
+      mass={PHYSICS_CONFIG.car_mass} 
+      colliders="cuboid" 
+      type="dynamic"
+      linearDamping={PHYSICS_CONFIG.linear_damping}
+      angularDamping={PHYSICS_CONFIG.angular_damping}
+    >
       <mesh>
         <boxGeometry args={[1.8, 1, 4.5]} />
         <meshStandardMaterial color="#FBBF24" />

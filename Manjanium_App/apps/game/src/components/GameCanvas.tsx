@@ -28,7 +28,8 @@ export function GameCanvas() {
         ]}
       >
         <Canvas shadows camera={{ position: [0, 5, -10], fov: 60 }}>
-          <color attach="background" args={['#87CEEB']} />
+          <color attach="background" args={['#0a0a0a']} />
+          <fog attach="fog" args={['#131313', 50, 500]} />
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
           <Physics>
