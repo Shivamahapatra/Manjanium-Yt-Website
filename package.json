@@ -6,7 +6,8 @@
     "dev:game": "pnpm --filter game dev",
     "build:hub": "pnpm --filter hub build",
     "build:game": "pnpm --filter game build",
-    "build": "pnpm --filter hub build && pnpm --filter game build"
+    "build": "pnpm --filter hub build && pnpm --filter game build",
+    "lint": "pnpm --filter hub lint && pnpm --filter game lint"
   },
   "packageManager": "pnpm@9.0.0"
 }

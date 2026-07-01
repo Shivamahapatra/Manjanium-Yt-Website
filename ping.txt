@@ -14,3 +14,16 @@ Context:
 - Live data flowing correctly in all presets
 - Track map updates with race progress
 - Build passes with 0 errors
+--- Update: Monorepo Version Fix (2026-07-01) ---
+Changes made:
+- Fixed apps/hub/package.json: downgraded next from 16.2.9 to 14.2.35
+- Fixed apps/hub/package.json: corrected @clerk/nextjs to match original version
+- Fixed apps/game/package.json: pinned all versions to match hub exactly
+- Removed "type": "module" from hub package.json (was breaking Next.js)
+- Verified .env.local copied correctly to both apps
+- Fresh pnpm install completed successfully
+- Both apps verified running cleanly (hub on 3000, game on 3001)
+Context:
+- apps/hub: Next.js 14.2.35, fully working with Clerk auth and Supabase
+- apps/game: Next.js 14.2.35, placeholder page ready for game migration
+- Ready for Vercel Multi Zones setup
