@@ -30,6 +30,38 @@ Context:
 
 --- Update: Game Physics + Camera Fix (2026-07-01) ---
 Changes:
+--- Update: Preset Refinements - F1 & Football (2026-06-24T16:00:00+00:00) ---
+Changes made:
+- Applied preset system to Football Hub (3 presets with sidebar)
+- Refined F1 Preset 1: 65/35 split (Timing/Globe) with better space utilization
+- Redesigned F1 Preset 2: Single "Live" tab with Timing + Team Radio + Race Control + Live Track Map
+- Reorganized F1 Preset 3: Globe moved to RIGHT, 3-column layout
+- Created LiveTrackMap component for real-time race visualization
+- Removed tab switcher from Preset 2 (all content visible)
+- All presets controlled via Settings (not shown in hubs)
+- Football presets mirror F1 structure
+Context:
+- F1 and Football both use preset system
+- Settings expands sidebar for preset selection
+- Live data flowing correctly in all presets
+- Track map updates with race progress
+- Build passes with 0 errors
+--- Update: Monorepo Version Fix (2026-07-01) ---
+Changes made:
+- Fixed apps/hub/package.json: downgraded next from 16.2.9 to 14.2.35
+- Fixed apps/hub/package.json: corrected @clerk/nextjs to match original version
+- Fixed apps/game/package.json: pinned all versions to match hub exactly
+- Removed "type": "module" from hub package.json (was breaking Next.js)
+- Verified .env.local copied correctly to both apps
+- Fresh pnpm install completed successfully
+- Both apps verified running cleanly (hub on 3000, game on 3001)
+Context:
+- apps/hub: Next.js 14.2.35, fully working with Clerk auth and Supabase
+- apps/game: Next.js 14.2.35, placeholder page ready for game migration
+- Ready for Vercel Multi Zones setup
+
+--- Update: Game Physics + Camera Fix (2026-07-01) ---
+Changes:
 - Reduced throttle_force from ~50000 to 800 (car was hitting 7105 km/h)
 - Added speed cap at 300 km/h with force scaling
 - Increased linearDamping to 0.5 for realistic deceleration
@@ -40,3 +72,17 @@ Context:
 - Game renders correctly (ground, sky, car box all visible)
 - Physics now realistic, camera tracks player
 - Ready for track geometry and lap timing testing
+
+--- Update: Global Leaderboard (2026-07-01) ---
+Changes:
+- Created apps/game/src/lib/leaderboard.ts (submit + fetch functions)
+- Created apps/game/src/components/ui/Leaderboard.tsx (display component)
+- Updated PostRacePodium.tsx to submit times and show leaderboard
+- Supabase table: simulator_leaderboards with RLS policies
+- Auto-submits best lap time on race completion
+- Shows top 10 with medal icons, highlights current user
+Context:
+- Times saved to Supabase after each race
+- Global leaderboard visible on post-race podium
+- User rank displayed (#X globally)
+- Only updates if new time beats existing best
