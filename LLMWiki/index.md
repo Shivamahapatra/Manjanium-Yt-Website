@@ -12,6 +12,7 @@ This is the content catalog for the wiki. It is updated automatically on every i
 - [[Paddock_Simulator]]: 3D multiplayer racing simulator.
 - [[PaddockSimulator]] — Full game feature map
 - [[ManjaniumSportsHub]] — F1 + Football hub architecture
+- [[GhostRacingSystem]] — Ghost recording, playback, and rendering
 
 ## Concepts
 *(Thematic pages, ideas, high-level synthesis, etc.)*
@@ -27,6 +28,8 @@ This is the content catalog for the wiki. It is updated automatically on every i
 - [[ClerkAuthVersionCompatibility]] — Resolving Clerk + Next.js version mismatches
 - [[MCPConfigFixes]] — MCP server config gotchas for Windows
 - [[SupabaseSubscriptionHoisting]] — Realtime listener optimization pattern
+- [[GhostTelemetryRecording]] — Frame-by-frame physics interpolation
+- [[MultiZoneDeploymentConfig]] — Next.js fallback URLs for proxy rewrites
 
 ## Sources
 *(Curated list of raw sources that have been ingested)*

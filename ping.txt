@@ -113,3 +113,18 @@ Context:
 - Ghost plays back on next race with smooth interpolation
 - Blue translucent ghost car visible in scene
 - HUD shows +/- delta vs ghost in real time
+--- Update: AI Cars (2026-07-01) ---
+Changes:
+- Created aiConfig.ts (waypoints per track + difficulty multipliers)
+- Created AICar.tsx (waypoint-following AI with speed limits per corner)
+- Created AICarManager.tsx (spawns 1-5 AI cars at staggered positions)
+- Updated GameCanvas.tsx to render AI cars
+- Updated GameHUD.tsx to show race position
+- AI cars: 4 difficulty levels (easy 70% speed ? pro 100% speed)
+- Each track has 8 waypoints with corner speed limits
+Context:
+- AI cars follow waypoints using force-based steering
+- Speed limits per waypoint simulate braking for corners
+- Up to 5 AI opponents per race
+- Color-coded AI cars (blue, purple, pink, orange, teal)
+- Difficulty affects speed multiplier and reaction time

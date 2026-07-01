@@ -10,13 +10,24 @@ export function GameHUD() {
   const [showSettings, setShowSettings] = useState(false);
   const delta = -240; // mock delta for now
 
+  const currentPosition = 1;
+
   return (
     <>
       <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-6">
         <div className="flex justify-between items-start">
-          <div className="bg-black/60 backdrop-blur-md px-5 py-3 rounded-xl border border-white/10 text-white font-mono shadow-lg">
-            <div className="text-xs text-neutral-400 font-['Inter'] mb-1 tracking-wider">LAP</div>
-            <div className="text-3xl font-black font-[Outfit]">{lap} <span className="text-lg text-neutral-500">/ {totalLaps}</span></div>
+          <div className="flex gap-4">
+            <div className="bg-black/60 backdrop-blur-md px-5 py-3 rounded-xl border border-white/10 text-white font-mono shadow-lg">
+              <div className="text-xs text-neutral-400 font-['Inter'] mb-1 tracking-wider">LAP</div>
+              <div className="text-3xl font-black font-[Outfit]">{lap} <span className="text-lg text-neutral-500">/ {totalLaps}</span></div>
+            </div>
+            
+            <div className="bg-black/60 backdrop-blur-md px-5 py-3 rounded-xl border border-white/10 text-white font-mono shadow-lg text-center">
+              <div className="text-xs text-[#6B7280]">POSITION</div>
+              <div className="text-3xl font-bold text-white">
+                P<span className="text-[#FBBF24]">{currentPosition}</span>
+              </div>
+            </div>
           </div>
           
           <div className="flex flex-col items-end gap-3">

@@ -9,6 +9,7 @@ import { MultiplayerCars } from './physics/MultiplayerCars'
 import { initMultiplayer, leaveMultiplayer } from '../lib/multiplayer'
 import GhostCar from './physics/GhostCar'
 import { ghostPlayer } from './physics/VehicleController'
+import AICarManager from './physics/AICarManager'
 
 export function GameCanvas() {
   useEffect(() => {
@@ -39,6 +40,7 @@ export function GameCanvas() {
             <VehicleController />
             <GhostCar ghostPlayer={ghostPlayer} />
             <MultiplayerCars />
+            <AICarManager trackId="monza" difficulty="medium" numberOfCars={3} />
           </Physics>
           <Environment preset="sunset" />
         </Canvas>
