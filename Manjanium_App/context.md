@@ -136,11 +136,3 @@ Changes made:
 Context:
 - All phases for the Paddock Simulator are now complete.
 - Game loop is fully functional (Start, Drive, Deploy ERS/DRS, Finish Race, Podium).
-
---- Update: Project Restructuring for Workspace Boundaries (2026-07-01T12:09:00+05:30) ---
-Changes made:
-- Renamed Obs-Raw to LLMWiki and updated its internal references.
-- Created Manjanium_App and moved the monorepo application code (apps, packages, package.json, etc.) inside it.
-- Updated .gitignore to exclude /LLMWiki/.obsidian/ but track the rest of the wiki.
-Context:
-- The project now strictly separates application code (/Manjanium_App) from the knowledge base (/LLMWiki) per the new global rules.

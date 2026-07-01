@@ -1,0 +1,30 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "build": {
+      "prompt": "{file:O:\\AI projects\\Manjanium Sports UI\\Manjanium Yt Website\\Obs-Raw\\.grimoire\\opencode\\system.md}"
+    },
+    "grimoire-full-access": {
+      "mode": "primary",
+      "permission": {
+        "plan_enter": "allow",
+        "question": "allow"
+      },
+      "prompt": "{file:O:\\AI projects\\Manjanium Sports UI\\Manjanium Yt Website\\Obs-Raw\\.grimoire\\opencode\\system.md}"
+    },
+    "grimoire-safe": {
+      "mode": "primary",
+      "permission": {
+        "plan_enter": "allow",
+        "question": "allow",
+        "bash": "ask",
+        "edit": "ask",
+        "write": "ask"
+      },
+      "prompt": "{file:O:\\AI projects\\Manjanium Sports UI\\Manjanium Yt Website\\Obs-Raw\\.grimoire\\opencode\\system.md}"
+    },
+    "plan": {
+      "prompt": "{file:O:\\AI projects\\Manjanium Sports UI\\Manjanium Yt Website\\Obs-Raw\\.grimoire\\opencode\\system.md}"
+    }
+  }
+}

@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -14,11 +14,11 @@
 /coverage
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build/
 
 # misc
 .DS_Store
@@ -41,9 +41,10 @@ yarn-error.log*
 next-env.d.ts
 
 # clerk configuration (can include secrets)
-/.clerk/
+.clerk/
 
-apps/*/node_modules/
-apps/*/.next/
-packages/*/node_modules/
+Manjanium_App/apps/*/node_modules/
+Manjanium_App/apps/*/.next/
+Manjanium_App/packages/*/node_modules/
+/LLMWiki/.obsidian/
 .turbo/

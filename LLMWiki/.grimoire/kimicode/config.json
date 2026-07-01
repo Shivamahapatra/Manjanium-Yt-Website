@@ -1,0 +1,30 @@
+{
+  "$schema": "https://kimicode.ai/config.json",
+  "agent": {
+    "build": {
+      "prompt": "{file:O:\\AI projects\\Manjanium Sports UI\\Manjanium Yt Website\\Obs-Raw\\.grimoire\\kimicode\\system.md}"
+    },
+    "auto": {
+      "mode": "primary",
+      "permission": {
+        "plan_enter": "allow",
+        "question": "allow"
+      },
+      "prompt": "{file:O:\\AI projects\\Manjanium Sports UI\\Manjanium Yt Website\\Obs-Raw\\.grimoire\\kimicode\\system.md}"
+    },
+    "default": {
+      "mode": "primary",
+      "permission": {
+        "plan_enter": "allow",
+        "question": "allow",
+        "bash": "ask",
+        "edit": "ask",
+        "write": "ask"
+      },
+      "prompt": "{file:O:\\AI projects\\Manjanium Sports UI\\Manjanium Yt Website\\Obs-Raw\\.grimoire\\kimicode\\system.md}"
+    },
+    "plan": {
+      "prompt": "{file:O:\\AI projects\\Manjanium Sports UI\\Manjanium Yt Website\\Obs-Raw\\.grimoire\\kimicode\\system.md}"
+    }
+  }
+}
