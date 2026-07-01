@@ -43,8 +43,8 @@ export default function SimulatorPage() {
     createSession(session)
     setCurrentTrack(selectedTrack)
 
-    // Navigate to game (will create in Phase 3)
-    router.push('/simulator/game')
+    // Navigate to game (Multi Zone path)
+    router.push('/game')
   }
 
   return (

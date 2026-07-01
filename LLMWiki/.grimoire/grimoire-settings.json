@@ -71,9 +71,9 @@
       "reasoningSummary": "detailed",
       "environmentVariables": "",
       "environmentHash": "",
-      "installationMethod": "native-windows",
-      "installationMethodsByHost": {},
-      "wslDistroOverride": "",
+      "installationMethodsByHost": {
+        "device:dcf238da-a88a-4d38-b891-665608bd8c2e": "native-windows"
+      },
       "wslDistroOverridesByHost": {}
     },
     "gemini": {
