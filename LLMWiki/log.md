@@ -16,6 +16,12 @@ Processed the main project context file. Extracted entities `[[Manjanium_On_Soft
 ## [2026-07-01] ingest | Ghost Racing and Vercel Multi Zones
 - [2026-07-01 19:46:00] Ingested: session-2026-07-01-ghost-racing-and-vercel.md -> Created: [[GhostRacingSystem]], [[GhostTelemetryRecording]], [[MultiZoneDeploymentConfig]]
 
+- [2026-07-01 20:03:00] Ingested: paddock-simulator-engineering-spec.md
+  Created: RaycastVehicleController.md, TireDegradation.md,
+  ERSSystem.md, DRSSystem.md, TrackSectorSystem.md,
+  PointerLockSteering.md
+  Updated: index.md, log.md
+
 ## [2026-07-01 14:47:32] Initial wiki population:
 Created: MonorepoArchitecture.md, StitchDesignSystem.md,
 WebGLContextManagement.md, RapierPhysics.md,

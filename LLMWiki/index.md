@@ -31,6 +31,14 @@ This is the content catalog for the wiki. It is updated automatically on every i
 - [[GhostTelemetryRecording]] — Frame-by-frame physics interpolation
 - [[MultiZoneDeploymentConfig]] — Next.js fallback URLs for proxy rewrites
 
+## 🎮 Game & Physics
+- [[RaycastVehicleController]] — Advanced suspension simulation
+- [[TireDegradation]] — Dynamic grip loss per lap/weather
+- [[ERSSystem]] — Battery boost mechanics
+- [[DRSSystem]] — Aerodynamic drag reduction rules
+- [[TrackSectorSystem]] — Anti-cheat sector verification
+- [[PointerLockSteering]] — Mouse steering via Pointer Lock API
+
 ## Sources
 *(Curated list of raw sources that have been ingested)*
 - [[LLM_Wiki_Idea_File]]: The original pattern description for this second brain.
