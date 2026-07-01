@@ -1,7 +1,7 @@
 {
   "userName": "",
-  "permissionMode": "normal",
-  "model": "gpt-5.5",
+  "permissionMode": "full_access",
+  "model": "opus",
   "thinkingBudget": "off",
   "effortLevel": "high",
   "serviceTier": "default",
@@ -58,7 +58,7 @@
       "enableOpus1M": false,
       "enableSonnet1M": false,
       "customModels": "",
-      "lastModel": "haiku",
+      "lastModel": "opus",
       "environmentVariables": "",
       "environmentHash": "",
       "respectProjectSettings": true
@@ -165,23 +165,26 @@
       ]
     }
   },
-  "settingsProvider": "codex",
+  "settingsProvider": "claude",
   "savedProviderModel": {
     "codex": "gpt-5.5",
-    "opencode": "opencode:opencode/big-pickle"
+    "opencode": "opencode:opencode/big-pickle",
+    "claude": "opus"
   },
   "savedProviderEffort": {
-    "codex": "high"
+    "codex": "high",
+    "claude": "high"
   },
   "savedProviderServiceTier": {
     "codex": "default"
   },
   "savedProviderThinkingBudget": {},
   "savedProviderPermissionMode": {
-    "codex": "normal"
+    "codex": "full_access",
+    "claude": "full_access"
   },
   "lastCustomModel": "",
-  "lastSeenChangelogVersion": "",
+  "lastSeenChangelogVersion": "1.0.25",
   "maxTabs": 5,
   "tabBarPosition": "header",
   "enableAutoScroll": true,

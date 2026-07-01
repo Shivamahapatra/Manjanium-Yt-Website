@@ -1,0 +1,25 @@
+{
+  "id": "conv-1782905020543-vanvih7ac",
+  "providerId": "claude",
+  "title": "make all these",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1782905020552,
+  "updatedAt": 1782905023666,
+  "lastResponseAt": 1782905023666,
+  "sessionId": null,
+  "providerState": {},
+  "currentNote": "F1Badge.md",
+  "assistantResponseMetadata": [
+    {
+      "assistantMessageIndex": 0,
+      "metadata": {
+        "providerId": "claude",
+        "providerLabel": "Claude Code",
+        "model": "opus",
+        "modelLabel": "Opus 4.8",
+        "effort": "high",
+        "effortLabel": "High"
+      }
+    }
+  ]
+}

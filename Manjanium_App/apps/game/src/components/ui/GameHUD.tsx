@@ -3,10 +3,12 @@ import { useTelemetryStore } from '../../store/telemetry';
 import { Settings } from 'lucide-react';
 import { SettingsModal } from './SettingsModal';
 import { PostRacePodium } from './PostRacePodium';
+import { ghostPlayer } from '../physics/VehicleController';
 
 export function GameHUD() {
   const { speed, gear, lap, totalLaps, ersBattery, ersActive, drsAvailable, drsActive, raceFinished } = useTelemetryStore();
   const [showSettings, setShowSettings] = useState(false);
+  const delta = -240; // mock delta for now
 
   return (
     <>
@@ -20,7 +22,18 @@ export function GameHUD() {
           <div className="flex flex-col items-end gap-3">
             <div className="bg-black/60 backdrop-blur-md px-5 py-3 rounded-xl border border-white/10 text-white font-mono text-right shadow-lg">
               <div className="text-xs text-neutral-400 font-['Inter'] mb-1 tracking-wider">DELTA</div>
-              <div className="text-2xl font-bold text-[#10B981] font-[Outfit]">-0.240</div>
+              {ghostPlayer.hasGhost() ? (
+                <div className="text-center">
+                  <div className="text-xs text-[#6B7280]">vs GHOST</div>
+                  <div className={`text-lg font-mono font-bold ${
+                    delta < 0 ? 'text-[#10B981]' : 'text-[#EF4444]'
+                  }`}>
+                    {delta < 0 ? '' : '+'}{(delta / 1000).toFixed(3)}s
+                  </div>
+                </div>
+              ) : (
+                <div className="text-2xl font-bold text-[#10B981] font-[Outfit]">-0.240</div>
+              )}
             </div>
             
             <button 

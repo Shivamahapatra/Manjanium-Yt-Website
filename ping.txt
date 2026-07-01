@@ -97,3 +97,19 @@ Context:
 - Both apps build cleanly
 - Ready to deploy as 2 separate Vercel projects
 - After deploying game app, update NEXT_PUBLIC_GAME_APP_URL in hub to production URL
+
+--- Update: Ghost Racing (2026-07-01) ---
+Changes:
+- Created ghostRecorder.ts (frame-by-frame telemetry recording)
+- Created ghostPlayer.ts (interpolated playback with lerp/slerp)
+- Created GhostCar.tsx (translucent blue ghost car in 3D scene)
+- Updated VehicleController.tsx to record every frame + save best lap
+- Updated GameCanvas.tsx to render ghost car
+- Updated GameHUD.tsx to show delta vs ghost
+- Ghost stored in localStorage (persists between sessions)
+Context:
+- Ghost records every physics frame (position + rotation + speed + gear)
+- Best lap auto-saved to localStorage per track
+- Ghost plays back on next race with smooth interpolation
+- Blue translucent ghost car visible in scene
+- HUD shows +/- delta vs ghost in real time

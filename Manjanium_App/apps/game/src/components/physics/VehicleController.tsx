@@ -1,9 +1,11 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { RigidBody, RapierRigidBody } from '@react-three/rapier'
 import { useKeyboardControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { useTelemetryStore } from '../../store/telemetry'
+import { GhostRecorder, saveBestGhost, loadBestGhost } from '../../lib/ghostRecorder'
+import { GhostPlayer } from '../../lib/ghostPlayer'
 
 export const PHYSICS_CONFIG = {
   gravity: -9.81,
@@ -17,9 +19,19 @@ export const PHYSICS_CONFIG = {
   angular_damping: 0.8,
 }
 
-export function VehicleController() {
+// Singletons for ghost system
+export const ghostRecorder = new GhostRecorder()
+export const ghostPlayer = new GhostPlayer()
+
+interface VehicleControllerProps {
+  trackId?: string
+  onLapComplete?: (lapTime: number) => void
+}
+
+export function VehicleController({ trackId, onLapComplete }: VehicleControllerProps) {
   const chassisRef = useRef<RapierRigidBody>(null)
   const [, getKeys] = useKeyboardControls()
+  const lapStartTimeRef = useRef<number>(Date.now())
   
   // Reusable vectors for calculations
   const forwardVector = new THREE.Vector3()
@@ -27,6 +39,17 @@ export function VehicleController() {
   const desiredCameraPos = new THREE.Vector3()
   
   const TURN_SPEED = 8000;
+
+  // Load best ghost on mount
+  useEffect(() => {
+    const bestGhost = loadBestGhost(trackId || 'monza')
+    if (bestGhost) {
+      ghostPlayer.loadGhost(bestGhost)
+    }
+    ghostRecorder.startRecording()
+    ghostPlayer.startPlayback()
+    lapStartTimeRef.current = Date.now()
+  }, [trackId])
 
   useFrame((state, delta) => {
     if (!chassisRef.current) return
@@ -147,6 +170,23 @@ export function VehicleController() {
     
     // Camera looks at car
     state.camera.lookAt(pos.x, pos.y + 1, pos.z)
+
+    // TODO: When lap is completed (detect finish line crossing), trigger this:
+    // const lapTime = Date.now() - lapStartTimeRef.current
+    // const ghost = ghostRecorder.stopRecording(lapTime, trackId || 'monza')
+    // const isNewBest = saveBestGhost(ghost)
+    // if (isNewBest) console.log('New best lap! Ghost saved.')
+    // ghostRecorder.startRecording()
+    // lapStartTimeRef.current = Date.now()
+    // if (onLapComplete) onLapComplete(lapTime)
+
+    // Record current frame every frame
+    ghostRecorder.recordFrame(
+      [pos.x, pos.y, pos.z],
+      [rotation.x, rotation.y, rotation.z, rotation.w],
+      currentSpeedKmh,
+      telemetryStore.gear
+    )
   })
 
   return (

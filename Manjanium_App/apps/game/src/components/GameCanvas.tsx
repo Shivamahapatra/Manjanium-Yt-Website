@@ -7,6 +7,8 @@ import { Track } from './physics/Track'
 import { VehicleController } from './physics/VehicleController'
 import { MultiplayerCars } from './physics/MultiplayerCars'
 import { initMultiplayer, leaveMultiplayer } from '../lib/multiplayer'
+import GhostCar from './physics/GhostCar'
+import { ghostPlayer } from './physics/VehicleController'
 
 export function GameCanvas() {
   useEffect(() => {
@@ -35,6 +37,7 @@ export function GameCanvas() {
           <Physics>
             <Track />
             <VehicleController />
+            <GhostCar ghostPlayer={ghostPlayer} />
             <MultiplayerCars />
           </Physics>
           <Environment preset="sunset" />
