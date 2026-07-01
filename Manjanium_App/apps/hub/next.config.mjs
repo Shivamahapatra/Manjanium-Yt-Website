@@ -8,11 +8,11 @@ const nextConfig = {
       afterFiles: [
         {
           source: '/simulator',
-          destination: `${process.env.NEXT_PUBLIC_GAME_APP_URL}/simulator`,
+          destination: `${process.env.NEXT_PUBLIC_GAME_APP_URL || 'http://localhost:3001'}/simulator`,
         },
         {
           source: '/simulator/:path*',
-          destination: `${process.env.NEXT_PUBLIC_GAME_APP_URL}/simulator/:path*`,
+          destination: `${process.env.NEXT_PUBLIC_GAME_APP_URL || 'http://localhost:3001'}/simulator/:path*`,
         },
       ],
     }
