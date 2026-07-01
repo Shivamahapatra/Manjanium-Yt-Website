@@ -57,7 +57,7 @@ export default function AICar({
     const normalizedDir = direction.normalize()
     const forceMagnitude = Math.max(0, (targetSpeedMs - currentSpeed) * 500)
 
-    rigidBodyRef.current.applyForce(
+    rigidBodyRef.current.applyImpulse(
       {
         x: normalizedDir.x * forceMagnitude * delta,
         y: 0,

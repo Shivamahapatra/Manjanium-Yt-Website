@@ -139,11 +139,11 @@ export default function VehicleController({ trackId = 'monza' }) {
     if (throttle > 0 && speed < maxSpeedMs) {
       const speedRatio = speed / maxSpeedMs
       const force = PHYSICS.throttle_force * throttle * forceMultiplier * dragMultiplier * (1 - speedRatio * 0.7)
-      chassisRef.current.applyForce(
+      chassisRef.current.applyImpulse(
         {
-          x: forwardDir.x * force,
+          x: forwardDir.x * force * delta,
           y: 0,
-          z: forwardDir.z * force,
+          z: forwardDir.z * force * delta,
         },
         true
       )
