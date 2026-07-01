@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { GameHUD } from '@/components/ui/GameHUD'
+import GameHUD from '@/components/ui/GameHUD'
 import { SelectionScreen } from '@/components/ui/SelectionScreen'
 
 const GameCanvas = dynamic(() => import('@/components/GameCanvas').then(mod => mod.GameCanvas), { ssr: false })

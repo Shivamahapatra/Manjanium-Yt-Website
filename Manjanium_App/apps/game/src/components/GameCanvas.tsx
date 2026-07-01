@@ -4,11 +4,11 @@ import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { Environment, KeyboardControls } from '@react-three/drei'
 import { Track } from './physics/Track'
-import { VehicleController } from './physics/VehicleController'
+import VehicleController, { ghostPlayer } from './physics/VehicleController'
 import { MultiplayerCars } from './physics/MultiplayerCars'
 import { initMultiplayer, leaveMultiplayer } from '../lib/multiplayer'
 import GhostCar from './physics/GhostCar'
-import { ghostPlayer } from './physics/VehicleController'
+
 import AICarManager from './physics/AICarManager'
 
 export function GameCanvas() {

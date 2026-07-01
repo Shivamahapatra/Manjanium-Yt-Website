@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useTelemetryStore } from '../../store/telemetry';
+import { useGamePhysics } from '../../store/telemetry';
 import { Button } from '@manjanium/ui/src/components/Button';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { submitLapTime, getUserRank, formatLapTime } from '../../lib/leaderboard';
 import Leaderboard from './Leaderboard';
 
 export function PostRacePodium() {
-  const { resetRace } = useTelemetryStore();
+  const { resetRace } = useGamePhysics();
   const { userId } = useAuth();
   const { user } = useUser();
   const [userRank, setUserRank] = useState<number | null>(null);
