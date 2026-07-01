@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/simulator/:path*",
+      "destination": "GAME_APP_VERCEL_URL/simulator/:path*"
+    }
+  ]
+}

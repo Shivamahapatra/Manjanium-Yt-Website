@@ -84,5 +84,16 @@ Changes:
 Context:
 - Times saved to Supabase after each race
 - Global leaderboard visible on post-race podium
-- User rank displayed (#X globally)
 - Only updates if new time beats existing best
+
+--- Update: Vercel Multi Zones Setup (2026-07-01) ---
+Changes:
+- apps/game/next.config.mjs: added basePath /simulator + assetPrefix
+- apps/hub/next.config.mjs: added rewrites for /simulator/* → game app URL
+- apps/hub/.env.local: added NEXT_PUBLIC_GAME_APP_URL=localhost:3001 for dev
+- Created vercel-project.json instructions for both apps
+- Local dev: hub on :3000, game on :3001, /simulator proxy works
+Context:
+- Both apps build cleanly
+- Ready to deploy as 2 separate Vercel projects
+- After deploying game app, update NEXT_PUBLIC_GAME_APP_URL in hub to production URL

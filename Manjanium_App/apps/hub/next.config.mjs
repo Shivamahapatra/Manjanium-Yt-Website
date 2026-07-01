@@ -4,18 +4,19 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
   async rewrites() {
-    const GAME_URL = process.env.GAME_URL || "http://localhost:3001";
-    return [
-      {
-        source: '/game',
-        destination: `${GAME_URL}/game`,
-      },
-      {
-        source: '/game/:path*',
-        destination: `${GAME_URL}/game/:path*`,
-      },
-    ];
+    return {
+      afterFiles: [
+        {
+          source: '/simulator',
+          destination: `${process.env.NEXT_PUBLIC_GAME_APP_URL}/simulator`,
+        },
+        {
+          source: '/simulator/:path*',
+          destination: `${process.env.NEXT_PUBLIC_GAME_APP_URL}/simulator/:path*`,
+        },
+      ],
+    }
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

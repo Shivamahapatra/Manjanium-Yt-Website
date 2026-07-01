@@ -1,0 +1,14 @@
+{
+  "_instructions": "Deploy this as a separate Vercel project named manjanium-game",
+  "rootDirectory": "apps/game",
+  "buildCommand": "cd ../.. && pnpm build:game",
+  "installCommand": "cd ../.. && pnpm install",
+  "outputDirectory": "apps/game/.next",
+  "framework": "nextjs",
+  "envVars": [
+    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+    "CLERK_SECRET_KEY",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+  ]
+}

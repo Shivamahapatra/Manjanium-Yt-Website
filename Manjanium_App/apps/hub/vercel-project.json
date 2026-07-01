@@ -1,0 +1,15 @@
+{
+  "_instructions": "Deploy this as a separate Vercel project named manjanium-hub",
+  "rootDirectory": "apps/hub",
+  "buildCommand": "cd ../.. && pnpm build:hub",
+  "installCommand": "cd ../.. && pnpm install",
+  "outputDirectory": "apps/hub/.next",
+  "framework": "nextjs",
+  "envVars": [
+    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+    "CLERK_SECRET_KEY",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "NEXT_PUBLIC_GAME_APP_URL"
+  ]
+}
