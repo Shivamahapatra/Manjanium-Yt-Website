@@ -29,7 +29,7 @@ function createOvalTrackShape(
 }
 
 // Track configuration per track type
-const TRACK_CONFIG = {
+export const TRACK_CONFIG = {
   monza: { radiusX: 120, radiusZ: 80, trackWidth: 16, wallHeight: 2 },
   monaco: { radiusX: 70, radiusZ: 50, trackWidth: 10, wallHeight: 3 },
   spa: { radiusX: 150, radiusZ: 100, trackWidth: 18, wallHeight: 2 },
@@ -38,10 +38,19 @@ const TRACK_CONFIG = {
 }
 
 interface GameTrackProps {
-  trackId?: string
+  trackId?: string;
+  onLoaded?: () => void;
 }
 
-export default function GameTrack({ trackId = 'monza' }: GameTrackProps) {
+export default function GameTrack({ trackId = 'monza', onLoaded }: GameTrackProps) {
+  useEffect(() => {
+    if (onLoaded) {
+      // Simulate slight delay for mesh to initialize
+      const timer = setTimeout(() => onLoaded(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [onLoaded]);
+
   const config = TRACK_CONFIG[trackId as keyof typeof TRACK_CONFIG] || TRACK_CONFIG.monza
   
   const { 

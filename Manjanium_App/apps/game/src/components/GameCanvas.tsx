@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { Environment } from '@react-three/drei'
@@ -14,6 +14,8 @@ import GameTrack from './physics/GameTrack'
 import AICarManager from './physics/AICarManager'
 
 export function GameCanvas() {
+  const [trackLoaded, setTrackLoaded] = useState(false);
+
   useEffect(() => {
     // In a real app we'd pass the room ID and mode from the SelectionScreen
     initMultiplayer('global-track');
@@ -43,8 +45,8 @@ export function GameCanvas() {
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
         <Physics gravity={[0, -9.81, 0]} debug={false}>
-          <GameTrack trackId="monza" />
-          <DynamicRaycastVehicleController trackId="monza" />
+          <GameTrack trackId="monza" onLoaded={() => setTrackLoaded(true)} />
+          <DynamicRaycastVehicleController trackId="monza" trackLoaded={trackLoaded} />
           <GhostCar ghostPlayer={ghostPlayer} />
           <MultiplayerCars />
           <AICarManager trackId="monza" difficulty="medium" numberOfCars={3} />

@@ -8,9 +8,11 @@ import { useGamePhysics, calculateTireFriction, WEATHER_FRICTION_MULTIPLIER, DEG
 import { ghostPlayer, ghostRecorder } from './VehicleController'
 import { saveBestGhost, loadBestGhost } from '../../lib/ghostRecorder'
 import { getSimulatorInputs, useSimulatorInputs } from '../../hooks/useSimulatorInputs';
+import { TRACK_CONFIG } from './GameTrack';
 
 interface VehicleControllerProps {
-  children?: React.ReactNode;
+  trackId?: string;
+  trackLoaded?: boolean;
 }
 
 const GRAVITY = 9.81;
@@ -29,7 +31,7 @@ const SECTOR_ZONES = {
   startFinish: { center: [0, 0, -50] as [number, number, number], radius: 10 },
 }
 
-export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId?: string }) {
+export function DynamicRaycastVehicleController({ trackId = 'monza', trackLoaded = false }: VehicleControllerProps) {
   const chassisRef = useRef<RapierRigidBody>(null);
   const { rapier, world } = useRapier();
   const { camera } = useThree();
@@ -40,6 +42,12 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
   const suspensionStiffness = 35.0;
   const suspensionDamping = 4.0;
   const suspensionRestLength = 0.4;
+  const maxSuspensionForce = 6000; // Force clamp threshold
+  const antiRollStiffness = 5000;  // Anti-roll bar logic hook
+  
+  // Track offset calibration
+  const config = TRACK_CONFIG[trackId as keyof typeof TRACK_CONFIG] || TRACK_CONFIG.monza;
+  const spawnZ = -config.radiusZ;
   
   // State for velocity tracking to calculate G-Forces
   const lastVelocity = useRef<THREE.Vector3>(new THREE.Vector3());
@@ -80,6 +88,16 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
   useFrame((state, delta) => {
     const inputs = getSimulatorInputs();
     
+    // Hold kinematic loop until track loaded
+    if (!trackLoaded) {
+      if (chassisRef.current) {
+        chassisRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+        chassisRef.current.setAngvel({ x: 0, y: 0, z: 0 }, true);
+        chassisRef.current.setTranslation({ x: 0, y: 1, z: spawnZ }, true);
+      }
+      return;
+    }
+
     if (!chassisRef.current || carState === 'DNF' || inputs.isPaused) return;
     
     const chassisPosition = chassisRef.current.translation();
@@ -131,7 +149,9 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
     // Convert current velocity to local space for damping
     const velocity = new THREE.Vector3(currentVelocity.x, currentVelocity.y, currentVelocity.z);
 
-    SUSPENSION_POINTS.forEach((point) => {
+    const compressions = [0, 0, 0, 0];
+
+    SUSPENSION_POINTS.forEach((point, index) => {
       // Get world position of suspension point
       const worldPoint = point.clone().applyQuaternion(quaternion).add(new THREE.Vector3(chassisPosition.x, chassisPosition.y, chassisPosition.z));
       
@@ -145,20 +165,34 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
       if (hit) {
         const compression = suspensionRestLength - (hit as any).toi;
         if (compression > 0) {
+          compressions[index] = compression;
           // Point velocity calculation
           const pointVelocity = velocity.clone(); 
-          // Note: for a more accurate model, angular velocity should be factored into pointVelocity
           
           const dampingForce = pointVelocity.dot(downDir) * suspensionDamping;
           const springForce = compression * suspensionStiffness;
           
-          const totalForce = Math.max(0, springForce - dampingForce);
-          const forceVector = downDir.clone().multiplyScalar(-totalForce);
+          let totalForce = Math.max(0, springForce - dampingForce);
           
+          // Strict suspension force clamping
+          totalForce = Math.min(totalForce, maxSuspensionForce);
+
+          const forceVector = downDir.clone().multiplyScalar(-totalForce);
           chassisRef.current?.addForceAtPoint(forceVector, worldPoint, true);
         }
       }
     });
+
+    // Anti-Roll Bar Logic Hook
+    // Front wheels: index 0 (Left), index 1 (Right)
+    const frontRoll = (compressions[0] - compressions[1]) * antiRollStiffness;
+    if (compressions[0] > 0) chassisRef.current.addForceAtPoint(new THREE.Vector3(0, -1, 0).applyQuaternion(quaternion).normalize().multiplyScalar(frontRoll), SUSPENSION_POINTS[0].clone().applyQuaternion(quaternion).add(chassisPosition), true);
+    if (compressions[1] > 0) chassisRef.current.addForceAtPoint(new THREE.Vector3(0, -1, 0).applyQuaternion(quaternion).normalize().multiplyScalar(-frontRoll), SUSPENSION_POINTS[1].clone().applyQuaternion(quaternion).add(chassisPosition), true);
+
+    // Rear wheels: index 2 (Left), index 3 (Right)
+    const rearRoll = (compressions[2] - compressions[3]) * antiRollStiffness;
+    if (compressions[2] > 0) chassisRef.current.addForceAtPoint(new THREE.Vector3(0, -1, 0).applyQuaternion(quaternion).normalize().multiplyScalar(rearRoll), SUSPENSION_POINTS[2].clone().applyQuaternion(quaternion).add(chassisPosition), true);
+    if (compressions[3] > 0) chassisRef.current.addForceAtPoint(new THREE.Vector3(0, -1, 0).applyQuaternion(quaternion).normalize().multiplyScalar(-rearRoll), SUSPENSION_POINTS[3].clone().applyQuaternion(quaternion).add(chassisPosition), true);
 
     // 3. Transmission & Drivetrain
     const velocityMagnitude = currentVelVec.length();
@@ -293,10 +327,13 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
       ref={chassisRef}
       colliders="cuboid"
       mass={1800}
-      position={[0, 1, 0]}
+      position={[0, 1, spawnZ]}
       friction={0.5}
       restitution={0.1}
       canSleep={false}
+      linearDamping={0.5}
+      angularDamping={2.0}
+      gravityScale={trackLoaded ? 1 : 0}
     >
       <group>
         {/* Body */}
