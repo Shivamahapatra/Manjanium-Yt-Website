@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Spin } from "antd";
 import { motion } from "framer-motion";
-import { Trophy, Activity, History, Medal } from "lucide-react";
+import { Trophy, Activity, History, Medal, Network } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/shadcn-tabs";
 import { GroupStandingsCard } from "@/components/football/GroupStandingsCard";
 import { TopScorersWidget } from "@/components/football/TopScorersWidget";
@@ -18,6 +18,7 @@ import { useFootballRealtime } from "@/hooks/useFootballRealtime";
 import { FootballPresetLiveMatches } from "@/components/football/presets/FootballPresetLiveMatches";
 import { FootballPresetStandingsFocus } from "@/components/football/presets/FootballPresetStandingsFocus";
 import { FootballPresetCompactStats } from "@/components/football/presets/FootballPresetCompactStats";
+import { KnockoutBrackets } from "@/components/football/KnockoutBrackets";
 import { TerminalChat } from "@/components/chat/TerminalChat";
 import { FootballBadge } from "@/components/football/FootballBadge";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
@@ -237,6 +238,9 @@ function FootballHubContent() {
             <TabsTrigger value="standings" className="gap-2 px-6 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-background font-bold text-xs uppercase tracking-wider transition-all">
               <Trophy className="w-4 h-4" /> Standings
             </TabsTrigger>
+            <TabsTrigger value="knockouts" className="gap-2 px-6 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-background font-bold text-xs uppercase tracking-wider transition-all">
+              <Network className="w-4 h-4" /> Knockouts
+            </TabsTrigger>
             <TabsTrigger value="topScorers" className="gap-2 px-6 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-background font-bold text-xs uppercase tracking-wider transition-all">
               <Medal className="w-4 h-4" /> Scorers
             </TabsTrigger>
@@ -290,6 +294,14 @@ function FootballHubContent() {
                     ))}
                   </div>
                 )}
+              </motion.div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="knockouts" className="mt-0 outline-none">
+            {activeTab === 'knockouts' && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <KnockoutBrackets />
               </motion.div>
             )}
           </TabsContent>
