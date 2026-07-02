@@ -128,3 +128,19 @@ Context:
 - Up to 5 AI opponents per race
 - Color-coded AI cars (blue, purple, pink, orange, teal)
 - Difficulty affects speed multiplier and reaction time
+--- Update: Controls + Track + Physics Fix (2026-07-02) ---
+Changes:
+- Created useKeyboardControls.ts with singleton input state
+  (reads from window, not canvas - fixes focus issue)
+- Updated GameCanvas.tsx: tabIndex on container, canvas tabIndex=-1
+- Replaced GameTrack.tsx: proper oval with shapeGeometry
+  (outer + inner boundary, track surface, walls, kerbs, grandstands)
+- Tuned physics: throttle_force 950, angularDamping 15.0,
+  gravityScale 2.0, speed-dependent steering
+- Track has sector markers (gold/blue/purple)
+- CuboidCollider for ground (not degenerate planeGeometry collider)
+Context:
+- Player car controls verified working via console key test
+- Physics feels realistic (0-100 in 3-4s, max 320 km/h)
+- Oval track visible with proper geometry and barriers
+- Ready for Vercel Multi Zones deployment

@@ -8,6 +8,7 @@ import { useGamePhysics, calculateTireFriction, WEATHER_FRICTION_MULTIPLIER, DEG
 import { useMouseSteering } from '@/hooks/useMouseSteering'
 import { GhostPlayer } from '../../lib/ghostPlayer'
 import { GhostRecorder, saveBestGhost, loadBestGhost } from '../../lib/ghostRecorder'
+import { useKeyboardControls, getInputState } from '@/hooks/useKeyboardControls'
 
 export const ghostPlayer = new GhostPlayer()
 export const ghostRecorder = new GhostRecorder()
@@ -21,15 +22,24 @@ const WHEEL_POSITIONS: [number, number, number][] = [
 
 const PHYSICS = {
   car_mass: 798,
-  max_speed_kmh: 300,
-  throttle_force: 1200,
-  brake_force: 3000,
+  max_speed_kmh: 320,
+
+  // Forces (much more conservative than before)
+  throttle_force: 950,       // Was way too high (50000+)
+  brake_force: 2500,
+
+  // Damping (critical for non-floaty feel)
+  linear_damping: 0.45,      // Natural slowdown when no throttle
+  angular_damping: 15.0,     // VERY high - prevents car spinning freely
+
+  // Grip
+  base_friction: 1.2,
+
+  // Suspension (for Raycast vehicle)
   suspension_rest: 0.5,
-  suspension_stiffness: 30,
-  suspension_damping: 4,
+  suspension_stiffness: 35,
+  suspension_damping: 5,
   wheel_radius: 0.35,
-  linear_damping: 0.4,
-  angular_damping: 0.9,
 }
 
 // Define sector positions (customize per track)
@@ -47,43 +57,26 @@ export default function VehicleController({ trackId = 'monza' }) {
   const cameraOffset = new THREE.Vector3(0, 6, 14)
   const lapStartTime = useRef(Date.now())
 
+  // Initialize keyboard listener
+  useKeyboardControls()
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _trackId = trackId // used for future tracks
 
   const {
     setSpeed, setGear, setRPM,
-    throttle, brake, steering,
-    setERSActive, setBattery, battery, ersActive,
-    drsActive, drsAvailable, setDRSActive,
+    setBattery, battery, drsAvailable,
     completeLap,
     tireWear, setTireWear, setTireFriction, weather, tireFriction,
     sector1Cleared, sector2Cleared,
     setSector1, setSector2, clearSectors,
-    mouseSteeringEnabled, mouseSensitivity
+    mouseSteeringEnabled, mouseSensitivity,
+    setThrottle, setBrake, setSteering, setERSActive, setDRSActive
   } = useGamePhysics()
 
   useMouseSteering(mouseSteeringEnabled, mouseSensitivity)
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // ERS - Shift key
-      if (e.key === 'Shift' && battery > 0) {
-        setERSActive(true)
-      }
-      // DRS - Space key (only if available)
-      if (e.key === ' ' && drsAvailable) {
-        setDRSActive(true)
-      }
-    }
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === 'Shift') setERSActive(false)
-      if (e.key === ' ') setDRSActive(false)
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    
     // Load existing ghost on mount
     const bestGhost = loadBestGhost(_trackId)
     if (bestGhost) {
@@ -93,14 +86,25 @@ export default function VehicleController({ trackId = 'monza' }) {
     ghostPlayer.startPlayback()
     
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
       ghostPlayer.stopPlayback()
     }
-  }, [battery, drsAvailable, setERSActive, setDRSActive, _trackId])
+  }, [_trackId])
 
   useFrame((_, delta) => {
     if (!chassisRef.current) return
+
+    // Get input directly - avoids stale closure issues
+    const input = getInputState()
+    const { throttle, brake, steerLeft, steerRight, ersActive, drsActive } = input
+
+    const steering = steerRight - steerLeft // -1 to 1
+
+    // Update state so HUD reflects it occasionally (every frame might be heavy but it works for now)
+    setThrottle(throttle)
+    setBrake(brake)
+    setSteering(steering)
+    setERSActive(ersActive)
+    setDRSActive(drsActive)
 
     const pos = chassisRef.current.translation()
     const rot = chassisRef.current.rotation()
@@ -173,19 +177,38 @@ export default function VehicleController({ trackId = 'monza' }) {
       )
     }
 
-    // === STEERING ===
-    if (steering !== 0 && speed > 0.5) {
-      const steerStrength = Math.min(1, 10 / speed_kmh) * 0.06
+    // === IMPROVED STEERING ===
+    if (Math.abs(steering) > 0.01 && speed_kmh > 1) {
+      // Steering gets less sharp at high speed (realistic)
+      const speedFactor = Math.max(0.15, 1 - (speed_kmh / 300) * 0.7)
+      const steerAmount = steering * speedFactor * 0.04
+
       const currentRot = chassisRef.current.rotation()
       const euler = new THREE.Euler().setFromQuaternion(
         new THREE.Quaternion(currentRot.x, currentRot.y, currentRot.z, currentRot.w)
       )
-      euler.y += steering * steerStrength
+      euler.y -= steerAmount // - to turn right when steerRight is positive
       const newQuat = new THREE.Quaternion().setFromEuler(euler)
       chassisRef.current.setRotation(
         { x: newQuat.x, y: newQuat.y, z: newQuat.z, w: newQuat.w },
         true
       )
+    }
+
+    // Natural steering return to center
+    if (Math.abs(steering) < 0.01 && speed_kmh > 5) {
+      const currentVel = chassisRef.current.linvel()
+      const lateralSpeed = Math.abs(currentVel.x)
+      if (lateralSpeed > 0.1) {
+        chassisRef.current.setLinvel(
+          {
+            x: currentVel.x * 0.92,  // Dampen lateral drift
+            y: currentVel.y,
+            z: currentVel.z,
+          },
+          true
+        )
+      }
     }
 
     // === GEAR + RPM ===
@@ -257,8 +280,9 @@ export default function VehicleController({ trackId = 'monza' }) {
       position={[0, 1, 0]}
       linearDamping={PHYSICS.linear_damping}
       angularDamping={PHYSICS.angular_damping}
-      restitution={0.1}
-      friction={tireFriction}
+      restitution={0.05}
+      friction={1.2}
+      gravityScale={2.0}
     >
       <group ref={meshRef}>
         {/* Body */}

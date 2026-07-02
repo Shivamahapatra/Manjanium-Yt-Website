@@ -2,12 +2,13 @@
 import React, { useEffect } from 'react';
 import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
-import { Environment, KeyboardControls } from '@react-three/drei'
-import { Track } from './physics/Track'
+import { Environment } from '@react-three/drei'
+
 import VehicleController, { ghostPlayer } from './physics/VehicleController'
 import { MultiplayerCars } from './physics/MultiplayerCars'
 import { initMultiplayer, leaveMultiplayer } from '../lib/multiplayer'
 import GhostCar from './physics/GhostCar'
+import GameTrack from './physics/GameTrack'
 
 import AICarManager from './physics/AICarManager'
 
@@ -19,32 +20,36 @@ export function GameCanvas() {
   }, []);
 
   return (
-    <div className="w-full h-screen absolute inset-0 z-0">
-      <KeyboardControls
-        map={[
-          { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
-          { name: 'backward', keys: ['ArrowDown', 'KeyS'] },
-          { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
-          { name: 'right', keys: ['ArrowRight', 'KeyD'] },
-          { name: 'ers', keys: ['ShiftLeft', 'ShiftRight'] },
-          { name: 'drs', keys: ['Space'] },
-        ]}
+    <div
+      className="w-full h-screen absolute inset-0 z-0"
+      style={{ outline: 'none' }}
+      tabIndex={0}
+      onFocus={() => console.log('Game canvas focused')}
+      onClick={(e) => e.currentTarget.focus()}
+    >
+      <Canvas
+        shadows
+        camera={{ position: [0, 5, -10], fov: 60 }}
+        style={{ width: '100%', height: '100%', display: 'block' }}
+        onCreated={({ gl }) => {
+          // Ensure canvas doesn't steal keyboard focus
+          gl.domElement.setAttribute('tabIndex', '-1')
+          gl.domElement.style.outline = 'none'
+        }}
       >
-        <Canvas shadows camera={{ position: [0, 5, -10], fov: 60 }}>
-          <color attach="background" args={['#0a0a0a']} />
-          <fog attach="fog" args={['#131313', 50, 500]} />
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
-          <Physics>
-            <Track />
-            <VehicleController />
-            <GhostCar ghostPlayer={ghostPlayer} />
-            <MultiplayerCars />
-            <AICarManager trackId="monza" difficulty="medium" numberOfCars={3} />
-          </Physics>
-          <Environment preset="sunset" />
-        </Canvas>
-      </KeyboardControls>
+        <color attach="background" args={['#0a0a0a']} />
+        <fog attach="fog" args={['#131313', 50, 500]} />
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
+        <Physics gravity={[0, -9.81, 0]} debug={false}>
+          <GameTrack trackId="monza" />
+          <VehicleController trackId="monza" />
+          <GhostCar ghostPlayer={ghostPlayer} />
+          <MultiplayerCars />
+          <AICarManager trackId="monza" difficulty="medium" numberOfCars={3} />
+        </Physics>
+        <Environment preset="sunset" />
+      </Canvas>
     </div>
   )
 }
