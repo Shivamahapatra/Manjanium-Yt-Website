@@ -50,7 +50,7 @@ export default function HomePage() {
               <F1PreviewCard />
               <PlayerStatsCard />
               <CommunityPollsCard />
-              <Link href="/simulator">
+              <a href="/simulator" className="block h-full">
                 <motion.div
                   className="bg-linear-to-br from-[#FBBF24]/20 to-surface border border-[#FBBF24]/40 rounded-lg p-6 hover:border-[#FBBF24] transition-colors cursor-pointer h-full"
                   whileHover={{ scale: 1.02, y: -4 }}
@@ -66,7 +66,7 @@ export default function HomePage() {
                     Enter Simulator →
                   </div>
                 </motion.div>
-              </Link>
+              </a>
             </DashboardGrid>
           </motion.section>
 
