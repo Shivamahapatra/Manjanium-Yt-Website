@@ -46,6 +46,7 @@ export function SettingsPanel() {
         <p>Transmission: {isAuto ? 'AUTO' : 'MANUAL'}</p>
         {!isAuto && <p>Shift: Space (Up) / L-Shift (Down)</p>}
         <p>Weather: {weather.toUpperCase()}</p>
+        <p>ERS/DRS: T (Hold) / G (Toggle)</p>
       </div>
     );
   }
@@ -100,6 +101,8 @@ export function SettingsPanel() {
           <li><strong style={{color: 'white'}}>Space</strong> - Manual Shift Up</li>
           <li><strong style={{color: 'white'}}>L-Shift</strong> - Manual Shift Down</li>
           <li><strong style={{color: 'white'}}>R</strong> - Toggle Rain Mode</li>
+          <li><strong style={{color: 'white'}}>T</strong> - Hold to use ERS Battery</li>
+          <li><strong style={{color: 'white'}}>G</strong> - Enable DRS (when available)</li>
         </ul>
       </div>
 

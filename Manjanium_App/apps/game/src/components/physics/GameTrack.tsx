@@ -6,6 +6,7 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { useGamePhysics } from '@/store/telemetry'
 import { getInputState } from '@/hooks/useKeyboardControls'
+import { GridAssembly } from './GridAssembly'
 
 // Define oval track shape
 function createOvalTrackShape(
@@ -188,6 +189,9 @@ export default function GameTrack({ trackId = 'monza' }: GameTrackProps) {
       </RigidBody>
 
       {/* --- VISUAL LAYER --- */}
+      {/* Grid Assembly */}
+      <GridAssembly trackId={trackId} radiusZ={config.radiusZ} />
+
       {/* Ground plane visuals */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.05, 0]}>
         <planeGeometry args={[1000, 1000]} />

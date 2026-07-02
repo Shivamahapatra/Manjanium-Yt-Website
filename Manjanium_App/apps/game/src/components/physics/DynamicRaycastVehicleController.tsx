@@ -55,6 +55,7 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
     completeLap,
     tireWear, setTireWear, tireFriction, setTireFriction, weather,
     sector1Cleared, sector2Cleared, crossedStartFinish,
+    currentLap, drsAvailable, setDRSActive, battery, setBattery,
     setSector1, setSector2, clearSectors, setCrossedStartFinish,
     setThrottle, setBrake, setSteering
   } = useGamePhysics();
@@ -163,12 +164,43 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
       }
     }
 
-    // 4. Apply driving forces and steering (scaled by weather grip)
+    // 4. ERS and DRS Calculations
+    let ersMultiplier = 1.0;
+    if (inputs.ersActive && battery > 0) {
+      ersMultiplier = 1.4;
+      setBattery(Math.max(0, battery - delta * 20)); // Drain battery
+    } else if (inputs.brake > 0) {
+      setBattery(Math.min(100, battery + delta * inputs.brake * 10)); // Regenerate
+    }
+
+    let isDRSAllowed = false;
+    const ghostFrame = ghostPlayer.getCurrentFrame();
+    if (currentLap >= 2 && drsAvailable && ghostFrame) {
+      const ghostPos = new THREE.Vector3(...ghostFrame.position);
+      const carPos = new THREE.Vector3(chassisPosition.x, chassisPosition.y, chassisPosition.z);
+      const timeGap = carPos.distanceTo(ghostPos) / Math.max(velocityMagnitude, 1);
+      
+      if (timeGap < 1.0) {
+        isDRSAllowed = true;
+      }
+    }
+
+    let drsMultiplier = 1.0;
+    if (inputs.drsActive && isDRSAllowed) {
+      drsMultiplier = 1.4; // Simulates 40% drag reduction by boosting torque/speed
+    } else {
+      inputs.drsActive = false; // Force turn off if brake applied (handled in inputs) or not allowed
+    }
+    
+    // Sync HUD
+    setDRSActive(inputs.drsActive);
+
+    // 5. Apply driving forces and steering (scaled by weather grip, ERS, and DRS)
     const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion).normalize();
     const gripMultiplier = tireFriction;
     
     if (inputs.throttle > 0) {
-      const force = forwardDir.clone().multiplyScalar(inputs.throttle * maxTorque * engineTorqueMultiplier.current * gripMultiplier);
+      const force = forwardDir.clone().multiplyScalar(inputs.throttle * maxTorque * engineTorqueMultiplier.current * gripMultiplier * ersMultiplier * drsMultiplier);
       chassisRef.current.addForceAtPoint(force, chassisPosition, true);
     }
     if (inputs.brake > 0) {

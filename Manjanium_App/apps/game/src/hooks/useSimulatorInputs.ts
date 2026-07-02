@@ -13,6 +13,8 @@ export interface SimulatorInputState {
   mouseSensitivity: number;
   shiftUpTriggered: boolean;   // Momentary flag for impulse
   shiftDownTriggered: boolean; // Momentary flag
+  ersActive: boolean;
+  drsActive: boolean;
 }
 
 // Singleton state to avoid React re-renders in the physics loop
@@ -26,6 +28,8 @@ const inputState: SimulatorInputState = {
   mouseSensitivity: 0.005,
   shiftUpTriggered: false,
   shiftDownTriggered: false,
+  ersActive: false,
+  drsActive: false,
 };
 
 export function getSimulatorInputs(): SimulatorInputState {
@@ -74,6 +78,9 @@ export function useSimulatorInputs() {
           // Toggle weather
           const currentWeather = useGamePhysics.getState().weather;
           useGamePhysics.getState().setWeather(currentWeather === 'rain' ? 'clear' : 'rain');
+        } else if (key === 'g') {
+          // Trigger DRS (disengaged by braking later)
+          inputState.drsActive = true;
         } else if (key === 'escape') {
           // ESC pauses the game natively by exiting pointer lock, which is handled in pointerlockchange
           // But if pointer lock isn't active, we can manually pause
@@ -98,8 +105,14 @@ export function useSimulatorInputs() {
       // Throttle
       inputState.throttle = keys.has('w') || keys.has('arrowup') ? 1 : 0;
       
-      // Brake
+      // Brake (also disengages DRS)
       inputState.brake = keys.has('s') || keys.has('arrowdown') ? 1 : 0;
+      if (inputState.brake > 0) {
+        inputState.drsActive = false;
+      }
+
+      // ERS (hold)
+      inputState.ersActive = keys.has('t');
 
       // Keyboard steering fallback (if pointer lock is not active, though mouse overrides it)
       if (!document.pointerLockElement) {
