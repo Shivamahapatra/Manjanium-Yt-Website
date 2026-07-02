@@ -57,7 +57,7 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
     sector1Cleared, sector2Cleared, crossedStartFinish,
     currentLap, drsAvailable, setDRSActive, battery, setBattery,
     setSector1, setSector2, clearSectors, setCrossedStartFinish,
-    setThrottle, setBrake, setSteering
+    setThrottle, setBrake, setSteering, totalLaps
   } = useGamePhysics();
 
   // Initialize inputs
@@ -81,6 +81,27 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
     const inputs = getSimulatorInputs();
     
     if (!chassisRef.current || carState === 'DNF' || inputs.isPaused) return;
+    
+    const chassisPosition = chassisRef.current.translation();
+    const isRaceFinished = currentLap > totalLaps;
+
+    if (isRaceFinished) {
+      // Freeze physics
+      chassisRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      chassisRef.current.setAngvel({ x: 0, y: 0, z: 0 }, true);
+      
+      // Orbit camera smoothly
+      const time = state.clock.getElapsedTime();
+      const radius = 15;
+      const height = 5;
+      const camX = chassisPosition.x + Math.sin(time * 0.3) * radius;
+      const camZ = chassisPosition.z + Math.cos(time * 0.3) * radius;
+      
+      const targetCamPos = new THREE.Vector3(camX, chassisPosition.y + height, camZ);
+      camera.position.lerp(targetCamPos, 0.05);
+      camera.lookAt(chassisPosition.x, chassisPosition.y + 1, chassisPosition.z);
+      return; // Skip rest of physics loop
+    }
 
     const currentVelocity = chassisRef.current.linvel();
     const currentVelVec = new THREE.Vector3(currentVelocity.x, currentVelocity.y, currentVelocity.z);
@@ -104,7 +125,6 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
     lastVelocity.current.copy(currentVelVec);
 
     // Apply Raycast Suspension Forces
-    const chassisPosition = chassisRef.current.translation();
     const chassisRotation = chassisRef.current.rotation();
     const quaternion = new THREE.Quaternion(chassisRotation.x, chassisRotation.y, chassisRotation.z, chassisRotation.w);
     

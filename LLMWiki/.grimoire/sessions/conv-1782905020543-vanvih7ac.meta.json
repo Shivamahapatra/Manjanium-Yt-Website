@@ -1,14 +1,14 @@
 {
   "id": "conv-1782905020543-vanvih7ac",
   "providerId": "claude",
-  "title": "make all these",
+  "title": "hie",
   "titleGenerationStatus": "failed",
   "createdAt": 1782905020552,
-  "updatedAt": 1782905023666,
-  "lastResponseAt": 1782905023666,
+  "updatedAt": 1783013077243,
+  "lastResponseAt": 1783013077243,
   "sessionId": null,
   "providerState": {},
-  "currentNote": "F1Badge.md",
+  "currentNote": "raw/session-2026-07-01-ghost-racing-and-vercel.md",
   "assistantResponseMetadata": [
     {
       "assistantMessageIndex": 0,
