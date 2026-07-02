@@ -1,9 +1,13 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { RigidBody, useRapier, RapierRigidBody } from '@react-three/rapier';
 import * as THREE from 'three';
+import { useGamePhysics, calculateTireFriction, WEATHER_FRICTION_MULTIPLIER, DEGRADATION_RATE } from '@/store/telemetry'
+import { ghostPlayer, ghostRecorder } from './VehicleController'
+import { saveBestGhost, loadBestGhost } from '../../lib/ghostRecorder'
+import { getSimulatorInputs, useSimulatorInputs } from '../../hooks/useSimulatorInputs';
 
 interface VehicleControllerProps {
   children?: React.ReactNode;
@@ -19,9 +23,18 @@ const SUSPENSION_POINTS = [
   new THREE.Vector3(0.8, -0.3, -1.5),  // Rear Right
 ];
 
-export function DynamicRaycastVehicleController({ children }: VehicleControllerProps) {
+const SECTOR_ZONES = {
+  sector1: { center: [80, 0, 0] as [number, number, number], radius: 15 },
+  sector2: { center: [-80, 0, 0] as [number, number, number], radius: 15 },
+  startFinish: { center: [0, 0, -50] as [number, number, number], radius: 10 },
+}
+
+export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId?: string }) {
   const chassisRef = useRef<RapierRigidBody>(null);
   const { rapier, world } = useRapier();
+  const { camera } = useThree();
+  const cameraOffset = new THREE.Vector3(0, 6, 14);
+  const lapStartTime = useRef(Date.now());
   
   // Physics tuning
   const suspensionStiffness = 35.0;
@@ -31,12 +44,42 @@ export function DynamicRaycastVehicleController({ children }: VehicleControllerP
   // State for velocity tracking to calculate G-Forces
   const lastVelocity = useRef<THREE.Vector3>(new THREE.Vector3());
   
-  // Damage states
+  // Performance and damage states
   const [carState, setCarState] = useState<'OK' | 'DNF'>('OK');
   const engineTorqueMultiplier = useRef(1.0);
+  const maxTorque = 2500;
+  const optimalRpmVelocity = 80; // Example optimal shifting velocity
+
+  const {
+    setSpeed, setGear, setRPM,
+    completeLap,
+    tireWear, setTireWear, setTireFriction, weather,
+    sector1Cleared, sector2Cleared,
+    setSector1, setSector2, clearSectors,
+    setThrottle, setBrake, setSteering
+  } = useGamePhysics();
+
+  // Initialize inputs
+  useSimulatorInputs();
+
+  React.useEffect(() => {
+    // Load existing ghost on mount
+    const bestGhost = loadBestGhost(trackId)
+    if (bestGhost) {
+      ghostPlayer.loadGhost(bestGhost)
+    }
+    ghostRecorder.startRecording()
+    ghostPlayer.startPlayback()
+    
+    return () => {
+      ghostPlayer.stopPlayback()
+    }
+  }, [trackId])
 
   useFrame((state, delta) => {
-    if (!chassisRef.current || carState === 'DNF') return;
+    const inputs = getSimulatorInputs();
+    
+    if (!chassisRef.current || carState === 'DNF' || inputs.isPaused) return;
 
     const currentVelocity = chassisRef.current.linvel();
     const currentVelVec = new THREE.Vector3(currentVelocity.x, currentVelocity.y, currentVelocity.z);
@@ -96,7 +139,106 @@ export function DynamicRaycastVehicleController({ children }: VehicleControllerP
       }
     });
 
-    // TODO: Apply driving forces modified by engineTorqueMultiplier.current
+    // 3. Transmission & Drivetrain
+    const velocityMagnitude = currentVelVec.length();
+    
+    if (inputs.isAuto) {
+      // Automatic Transmission
+      const computedGear = Math.max(1, Math.min(8, Math.ceil(velocityMagnitude / 15)));
+      inputs.gear = computedGear;
+    } else {
+      // Manual Transmission Impulse
+      if (inputs.shiftUpTriggered) {
+        inputs.shiftUpTriggered = false;
+        // Check if velocity is within optimal RPM band roughly
+        if (velocityMagnitude > 10 && velocityMagnitude % 15 > 10) {
+           const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion).normalize();
+           // Momentary linear impulse burst
+           chassisRef.current.applyImpulse(forwardDir.multiplyScalar(10000), true);
+           console.log('PERFECT SHIFT IMPULSE!');
+        }
+      }
+      if (inputs.shiftDownTriggered) {
+        inputs.shiftDownTriggered = false;
+      }
+    }
+
+    // 4. Apply driving forces and steering
+    const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion).normalize();
+    
+    if (inputs.throttle > 0) {
+      const force = forwardDir.clone().multiplyScalar(inputs.throttle * maxTorque * engineTorqueMultiplier.current);
+      chassisRef.current.addForceAtPoint(force, chassisPosition, true);
+    }
+    if (inputs.brake > 0) {
+      const force = forwardDir.clone().multiplyScalar(-inputs.brake * maxTorque * 1.5);
+      chassisRef.current.addForceAtPoint(force, chassisPosition, true);
+    }
+    
+    // Steering Torque mapping
+    if (inputs.steering !== 0) {
+      const turnForce = 8000 * -inputs.steering; 
+      // Apply torque for steering
+      chassisRef.current.applyTorqueImpulse(new THREE.Vector3(0, turnForce * delta, 0), true);
+    }
+    
+    // Telemetry updates
+    const speed_kmh = velocityMagnitude * 3.6;
+    setSpeed(Math.round(speed_kmh * 10) / 10);
+    setGear(inputs.gear);
+    setRPM(Math.round(3000 + ((speed_kmh / 320) * 12000)));
+    setThrottle(inputs.throttle);
+    setBrake(inputs.brake);
+    setSteering(inputs.steering);
+    
+    // Tire wear (simplified)
+    const distanceDelta = velocityMagnitude * delta;
+    const weatherMultiplier = WEATHER_FRICTION_MULTIPLIER[weather];
+    const newWear = Math.max(0, tireWear - distanceDelta * DEGRADATION_RATE * weatherMultiplier);
+    setTireWear(newWear);
+    setTireFriction(calculateTireFriction(newWear, weather));
+
+    // Sectors
+    const carPos = new THREE.Vector3(chassisPosition.x, 0, chassisPosition.z);
+    
+    const s1 = new THREE.Vector3(...SECTOR_ZONES.sector1.center);
+    if (!sector1Cleared && carPos.distanceTo(s1) < SECTOR_ZONES.sector1.radius) {
+      setSector1();
+    }
+    const s2 = new THREE.Vector3(...SECTOR_ZONES.sector2.center);
+    if (sector1Cleared && !sector2Cleared && carPos.distanceTo(s2) < SECTOR_ZONES.sector2.radius) {
+      setSector2();
+    }
+    const sf = new THREE.Vector3(...SECTOR_ZONES.startFinish.center);
+    if (sector1Cleared && sector2Cleared && carPos.distanceTo(sf) < SECTOR_ZONES.startFinish.radius) {
+      const lapTime = Date.now() - lapStartTime.current;
+      completeLap(lapTime);
+      
+      const ghost = ghostRecorder.stopRecording(lapTime, trackId);
+      if (ghost) {
+        saveBestGhost(ghost);
+        ghostPlayer.loadGhost(ghost);
+      }
+      ghostRecorder.startRecording();
+      ghostPlayer.startPlayback();
+
+      lapStartTime.current = Date.now();
+      clearSectors();
+    }
+
+    // Ghost frame
+    ghostRecorder.recordFrame(
+      [chassisPosition.x, chassisPosition.y, chassisPosition.z],
+      [chassisRotation.x, chassisRotation.y, chassisRotation.z, chassisRotation.w],
+      speed_kmh,
+      inputs.gear
+    );
+
+    // Follow Camera
+    const offset = cameraOffset.clone().applyQuaternion(quaternion);
+    const targetPos = new THREE.Vector3(chassisPosition.x + offset.x, chassisPosition.y + offset.y, chassisPosition.z + offset.z);
+    camera.position.lerp(targetPos, 0.06);
+    camera.lookAt(chassisPosition.x, chassisPosition.y + 1, chassisPosition.z);
   });
 
   return (
@@ -109,11 +251,40 @@ export function DynamicRaycastVehicleController({ children }: VehicleControllerP
       restitution={0.1}
       canSleep={false}
     >
-      <mesh>
-        <boxGeometry args={[1.8, 0.8, 4.5]} />
-        <meshStandardMaterial color={carState === 'DNF' ? 'red' : 'blue'} wireframe />
-      </mesh>
-      {children}
+      <group>
+        {/* Body */}
+        <mesh position={[0, 0.4, 0]} castShadow>
+          <boxGeometry args={[1.8, 0.8, 4.5]} />
+          <meshStandardMaterial color={carState === 'DNF' ? '#550000' : '#EF4444'} metalness={0.4} roughness={0.3} />
+        </mesh>
+        {/* Nose cone */}
+        <mesh position={[0, 0.3, 2.8]} castShadow>
+          <boxGeometry args={[1.2, 0.4, 1.2]} />
+          <meshStandardMaterial color={carState === 'DNF' ? '#550000' : '#CC0000'} metalness={0.4} roughness={0.3} />
+        </mesh>
+        {/* Cockpit */}
+        <mesh position={[0, 0.85, 0.3]} castShadow>
+          <boxGeometry args={[0.9, 0.5, 1.2]} />
+          <meshStandardMaterial color="#111111" />
+        </mesh>
+        {/* Rear wing */}
+        <mesh position={[0, 1.0, -2.2]} castShadow>
+          <boxGeometry args={[2.0, 0.08, 0.5]} />
+          <meshStandardMaterial color="#CC0000" metalness={0.6} />
+        </mesh>
+        {/* Front wing */}
+        <mesh position={[0, 0.1, 2.5]} castShadow>
+          <boxGeometry args={[2.2, 0.06, 0.3]} />
+          <meshStandardMaterial color="#CC0000" metalness={0.6} />
+        </mesh>
+        {/* Wheels */}
+        {SUSPENSION_POINTS.map((pos, i) => (
+          <mesh key={i} position={[pos.x, pos.y, pos.z]} rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.35, 0.35, 0.35, 16]} />
+            <meshStandardMaterial color="#111111" roughness={0.9} />
+          </mesh>
+        ))}
+      </group>
     </RigidBody>
   );
 }

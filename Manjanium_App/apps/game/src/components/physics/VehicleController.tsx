@@ -5,7 +5,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { RigidBody, useRapier } from '@react-three/rapier'
 import * as THREE from 'three'
 import { useGamePhysics, calculateTireFriction, WEATHER_FRICTION_MULTIPLIER, DEGRADATION_RATE } from '@/store/telemetry'
-import { useMouseSteering } from '@/hooks/useMouseSteering'
+
 import { GhostPlayer } from '../../lib/ghostPlayer'
 import { GhostRecorder, saveBestGhost, loadBestGhost } from '../../lib/ghostRecorder'
 import { useKeyboardControls, getInputState } from '@/hooks/useKeyboardControls'
@@ -70,11 +70,8 @@ export default function VehicleController({ trackId = 'monza' }) {
     tireWear, setTireWear, setTireFriction, weather, tireFriction,
     sector1Cleared, sector2Cleared,
     setSector1, setSector2, clearSectors,
-    mouseSteeringEnabled, mouseSensitivity,
     setThrottle, setBrake, setSteering, setERSActive, setDRSActive
   } = useGamePhysics()
-
-  useMouseSteering(mouseSteeringEnabled, mouseSensitivity)
 
   useEffect(() => {
     // Load existing ghost on mount

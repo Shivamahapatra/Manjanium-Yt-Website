@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { useAuth } from '@clerk/nextjs'
 import GameHUD from '@/components/ui/GameHUD'
 import { SelectionScreen } from '@/components/ui/SelectionScreen'
+import { SettingsPanel } from '@/components/ui/SettingsPanel'
 
 const GameCanvas = dynamic(() => import('@/components/GameCanvas').then(mod => mod.GameCanvas), { ssr: false })
 
@@ -19,6 +20,7 @@ export default function SimulatorPage() {
         <>
           <GameCanvas />
           <GameHUD />
+          <SettingsPanel />
         </>
       )}
     </main>

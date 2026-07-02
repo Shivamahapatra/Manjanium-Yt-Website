@@ -4,7 +4,8 @@ import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { Environment } from '@react-three/drei'
 
-import VehicleController, { ghostPlayer } from './physics/VehicleController'
+import { DynamicRaycastVehicleController } from './physics/DynamicRaycastVehicleController'
+import { ghostPlayer } from './physics/VehicleController'
 import { MultiplayerCars } from './physics/MultiplayerCars'
 import { initMultiplayer, leaveMultiplayer } from '../lib/multiplayer'
 import GhostCar from './physics/GhostCar'
@@ -43,7 +44,7 @@ export function GameCanvas() {
         <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
         <Physics gravity={[0, -9.81, 0]} debug={false}>
           <GameTrack trackId="monza" />
-          <VehicleController trackId="monza" />
+          <DynamicRaycastVehicleController trackId="monza" />
           <GhostCar ghostPlayer={ghostPlayer} />
           <MultiplayerCars />
           <AICarManager trackId="monza" difficulty="medium" numberOfCars={3} />
