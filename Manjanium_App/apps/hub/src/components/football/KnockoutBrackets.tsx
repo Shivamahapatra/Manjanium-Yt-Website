@@ -9,14 +9,16 @@ export function KnockoutBrackets() {
   const [selectedMatch, setSelectedMatch] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch from Supabase
+    // Fetch from real data API
     const fetchBrackets = async () => {
-      const { data, error } = await supabase
-        .from('tournament_brackets')
-        .select('*');
-      
-      if (!error && data) {
-        setBrackets(data);
+      try {
+        const res = await fetch('/api/football/knockouts');
+        const data = await res.json();
+        if (data && data.length > 0) {
+          setBrackets(data);
+        }
+      } catch (e) {
+        console.error(e);
       }
     };
     fetchBrackets();
@@ -35,77 +37,120 @@ export function KnockoutBrackets() {
 
   const displayData = brackets.length > 0 ? brackets : mockData;
 
-  const quarters = displayData.filter(b => b.round === 'Quarter-Finals');
-  const semis = displayData.filter(b => b.round === 'Semi-Finals');
-  const final = displayData.filter(b => b.round === 'Final');
+  const r32 = brackets.filter(b => b.round === 'Round of 32');
+  const r16 = brackets.filter(b => b.round === 'Round of 16');
+  const quarters = brackets.filter(b => b.round === 'Quarter-Finals');
+  const semis = brackets.filter(b => b.round === 'Semi-Finals');
+  const final = brackets.filter(b => b.round === 'Final');
 
-  const MatchCard = ({ match }: { match: any }) => (
-    <div 
-      className="bg-[var(--football-surface-alt)] border border-[var(--football-border)] p-4 rounded-xl cursor-pointer hover:bg-white/10 transition-colors w-48 shadow-lg"
-      onClick={() => setSelectedMatch(match.match_id)}
-    >
-      <div className="flex justify-between items-center mb-2">
-        <span className="font-bold text-white truncate w-3/4">{match.team1 || 'TBD'}</span>
-        <span className="text-emerald-400 font-mono font-bold">{match.score1 ?? '-'}</span>
-      </div>
-      <div className="flex justify-between items-center">
-        <span className="font-bold text-white truncate w-3/4">{match.team2 || 'TBD'}</span>
-        <span className="text-emerald-400 font-mono font-bold">{match.score2 ?? '-'}</span>
-      </div>
-      {(match.pen1 !== undefined || match.pen2 !== undefined) && (
-        <div className="text-xs text-white/50 text-center mt-2 font-mono">
-          Pen: {match.pen1} - {match.pen2}
+  const MatchCard = ({ match }: { match: any }) => {
+    if (!match) return <div className="w-56 h-[90px]" />; // Spacer if missing
+    return (
+      <div 
+        className={`bg-[var(--football-surface-alt)] border border-[var(--football-border)] p-3 rounded-xl cursor-pointer hover:bg-white/10 transition-colors w-56 shadow-lg z-10 relative ${match.isPlaceholder ? 'opacity-60' : ''}`}
+        onClick={() => setSelectedMatch(match.match_id)}
+      >
+        <div className="flex justify-between items-center mb-2">
+          <div className="flex items-center gap-2 overflow-hidden">
+            {match.logo1 && <img src={match.logo1} alt={match.team1} className="w-5 h-5 object-contain" />}
+            <span className="font-bold text-white text-sm truncate">{match.team1 || 'TBD'}</span>
+          </div>
+          <span className="text-emerald-400 font-mono font-bold text-md">{!isNaN(match.score1) ? match.score1 : '-'}</span>
         </div>
-      )}
-    </div>
-  );
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2 overflow-hidden">
+            {match.logo2 && <img src={match.logo2} alt={match.team2} className="w-5 h-5 object-contain" />}
+            <span className="font-bold text-white text-sm truncate">{match.team2 || 'TBD'}</span>
+          </div>
+          <span className="text-emerald-400 font-mono font-bold text-md">{!isNaN(match.score2) ? match.score2 : '-'}</span>
+        </div>
+        {(match.pen1 !== undefined || match.pen2 !== undefined) && (
+          <div className="text-xs text-white/50 text-center mt-1 font-mono">
+            Pen: {match.pen1} - {match.pen2}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
-    <div className="w-full glass-panel rounded-2xl p-8 overflow-x-auto min-h-[600px]">
-      <h2 className="text-2xl font-bold mb-12 font-heading text-white">Knockout Stage</h2>
+    <div className="w-full glass-panel rounded-2xl p-8 overflow-x-auto overflow-y-auto max-h-[85vh]">
+      <div className="sticky left-0 top-0 z-20">
+        <h2 className="text-2xl font-bold mb-8 font-heading text-white">Knockout Stage (2026 World Cup)</h2>
+      </div>
       
-      <div className="flex justify-between min-w-[800px] items-center">
+      <div className="flex justify-between min-w-[1400px] h-[1800px] items-stretch pb-12">
+        {/* Round of 32 */}
+        <div className="flex flex-col justify-around relative w-56">
+          <div className="text-sm font-bold text-[#0EA5E9] uppercase tracking-widest text-center absolute -top-8 w-full">Round of 32</div>
+          {Array.from({ length: 16 }).map((_, i) => (
+            <div key={i} className="relative flex items-center h-full">
+              <MatchCard match={r32[i]} />
+              <div className="absolute top-1/2 -right-8 w-8 h-px bg-[var(--football-border)] z-0" />
+            </div>
+          ))}
+        </div>
+
+        {/* Round of 16 */}
+        <div className="flex flex-col justify-around relative w-56">
+          <div className="text-sm font-bold text-[#0EA5E9] uppercase tracking-widest text-center absolute -top-8 w-full">Round of 16</div>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="relative flex items-center h-[225px]">
+              {/* Connectors from R32 */}
+              <div className="absolute top-1/2 -left-8 w-8 h-px bg-[var(--football-border)] z-0" />
+              <div className="absolute -left-8 w-px bg-[var(--football-border)] z-0 h-[112px]" style={{ top: '25%' }} />
+              
+              <MatchCard match={r16[i]} />
+              
+              <div className="absolute top-1/2 -right-8 w-8 h-px bg-[var(--football-border)] z-0" />
+            </div>
+          ))}
+        </div>
+
         {/* Quarter Finals */}
-        <div className="flex flex-col gap-12 justify-center relative">
-          <div className="text-sm font-bold text-[#0EA5E9] uppercase tracking-widest text-center mb-4">Quarter-Finals</div>
-          {quarters.slice(0, 4).map((q, i) => (
-            <div key={i} className="relative">
-              <MatchCard match={q} />
-              {/* Connector line */}
-              <div className="absolute top-1/2 -right-12 w-12 h-px bg-[var(--football-border)]" />
+        <div className="flex flex-col justify-around relative w-56">
+          <div className="text-sm font-bold text-[#0EA5E9] uppercase tracking-widest text-center absolute -top-8 w-full">Quarter-Finals</div>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="relative flex items-center h-[450px]">
+              {/* Connectors from R16 */}
+              <div className="absolute top-1/2 -left-8 w-8 h-px bg-[var(--football-border)] z-0" />
+              <div className="absolute -left-8 w-px bg-[var(--football-border)] z-0 h-[225px]" style={{ top: '25%' }} />
+              
+              <MatchCard match={quarters[i]} />
+              
+              <div className="absolute top-1/2 -right-8 w-8 h-px bg-[var(--football-border)] z-0" />
             </div>
           ))}
         </div>
 
         {/* Semi Finals */}
-        <div className="flex flex-col gap-32 justify-center relative">
-          <div className="text-sm font-bold text-[#0EA5E9] uppercase tracking-widest text-center mb-4">Semi-Finals</div>
-          {semis.slice(0, 2).map((s, i) => (
-            <div key={i} className="relative">
-              {/* Connector lines from QF */}
-              <div className="absolute top-1/2 -left-12 w-12 h-px bg-[var(--football-border)]" />
-              <div className="absolute -left-12 w-px bg-[var(--football-border)] top-[-3rem] h-[6rem]" style={{ top: i === 0 ? '-3rem' : 'auto', bottom: i === 1 ? '-3rem' : 'auto' }} />
+        <div className="flex flex-col justify-around relative w-56">
+          <div className="text-sm font-bold text-[#0EA5E9] uppercase tracking-widest text-center absolute -top-8 w-full">Semi-Finals</div>
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="relative flex items-center h-[900px]">
+              {/* Connectors from QF */}
+              <div className="absolute top-1/2 -left-8 w-8 h-px bg-[var(--football-border)] z-0" />
+              <div className="absolute -left-8 w-px bg-[var(--football-border)] z-0 h-[450px]" style={{ top: '25%' }} />
               
-              <MatchCard match={s} />
+              <MatchCard match={semis[i]} />
               
-              {/* Connector line to Final */}
-              <div className="absolute top-1/2 -right-12 w-12 h-px bg-[var(--football-border)]" />
+              <div className="absolute top-1/2 -right-8 w-8 h-px bg-[var(--football-border)] z-0" />
             </div>
           ))}
         </div>
 
         {/* Final */}
-        <div className="flex flex-col justify-center relative">
-          <div className="text-sm font-bold text-amber-400 uppercase tracking-widest text-center mb-4 flex items-center justify-center gap-2">
+        <div className="flex flex-col justify-center relative w-56">
+          <div className="text-sm font-bold text-amber-400 uppercase tracking-widest text-center absolute -top-8 w-full flex items-center justify-center gap-2">
             🏆 Final
           </div>
-          {final.slice(0, 1).map((f, i) => (
-            <div key={i} className="relative scale-110">
-               {/* Connector lines from SF */}
-              <div className="absolute top-1/2 -left-12 w-12 h-px bg-[var(--football-border)]" />
-              <div className="absolute -left-12 w-px bg-[var(--football-border)] top-[-8rem] h-[16rem]" />
+          {Array.from({ length: 1 }).map((_, i) => (
+            <div key={i} className="relative flex items-center scale-110">
+              {/* Connectors from SF */}
+              <div className="absolute top-1/2 -left-8 w-8 h-px bg-[var(--football-border)] z-0" />
+              <div className="absolute -left-8 w-px bg-[var(--football-border)] z-0 h-[900px]" style={{ top: '-450px' }} />
 
-              <MatchCard match={f} />
+              <MatchCard match={final[i]} />
             </div>
           ))}
         </div>
