@@ -6,6 +6,7 @@ import { TeamLineup } from '@/components/football/TeamLineup';
 import { MatchStatistics } from '@/components/football/MatchStatistics';
 import DecryptedText from "@/components/ui/DecryptedText";
 import { FootballBadge } from './FootballBadge';
+import { useLiveTicker } from '@/hooks/useLiveTicker';
 
 export interface MatchDetailsModalProps {
   matchId: string;
@@ -13,11 +14,22 @@ export interface MatchDetailsModalProps {
   onClose: () => void;
 }
 
+const getCategoryColor = (category: string) => {
+  switch (category) {
+    case 'GOAL': return 'border-emerald-500 bg-emerald-500/10';
+    case 'CARD': return 'border-red-500 bg-red-500/10';
+    case 'VAR': return 'border-purple-500 bg-purple-500/10';
+    case 'SUB': return 'border-blue-500 bg-blue-500/10';
+    default: return 'border-white/10 bg-white/5';
+  }
+};
+
 export function MatchDetailsModal({ matchId, isLive, onClose }: MatchDetailsModalProps) {
   const [activeTab, setActiveTab] = useState<'lineups' | 'timeline' | 'stats'>('timeline');
   const [details, setDetails] = useState<any>(null);
   const [commentary, setCommentary] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
+  const { events } = useLiveTicker(matchId);
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -216,18 +228,36 @@ export function MatchDetailsModal({ matchId, isLive, onClose }: MatchDetailsModa
           </div>
           
           <div className={`${activeTab !== 'timeline' ? 'hidden lg:block' : ''} order-1 lg:order-2`}>
-            {commentary?.events ? (
-               <LiveTimeline 
-                 events={commentary.events} 
-                 isLive={isLive} 
-                 currentMinute={match.elapsedTime} 
-                 onEventClick={(e) => console.log('Event', e)} 
-               />
-            ) : (
-               <div className="bg-[var(--football-surface-alt)] p-6 rounded-2xl text-center text-[#6B7280] border border-[var(--football-border)]">
-                 Timeline unavailable
-               </div>
-            )}
+            <div className="bg-[var(--football-surface-alt)] border border-[var(--football-border)] rounded-2xl p-6 h-[600px] overflow-y-auto">
+              <h3 className="text-xl font-bold mb-6 font-heading">Live Ticker</h3>
+              <div className="relative border-l border-white/10 ml-4 space-y-6 pb-4">
+                {events.length === 0 ? (
+                  <p className="text-white/50 pl-6 italic">Waiting for kickoff...</p>
+                ) : (
+                  events.map((ev) => (
+                    <div key={ev.id} className="relative pl-8">
+                      {/* Timeline Dot */}
+                      <div className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-emerald-400 ring-4 ring-[#0a0a0a]" />
+                      
+                      {/* Event Card */}
+                      <div className={`p-4 rounded-xl border-l-4 ${getCategoryColor(ev.category)} transition-all hover:bg-white/10`}>
+                        <div className="flex items-center gap-3 mb-1">
+                          <span className="text-emerald-400 font-mono font-bold text-sm">
+                            {ev.minute}'
+                          </span>
+                          <span className="text-xs font-bold uppercase tracking-wider text-white/70">
+                            {ev.category}
+                          </span>
+                        </div>
+                        <p className="text-white/90 text-sm leading-relaxed font-body">
+                          {ev.commentary}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
 
           <div className={`${activeTab !== 'stats' ? 'hidden lg:block' : ''} order-3 lg:order-3`}>
