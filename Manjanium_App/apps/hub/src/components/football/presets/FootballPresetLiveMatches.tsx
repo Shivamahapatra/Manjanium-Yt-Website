@@ -7,6 +7,7 @@ import { FootballBadge } from '@/components/football/FootballBadge';
 import { LiveMatchCard } from '@/components/football/LiveMatchCard';
 import { TerminalChat } from '@/components/chat/TerminalChat';
 import { LiveFixtureData } from '@/types/football';
+import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton'; // Assuming this exists or create a simple fallback
 
 interface FootballPresetLiveMatchesProps {
   fixtures: LiveFixtureData[];
@@ -16,11 +17,11 @@ interface FootballPresetLiveMatchesProps {
 export function FootballPresetLiveMatches({ fixtures, loadingLive }: FootballPresetLiveMatchesProps) {
   const [selectedMatch, setSelectedMatch] = useState<LiveFixtureData | null>(null);
   const isArray = Array.isArray(fixtures);
-  const liveCount = isArray ? fixtures.filter((f: LiveFixtureData) =>
+  const liveCount = isArray ? fixtures?.filter((f: LiveFixtureData) =>
     f?.fixture?.status?.short === '1H' || f?.fixture?.status?.short === '2H'
-  ).length : 0;
+  )?.length || 0 : 0;
 
-  const displayMatch = selectedMatch || (isArray && fixtures.length > 0 ? fixtures[0] : null);
+  const displayMatch = selectedMatch || (isArray && fixtures?.length > 0 ? fixtures[0] : null);
 
   return (
     <div className="flex flex-col gap-6">
@@ -41,9 +42,10 @@ export function FootballPresetLiveMatches({ fixtures, loadingLive }: FootballPre
           <FootballCard title="Match Center" className="h-full p-4">
             {loadingLive ? (
               <div className="flex justify-center p-8">
-                <div className="animate-spin w-8 h-8 border-2 border-[#0EA5E9] border-t-transparent rounded-full" />
+                {/* Fallback skeleton */}
+                <div className="w-full h-64 bg-neutral-900 animate-pulse rounded-xl" />
               </div>
-            ) : !isArray || fixtures.length === 0 ? (
+            ) : !isArray || fixtures?.length === 0 ? (
               <div className="p-8 text-center text-[#6B7280]">No live matches currently or rate limited.</div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
