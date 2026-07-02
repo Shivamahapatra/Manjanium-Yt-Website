@@ -4,15 +4,21 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
   async rewrites() {
+    let gameUrl = process.env.NEXT_PUBLIC_GAME_APP_URL || 'http://localhost:3001';
+    if (!gameUrl.startsWith('http')) {
+      gameUrl = `https://${gameUrl}`;
+    }
+    gameUrl = gameUrl.replace(/\/$/, ''); // Remove trailing slash if present
+
     return {
       afterFiles: [
         {
           source: '/simulator',
-          destination: `${process.env.NEXT_PUBLIC_GAME_APP_URL || 'http://localhost:3001'}/simulator`,
+          destination: `${gameUrl}/simulator`,
         },
         {
           source: '/simulator/:path*',
-          destination: `${process.env.NEXT_PUBLIC_GAME_APP_URL || 'http://localhost:3001'}/simulator/:path*`,
+          destination: `${gameUrl}/simulator/:path*`,
         },
       ],
     }
