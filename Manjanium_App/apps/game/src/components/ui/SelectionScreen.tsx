@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@manjanium/ui';
 
-export function SelectionScreen({ onStart }: { onStart: () => void }) {
+export function SelectionScreen({ onStart, userId }: { onStart: () => void, userId?: string | null }) {
   const [mode, setMode] = useState<'single' | 'multi' | 'time'>('single');
   const [track, setTrack] = useState('monza');
 
@@ -11,6 +11,11 @@ export function SelectionScreen({ onStart }: { onStart: () => void }) {
         <h1 className="text-4xl font-black italic text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-500 mb-8 text-center">
           PADDOCK SIMULATOR
         </h1>
+        {userId && (
+          <div className="text-center text-xs text-neutral-500 mb-6 uppercase tracking-widest">
+            Logged in as User: {userId.substring(0, 8)}...
+          </div>
+        )}
 
         <div className="space-y-6">
           <div>
