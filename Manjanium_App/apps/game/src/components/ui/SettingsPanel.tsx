@@ -3,11 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { STITCH_COLORS } from '@manjanium/ui';
 import { getSimulatorInputs, setMouseSensitivity, setSimulatorPaused } from '../../hooks/useSimulatorInputs';
+import { useGamePhysics } from '../../store/telemetry';
 
 export function SettingsPanel() {
   const [isPaused, setIsPaused] = useState(false);
   const [sensitivity, setSensitivity] = useState(0.005);
   const [isAuto, setIsAuto] = useState(true);
+  const weather = useGamePhysics((state) => state.weather);
+  const setWeather = useGamePhysics((state) => state.setWeather);
 
   // Poll the singleton state to update UI
   useEffect(() => {
@@ -42,6 +45,7 @@ export function SettingsPanel() {
         <p>Press ESC to open Settings / Pause</p>
         <p>Transmission: {isAuto ? 'AUTO' : 'MANUAL'}</p>
         {!isAuto && <p>Shift: Space (Up) / L-Shift (Down)</p>}
+        <p>Weather: {weather.toUpperCase()}</p>
       </div>
     );
   }
@@ -95,7 +99,25 @@ export function SettingsPanel() {
           <li><strong style={{color: 'white'}}>Ctrl</strong> - Toggle Auto/Manual</li>
           <li><strong style={{color: 'white'}}>Space</strong> - Manual Shift Up</li>
           <li><strong style={{color: 'white'}}>L-Shift</strong> - Manual Shift Down</li>
+          <li><strong style={{color: 'white'}}>R</strong> - Toggle Rain Mode</li>
         </ul>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <h4 style={{ margin: 0, color: STITCH_COLORS.muted }}>Weather:</h4>
+        <button 
+          onClick={() => setWeather(weather === 'rain' ? 'clear' : 'rain')}
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: weather === 'rain' ? '#3B82F6' : STITCH_COLORS.surface,
+            color: 'white',
+            border: `1px solid ${STITCH_COLORS.border}`,
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          {weather === 'rain' ? 'RAIN ACTIVE' : 'CLEAR'}
+        </button>
       </div>
 
       <button

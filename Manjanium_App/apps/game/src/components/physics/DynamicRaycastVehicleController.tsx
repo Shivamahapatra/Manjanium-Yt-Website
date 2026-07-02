@@ -53,9 +53,9 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
   const {
     setSpeed, setGear, setRPM,
     completeLap,
-    tireWear, setTireWear, setTireFriction, weather,
-    sector1Cleared, sector2Cleared,
-    setSector1, setSector2, clearSectors,
+    tireWear, setTireWear, tireFriction, setTireFriction, weather,
+    sector1Cleared, sector2Cleared, crossedStartFinish,
+    setSector1, setSector2, clearSectors, setCrossedStartFinish,
     setThrottle, setBrake, setSteering
   } = useGamePhysics();
 
@@ -163,21 +163,22 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
       }
     }
 
-    // 4. Apply driving forces and steering
+    // 4. Apply driving forces and steering (scaled by weather grip)
     const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion).normalize();
+    const gripMultiplier = tireFriction;
     
     if (inputs.throttle > 0) {
-      const force = forwardDir.clone().multiplyScalar(inputs.throttle * maxTorque * engineTorqueMultiplier.current);
+      const force = forwardDir.clone().multiplyScalar(inputs.throttle * maxTorque * engineTorqueMultiplier.current * gripMultiplier);
       chassisRef.current.addForceAtPoint(force, chassisPosition, true);
     }
     if (inputs.brake > 0) {
-      const force = forwardDir.clone().multiplyScalar(-inputs.brake * maxTorque * 1.5);
+      const force = forwardDir.clone().multiplyScalar(-inputs.brake * maxTorque * 1.5 * gripMultiplier);
       chassisRef.current.addForceAtPoint(force, chassisPosition, true);
     }
     
     // Steering Torque mapping
     if (inputs.steering !== 0) {
-      const turnForce = 8000 * -inputs.steering; 
+      const turnForce = 8000 * -inputs.steering * gripMultiplier; 
       // Apply torque for steering
       chassisRef.current.applyTorqueImpulse(new THREE.Vector3(0, turnForce * delta, 0), true);
     }
@@ -198,32 +199,26 @@ export function DynamicRaycastVehicleController({ trackId = 'monza' }: { trackId
     setTireWear(newWear);
     setTireFriction(calculateTireFriction(newWear, weather));
 
-    // Sectors
-    const carPos = new THREE.Vector3(chassisPosition.x, 0, chassisPosition.z);
-    
-    const s1 = new THREE.Vector3(...SECTOR_ZONES.sector1.center);
-    if (!sector1Cleared && carPos.distanceTo(s1) < SECTOR_ZONES.sector1.radius) {
-      setSector1();
-    }
-    const s2 = new THREE.Vector3(...SECTOR_ZONES.sector2.center);
-    if (sector1Cleared && !sector2Cleared && carPos.distanceTo(s2) < SECTOR_ZONES.sector2.radius) {
-      setSector2();
-    }
-    const sf = new THREE.Vector3(...SECTOR_ZONES.startFinish.center);
-    if (sector1Cleared && sector2Cleared && carPos.distanceTo(sf) < SECTOR_ZONES.startFinish.radius) {
-      const lapTime = Date.now() - lapStartTime.current;
-      completeLap(lapTime);
-      
-      const ghost = ghostRecorder.stopRecording(lapTime, trackId);
-      if (ghost) {
-        saveBestGhost(ghost);
-        ghostPlayer.loadGhost(ghost);
+    // Sectors & Checkpoints
+    if (crossedStartFinish) {
+      // Validate lap
+      if (sector1Cleared && sector2Cleared) {
+        const lapTime = Date.now() - lapStartTime.current;
+        completeLap(lapTime);
+        
+        const ghost = ghostRecorder.stopRecording(lapTime, trackId);
+        if (ghost) {
+          saveBestGhost(ghost);
+          ghostPlayer.loadGhost(ghost);
+        }
+        ghostRecorder.startRecording();
+        ghostPlayer.startPlayback();
       }
-      ghostRecorder.startRecording();
-      ghostPlayer.startPlayback();
 
+      // Reset lap state regardless of validation to start new lap checks
       lapStartTime.current = Date.now();
       clearSectors();
+      setCrossedStartFinish(false);
     }
 
     // Ghost frame

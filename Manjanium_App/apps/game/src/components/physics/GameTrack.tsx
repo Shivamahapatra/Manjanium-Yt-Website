@@ -42,10 +42,19 @@ interface GameTrackProps {
 
 export default function GameTrack({ trackId = 'monza' }: GameTrackProps) {
   const config = TRACK_CONFIG[trackId as keyof typeof TRACK_CONFIG] || TRACK_CONFIG.monza
-  const lapStartTime = useRef(Date.now())
-  const sector1Hit = useRef(false)
-  const sector2Hit = useRef(false)
-  const { completeLap, setSpeed } = useGamePhysics()
+  
+  const { 
+    setSector1, 
+    setSector2,
+    setCrossedStartFinish, 
+    completeLap,
+    setDRSAvailable,
+    weather 
+  } = useGamePhysics()
+  
+  // Track surface properties based on weather
+  const trackRoughness = weather === 'rain' ? 0.3 : 0.9;
+  const trackColor = weather === 'rain' ? '#1a1a1a' : '#2a2a2a';
 
   // Outer track boundary
   const outerPoints = useMemo(
@@ -128,17 +137,62 @@ export default function GameTrack({ trackId = 'monza' }: GameTrackProps) {
       {/* Fog for depth */}
       <fog attach="fog" args={['#1a1a2e', 100, 600]} />
 
-      {/* Ground plane (large, flat, outside track) */}
+      {/* --- PHYSICS LAYER --- */}
       <RigidBody type="fixed" colliders={false}>
-        <CuboidCollider
-          args={[500, 0.1, 500]}
-          position={[0, -0.1, 0]}
+        {/* Ground Collision Plane */}
+        <CuboidCollider args={[500, 0.1, 500]} position={[0, -0.1, 0]} />
+
+        {/* Track Walls Colliders */}
+        {wallSegments.map((wall, i) => (
+          <CuboidCollider
+            key={`wall-col-${i}`}
+            args={[wall.size[0] / 2, wall.size[1] / 2, wall.size[2] / 2]}
+            position={wall.position}
+            rotation={[0, wall.rotation, 0]}
+          />
+        ))}
+
+        {/* SENSORS */}
+        {/* Sector 1 Sensor */}
+        <CuboidCollider 
+          sensor 
+          args={[config.trackWidth / 2, 2, 0.5]} 
+          position={[config.radiusX, 0, 0]} 
+          onIntersectionEnter={() => setSector1()}
         />
-        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, 0, 0]}>
-          <planeGeometry args={[1000, 1000]} />
-          <meshStandardMaterial color="#1a3a1a" roughness={1} />
-        </mesh>
+
+        {/* Sector 2 Sensor */}
+        <CuboidCollider 
+          sensor 
+          args={[config.trackWidth / 2, 2, 0.5]} 
+          position={[-config.radiusX, 0, 0]} 
+          onIntersectionEnter={() => setSector2()}
+        />
+
+        {/* Start/Finish Sensor */}
+        <CuboidCollider 
+          sensor 
+          args={[config.trackWidth / 2, 2, 0.5]} 
+          position={[0, 0, -(config.radiusZ)]} 
+          onIntersectionEnter={() => setCrossedStartFinish(true)}
+        />
+
+        {/* DRS Zone Sensor (Main Straight) */}
+        <CuboidCollider 
+          sensor
+          args={[30, 5, config.trackWidth / 2]} 
+          position={[0, 0, -(config.radiusZ)]} 
+          onIntersectionEnter={() => setDRSAvailable(true)}
+          onIntersectionExit={() => setDRSAvailable(false)}
+        />
       </RigidBody>
+
+      {/* --- VISUAL LAYER --- */}
+      {/* Ground plane visuals */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.05, 0]}>
+        <planeGeometry args={[1000, 1000]} />
+        <meshStandardMaterial color={weather === 'rain' ? '#102010' : '#1a3a1a'} roughness={1} />
+      </mesh>
 
       {/* TRACK SURFACE */}
       <mesh
@@ -148,9 +202,9 @@ export default function GameTrack({ trackId = 'monza' }: GameTrackProps) {
       >
         <shapeGeometry args={[trackShape]} />
         <meshStandardMaterial
-          color="#2a2a2a"
-          roughness={0.9}
-          metalness={0.0}
+          color={trackColor}
+          roughness={trackRoughness}
+          metalness={weather === 'rain' ? 0.3 : 0.0}
         />
       </mesh>
 
@@ -181,30 +235,20 @@ export default function GameTrack({ trackId = 'monza' }: GameTrackProps) {
         <meshStandardMaterial color="#8B5CF6" transparent opacity={0.8} />
       </mesh>
 
-      {/* TRACK WALLS */}
+      {/* TRACK WALLS (Visuals only) */}
       {wallSegments.map((wall, i) => (
-        <RigidBody
-          key={`wall-${i}`}
-          type="fixed"
-          colliders={false}
+        <mesh
+          key={`wall-mesh-${i}`}
+          position={wall.position}
+          rotation={[0, wall.rotation, 0]}
+          castShadow
         >
-          <CuboidCollider
-            args={[wall.size[0] / 2, wall.size[1] / 2, wall.size[2] / 2]}
-            position={wall.position}
-            rotation={[0, wall.rotation, 0]}
+          <boxGeometry args={wall.size} />
+          <meshStandardMaterial
+            color="#EF4444"
+            roughness={0.7}
           />
-          <mesh
-            position={wall.position}
-            rotation={[0, wall.rotation, 0]}
-            castShadow
-          >
-            <boxGeometry args={wall.size} />
-            <meshStandardMaterial
-              color="#EF4444"
-              roughness={0.7}
-            />
-          </mesh>
-        </RigidBody>
+        </mesh>
       ))}
 
       {/* KERBS (visual only) - at corners */}

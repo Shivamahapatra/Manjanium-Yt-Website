@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useGamePhysics } from '../store/telemetry';
 
 export interface SimulatorInputState {
   throttle: number;    // 0 to 1
@@ -69,6 +70,10 @@ export function useSimulatorInputs() {
         } else if (key === 'shift' && !inputState.isAuto) {
           inputState.shiftDownTriggered = true;
           inputState.gear = Math.max(-1, inputState.gear - 1);
+        } else if (key === 'r') {
+          // Toggle weather
+          const currentWeather = useGamePhysics.getState().weather;
+          useGamePhysics.getState().setWeather(currentWeather === 'rain' ? 'clear' : 'rain');
         } else if (key === 'escape') {
           // ESC pauses the game natively by exiting pointer lock, which is handled in pointerlockchange
           // But if pointer lock isn't active, we can manually pause

@@ -48,9 +48,11 @@ export interface GamePhysicsState {
   // Lap sectors
   sector1Cleared: boolean
   sector2Cleared: boolean
+  crossedStartFinish: boolean
   clearSectors: () => void
   setSector1: () => void
   setSector2: () => void
+  setCrossedStartFinish: (crossed: boolean) => void
   resetRace: () => void
 
   // Settings
@@ -122,9 +124,11 @@ export const useGamePhysics = create<GamePhysicsState>((set) => ({
 
   sector1Cleared: false,
   sector2Cleared: false,
-  clearSectors: () => set({ sector1Cleared: false, sector2Cleared: false }),
+  crossedStartFinish: false,
+  clearSectors: () => set({ sector1Cleared: false, sector2Cleared: false, crossedStartFinish: false }),
   setSector1: () => set({ sector1Cleared: true }),
   setSector2: () => set({ sector2Cleared: true }),
+  setCrossedStartFinish: (crossedStartFinish) => set({ crossedStartFinish }),
   resetRace: () => set({ currentLap: 1, battery: 100 }),
 
   mouseSteeringEnabled: false,
