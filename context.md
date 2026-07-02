@@ -144,3 +144,12 @@ Changes made:
 - Updated .gitignore to exclude /LLMWiki/.obsidian/ but track the rest of the wiki.
 Context:
 - The project now strictly separates application code (/Manjanium_App) from the knowledge base (/LLMWiki) per the new global rules.
+
+--- Update: 2026 World Cup Knockouts Update (2026-07-03T00:15:00+05:30) ---
+Changes made:
+- Added `KnockoutBrackets.tsx` UI component in `apps/hub` to render a 5-column bracket.
+- Created `/api/football/knockouts` endpoint to fetch real-time 2026 World Cup data from ESPN's `fifa.world` API.
+- Implemented chronological round parsing logic for the 32-team knockout structure.
+- Updated `page.tsx` to include the Knockouts tab.
+Context:
+- The Knockout Brackets tab is now fully functional, live, and data-driven for the 2026 World Cup.
