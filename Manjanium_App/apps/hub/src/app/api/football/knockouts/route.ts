@@ -28,7 +28,7 @@ export async function GET() {
     const gamesJson = await gamesRes.json();
     
     const teamsList = teamsJson.teams || [];
-    const gamesList = gamesJson.data || [];
+    const gamesList = gamesJson.games || [];
 
     // Map team IDs to team data for fast lookup
     const teamMap: Record<string, any> = {};
@@ -37,7 +37,7 @@ export async function GET() {
     });
 
     // We only want knockout rounds
-    const knockoutGroups = ['R32', 'R16', 'QF', 'SF', 'THIRD', 'FINAL'];
+    const knockoutGroups = ['R32', 'R16', 'QF', 'SF', '3RD', 'FINAL'];
     
     const matches = gamesList
       .filter((game: any) => knockoutGroups.includes(game.group.toUpperCase()))
@@ -48,7 +48,7 @@ export async function GET() {
         else if (game.group.toUpperCase() === 'R16') roundName = 'Round of 16';
         else if (game.group.toUpperCase() === 'QF') roundName = 'Quarter-Finals';
         else if (game.group.toUpperCase() === 'SF') roundName = 'Semi-Finals';
-        else if (game.group.toUpperCase() === 'THIRD') roundName = 'Third Place Play-off';
+        else if (game.group.toUpperCase() === '3RD') roundName = 'Third Place Play-off';
         else if (game.group.toUpperCase() === 'FINAL') roundName = 'Final';
 
         const team1 = teamMap[game.home_team_id];

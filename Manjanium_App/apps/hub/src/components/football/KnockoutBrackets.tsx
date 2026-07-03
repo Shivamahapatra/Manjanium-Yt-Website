@@ -32,13 +32,13 @@ export function KnockoutBrackets() {
 
   // Mock data for visual structure if database is empty
   const mockData = [
-    { id: '1', round: 'Quarter-Finals', match_id: 'm1', team1: 'Spain', team2: 'Germany', score1: 2, score2: 1 },
-    { id: '2', round: 'Quarter-Finals', match_id: 'm2', team1: 'Portugal', team2: 'France', score1: 0, score2: 0, pen1: 3, pen2: 5 },
-    { id: '3', round: 'Quarter-Finals', match_id: 'm3', team1: 'England', team2: 'Switzerland', score1: 1, score2: 1, pen1: 5, pen2: 3 },
-    { id: '4', round: 'Quarter-Finals', match_id: 'm4', team1: 'Netherlands', team2: 'Turkey', score1: 2, score2: 1 },
-    { id: '5', round: 'Semi-Finals', match_id: 'm5', team1: 'Spain', team2: 'France', score1: 2, score2: 1 },
-    { id: '6', round: 'Semi-Finals', match_id: 'm6', team1: 'England', team2: 'Netherlands', score1: 2, score2: 1 },
-    { id: '7', round: 'Final', match_id: 'm7', team1: 'Spain', team2: 'England', score1: null, score2: null }
+    { id: '1', round: 'Quarter-Finals', match_id: 'm1', team1: 'Argentina', team2: 'Brazil', score1: 2, score2: 1 },
+    { id: '2', round: 'Quarter-Finals', match_id: 'm2', team1: 'France', team2: 'England', score1: 0, score2: 0, pen1: 3, pen2: 5 },
+    { id: '3', round: 'Quarter-Finals', match_id: 'm3', team1: 'Spain', team2: 'Germany', score1: 1, score2: 1, pen1: 5, pen2: 3 },
+    { id: '4', round: 'Quarter-Finals', match_id: 'm4', team1: 'Portugal', team2: 'Netherlands', score1: 2, score2: 1 },
+    { id: '5', round: 'Semi-Finals', match_id: 'm5', team1: 'Argentina', team2: 'England', score1: 2, score2: 1 },
+    { id: '6', round: 'Semi-Finals', match_id: 'm6', team1: 'Spain', team2: 'Portugal', score1: 2, score2: 1 },
+    { id: '7', round: 'Final', match_id: 'm7', team1: 'Argentina', team2: 'Spain', score1: null, score2: null }
   ];
 
   const displayData = brackets.length > 0 ? brackets : mockData;
