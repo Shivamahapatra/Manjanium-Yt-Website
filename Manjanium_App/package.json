@@ -4,6 +4,8 @@
   "scripts": {
     "dev:hub": "pnpm --filter hub dev",
     "dev:game": "pnpm --filter game dev",
+    "dev:telemetry": "cd apps/telemetry && .venv\\Scripts\\python main.py",
+    "dev:telemetry:mac": "cd apps/telemetry && .venv/bin/python main.py",
     "build:hub": "pnpm --filter hub build",
     "build:game": "pnpm --filter game build",
     "build": "pnpm --filter hub build && pnpm --filter game build",

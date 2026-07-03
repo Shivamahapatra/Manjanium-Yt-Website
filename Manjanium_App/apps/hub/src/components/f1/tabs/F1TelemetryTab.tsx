@@ -101,32 +101,22 @@ export function F1TelemetryTab() {
       );
       const data = await res.json();
 
-      if (data.telemetry && data.telemetry.length === 2) {
-        const p1Data = data.telemetry[0];
-        const p2Data = data.telemetry[1];
-        const maxLen = Math.max(p1Data.length, p2Data.length);
-
-        const merged = [];
-        for (let i = 0; i < maxLen; i++) {
-          const d1 = p1Data[i] || {};
-          const d2 = p2Data[i] || {};
-          merged.push({
-            distance: i,
-            p1Speed: d1.speed ?? null,
-            p1Throttle: d1.throttle ?? null,
-            p1Brake: d1.brake ?? null,
-            p1Gear: d1.n_gear ?? null,
-            p2Speed: d2.speed ?? null,
-            p2Throttle: d2.throttle ?? null,
-            p2Brake: d2.brake ?? null,
-            p2Gear: d2.n_gear ?? null,
-            delta:
-              d1.speed != null && d2.speed != null
-                ? d1.speed - d2.speed
-                : null,
-          });
-        }
-        setTelemetry(merged);
+      if (data.telemetry && Array.isArray(data.telemetry)) {
+        const mapped = data.telemetry.map((pt: any) => ({
+          distance: pt.distance,
+          p1Speed: pt.driver1.speed,
+          p1Throttle: pt.driver1.throttle,
+          p1Brake: pt.driver1.brake,
+          p1Gear: pt.driver1.gear,
+          p1Rpm: pt.driver1.rpm,
+          p2Speed: pt.driver2.speed,
+          p2Throttle: pt.driver2.throttle,
+          p2Brake: pt.driver2.brake,
+          p2Gear: pt.driver2.gear,
+          p2Rpm: pt.driver2.rpm,
+          delta: pt.delta,
+        }));
+        setTelemetry(mapped);
       } else {
         setTelemetry([]);
       }

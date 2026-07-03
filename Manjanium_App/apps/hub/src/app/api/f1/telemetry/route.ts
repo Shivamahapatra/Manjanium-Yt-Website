@@ -1,68 +1,48 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+const TELEMETRY_URL = process.env.TELEMETRY_API_URL || 'http://localhost:8000'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const driver1 = searchParams.get('d1');
-    const driver2 = searchParams.get('d2');
-    const year = searchParams.get('year');
-    const round = searchParams.get('round');
-    const sessionType = searchParams.get('session');
-    
-    let sessionKey = searchParams.get('session_key') || 'latest';
-    
-    // If year/round/session provided, resolve to session_key
-    if (year && round && sessionType) {
-      try {
-        // Map session shorthand to OpenF1 session_type
-        const sessionTypeMap: Record<string, string> = {
-          'FP1': 'Practice 1', 'FP2': 'Practice 2', 'FP3': 'Practice 3',
-          'Q': 'Qualifying', 'R': 'Race', 'S': 'Sprint',
-          'SQ': 'Sprint Qualifying',
-        };
-        const mappedType = sessionTypeMap[sessionType] || sessionType;
-        
-        const sessRes = await fetch(
-          `https://api.openf1.org/v1/sessions?year=${year}&session_type=${encodeURIComponent(mappedType)}`,
-          { cache: 'no-store' }
-        );
-        const sessData = await sessRes.json();
-        
-        if (Array.isArray(sessData) && sessData.length > 0) {
-          // Find session matching the round number
-          const roundNum = parseInt(round);
-          // Sessions don't have round numbers directly, so we pick by index or match by meeting_key
-          const matchedSession = sessData[roundNum - 1] || sessData[sessData.length - 1];
-          if (matchedSession?.session_key) {
-            sessionKey = matchedSession.session_key.toString();
-          }
-        }
-      } catch (e) {
-        // Fall back to latest
-        console.error('Session resolution failed:', e);
-      }
+    const { searchParams } = new URL(request.url)
+    const year = searchParams.get('year') || '2024'
+    const round = searchParams.get('round') || '1'
+    const session = searchParams.get('session') || 'Q'
+    const driver1 = searchParams.get('driver1') || 'VER'
+    const driver2 = searchParams.get('driver2') || 'HAM'
+    const lap = searchParams.get('lap') || 'fastest'
+
+    const pythonUrl = `${TELEMETRY_URL}/api/compare-laps?year=${year}&round=${round}&session=${session}&driver1=${driver1}&driver2=${driver2}&lap=${lap}`
+
+    const response = await fetch(pythonUrl, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(30000), // 30s timeout for cold starts
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return NextResponse.json(
+        { error: error.detail || 'Telemetry service error' },
+        { status: response.status }
+      )
     }
 
-    const urls: Promise<Response>[] = [];
-    if (driver1) urls.push(fetch(`https://api.openf1.org/v1/car_data?driver_number=${driver1}&session_key=${sessionKey}`, { cache: 'no-store' }));
-    if (driver2) urls.push(fetch(`https://api.openf1.org/v1/car_data?driver_number=${driver2}&session_key=${sessionKey}`, { cache: 'no-store' }));
-
-    // Also fetch drivers for color info
-    const driversRes = await fetch(`https://api.openf1.org/v1/drivers?session_key=${sessionKey}`, { cache: 'no-store' });
-    const driversData = await driversRes.json();
-
-    const responses = await Promise.all(urls);
-    const data = await Promise.all(responses.map(res => res.json()));
-
-    return NextResponse.json({
-      telemetry: data,
-      drivers: Array.isArray(driversData) ? driversData : [],
-      sessionKey
-    });
+    const data = await response.json()
+    return NextResponse.json(data, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, s-maxage=300', // Cache telemetry for 5 min
+      },
+    })
   } catch (error) {
-    return NextResponse.json({ error: String(error) }, { status: 500 });
+    console.error('Telemetry proxy error:', error)
+    return NextResponse.json(
+      {
+        error: 'Telemetry service unavailable',
+        fallback: true,
+        message: 'Run: pnpm dev:telemetry to start the FastF1 service',
+      },
+      { status: 503 }
+    )
   }
 }

@@ -1,0 +1,9 @@
+pycache/
+*.pyc
+*.pyo
+.env
+venv/
+.venv/
+fastf1_cache/
+*.parquet
+.cache/

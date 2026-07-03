@@ -118,6 +118,8 @@ export function TeamRadioPanel({ radioMsgs }: { radioMsgs: any[] }) {
   );
 }
 
+import { supabase } from "@/lib/supabase";
+
 export function F1LiveTab() {
   const { preset, loading: presetLoading } = useDashboardPreset();
   const [session, setSession] = useState<any>(null);
@@ -131,63 +133,82 @@ export function F1LiveTab() {
   const [radioMsgs, setRadioMsgs] = useState<any[]>([]);
   const [drivers, setDrivers] = useState<any[]>([]);
 
+  const applyPayload = (payload: any) => {
+    if (payload.session) {
+      setSession(payload.session);
+      setSessionKey(String(payload.session.session_key || 'latest'));
+    }
+    if (payload.drivers) setDrivers(payload.drivers);
+    if (payload.weatherData) setWeatherData(payload.weatherData);
+    if (payload.raceControlMsgs) {
+      const sorted = [...payload.raceControlMsgs].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setRaceControlMsgs(sorted.slice(0, 8));
+    }
+    if (payload.radioMsgs) {
+      const sorted = [...payload.radioMsgs].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setRadioMsgs(sorted.slice(0, 4));
+    }
+  };
+
   useEffect(() => {
-    const fetchAllData = async () => {
+    let pingInterval: NodeJS.Timeout;
+    let channel: any;
+
+    const init = async () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch("/api/f1/live");
-        if (res.status === 429) {
-          setError('rate_limited');
-          setTimeout(fetchAllData, 30000);
-          return;
-        }
-        if (res.status >= 500) {
-          setError('Server error. Please try again later.');
-          return;
-        }
-        const data = await res.json();
         
-        const currentSessionKey = data?.session?.session_key || "latest";
-        
-        if (data?.session) {
-          setSession(data.session);
-          setSessionKey(String(currentSessionKey));
-        }
-        
-        if (data?.drivers) {
-          setDrivers(data.drivers);
-        }
+        // 1. Send immediate ping to ensure backend is fetching fresh data
+        fetch("/api/f1/ping").catch(console.error);
 
-        // Fetch dependent data concurrently
-        const [weatherRes, controlRes, radioRes] = await Promise.allSettled([
-          fetch(`/api/f1/weather?session_key=${currentSessionKey}`).then(r => r.json()),
-          fetch(`/api/f1/racecontrol?session_key=${currentSessionKey}`).then(r => r.json()),
-          fetch(`/api/f1/radio?session_key=${currentSessionKey}`).then(r => r.json())
-        ]);
+        // 2. Fetch initial state from Supabase
+        const { data, error: dbError } = await supabase
+          .from('f1_live_timing')
+          .select('*')
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (data?.payload) {
+          applyPayload(data.payload);
+        } else if (dbError && dbError.code !== 'PGRST116') { // PGRST116 is 'no rows returned'
+          console.error("Supabase fetch error:", dbError);
+        }
+        
+        setLoading(false);
 
-        if (weatherRes.status === 'fulfilled' && weatherRes.value?.weather?.length > 0) {
-          setWeatherData(weatherRes.value.weather[weatherRes.value.weather.length - 1]);
-        }
-        if (controlRes.status === 'fulfilled' && controlRes.value?.racecontrol) {
-          const sorted = [...controlRes.value.racecontrol].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-          setRaceControlMsgs(sorted.slice(0, 8));
-        }
-        if (radioRes.status === 'fulfilled' && radioRes.value?.radio) {
-          const sorted = [...radioRes.value.radio].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-          setRadioMsgs(sorted.slice(0, 4));
-        }
+        // 3. Subscribe to Realtime updates
+        channel = supabase.channel('f1-live')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'f1_live_timing' },
+            (payload: any) => {
+              if (payload.new && payload.new.payload) {
+                applyPayload(payload.new.payload);
+              }
+            }
+          )
+          .subscribe();
+
+        // 4. Start lightweight background ping
+        pingInterval = setInterval(() => {
+          fetch("/api/f1/ping").catch(console.error);
+        }, 10000);
 
       } catch (err) {
-        console.error("F1 fetch error:", err);
+        console.error("F1 init error:", err);
         setError('Network error');
-      } finally {
         setLoading(false);
       }
     };
-    fetchAllData();
-    const interval = setInterval(fetchAllData, 15000);
-    return () => clearInterval(interval);
+
+    init();
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+      if (pingInterval) clearInterval(pingInterval);
+    };
   }, []);
 
   const currentVenue = useMemo(() => {
