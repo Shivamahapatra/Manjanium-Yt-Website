@@ -10,7 +10,7 @@ import { F1Badge } from '@/components/f1/F1Badge';
 // Import our premium F1 tab components
 import { F1LiveTab } from "@/components/f1/tabs/F1LiveTab";
 import { F1ReplayTab } from "@/components/f1/tabs/F1ReplayTab";
-import { F1TelemetryTab } from "@/components/f1/tabs/F1TelemetryTab";
+import F1TelemetryTab from "@/components/f1/tabs/F1TelemetryTab";
 import { F1StandingsTab } from "@/components/f1/tabs/F1StandingsTab";
 import { F1CalendarTab } from "@/components/f1/tabs/F1CalendarTab";
 import { F1ResultsTab } from "@/components/f1/tabs/F1ResultsTab";

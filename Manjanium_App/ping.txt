@@ -27,3 +27,21 @@ Context:
 - apps/hub: Next.js 14.2.35, fully working with Clerk auth and Supabase
 - apps/game: Next.js 14.2.35, placeholder page ready for game migration
 - Ready for Vercel Multi Zones setup
+
+--- Update: FastF1 Python Telemetry Backend (2026-07-03) ---
+Changes:
+- Created apps/telemetry/ Python FastAPI service
+- FastF1 integration with ephemeral /tmp cache
+- /api/compare-laps: distance-synchronized telemetry comparison
+- /api/available-sessions: session list endpoint
+- /api/session-drivers: driver list endpoint
+- Proxy in apps/hub/src/app/api/f1/telemetry/route.ts
+- Updated F1TelemetryTab.tsx with new data structure
+- Speed, Delta, Throttle, Gear chart tabs
+- pnpm dev:telemetry script in root package.json
+Context:
+- Cache: ephemeral /tmp (persistent volume to add at deployment)
+- Cold start: ~30-60s first load per session (downloads ~50MB)
+- Subsequent loads: sub-second from cache
+- Deploy target: Railway (pnpm dev:telemetry:railway when ready)
+- CORS configured for localhost:3000 + Vercel domain
