@@ -161,3 +161,12 @@ Changes made:
 Context:
 - Supabase local instance is not responding on port 54321, so data is mocked at the API route layer before returning to the UI to bypass the empty/placeholder values returned from the database.
 - The UI now properly shows simulated teams for Round of 32 and Round of 16.
+
+--- Update: Live Auto-Updating Knockout Bracket Integration (2026-07-03T13:51:00+05:30) ---
+Changes made:
+- Integrated the open-source `worldcup26.ir` REST API to fetch live match data and team metadata.
+- Rewrote `apps/hub/src/app/api/football/knockouts/route.ts` to merge teams with games and sort them into appropriate knockout rounds (R32, R16, QF, SF, Final).
+- Added client-side polling every 60 seconds to `KnockoutBrackets.tsx` (`fetchBrackets` interval).
+Context:
+- The bracket now displays real data from a reliable third-party API instead of static mocked data.
+- The UI will automatically update in real-time as live matches progress, fulfilling the auto-update requirement.

@@ -14,14 +14,20 @@ export function KnockoutBrackets() {
       try {
         const res = await fetch('/api/football/knockouts');
         const data = await res.json();
-        if (data && data.length > 0) {
+        if (data && data.length > 0 && !data.error) {
           setBrackets(data);
         }
       } catch (e) {
         console.error(e);
       }
     };
+    
+    // Initial fetch
     fetchBrackets();
+
+    // Poll every 60 seconds for live updates
+    const intervalId = setInterval(fetchBrackets, 60000);
+    return () => clearInterval(intervalId);
   }, []);
 
   // Mock data for visual structure if database is empty
