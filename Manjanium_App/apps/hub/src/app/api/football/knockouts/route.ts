@@ -74,9 +74,30 @@ export async function GET() {
         };
       })
       .sort((a: any, b: any) => {
-        const numA = parseInt(a.match_id.replace('m', ''), 10);
-        const numB = parseInt(b.match_id.replace('m', ''), 10);
-        return numA - numB;
+        const idA = a.match_id.replace('m', '');
+        const idB = b.match_id.replace('m', '');
+        
+        // Define the exact visual order from top-to-bottom for the bracket to connect properly
+        const matchOrder: Record<string, number> = {
+          // R32
+          '74': 1, '77': 2, '73': 3, '75': 4,
+          '83': 5, '84': 6, '81': 7, '82': 8,
+          '76': 9, '78': 10, '79': 11, '80': 12,
+          '86': 13, '88': 14, '85': 15, '87': 16,
+          // R16
+          '89': 1, '90': 2, '93': 3, '94': 4,
+          '91': 5, '92': 6, '95': 7, '96': 8,
+          // QF
+          '97': 1, '98': 2, '99': 3, '100': 4,
+          // SF
+          '101': 1, '102': 2,
+          // Final
+          '104': 1
+        };
+
+        const orderA = matchOrder[idA] || parseInt(idA, 10);
+        const orderB = matchOrder[idB] || parseInt(idB, 10);
+        return orderA - orderB;
       });
 
     // Update cache
