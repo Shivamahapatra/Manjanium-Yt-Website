@@ -15,71 +15,51 @@ export async function GET() {
       return NextResponse.json(cachedMatches);
     }
 
-    const headers = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Accept': 'application/json'
-    };
-
-    // Fetch teams and matches concurrently from worldcup26 API
-    const [teamsRes, gamesRes] = await Promise.all([
-      fetch('https://worldcup26.ir/get/teams', { headers, next: { revalidate: 3600 } }), // Teams don't change often
-      fetch('https://worldcup26.ir/get/games', { headers, cache: 'no-store' }) // Games update live
-    ]);
-
-    if (!teamsRes.ok || !gamesRes.ok) {
-      throw new Error(`API error: Teams ${teamsRes.status}, Games ${gamesRes.status}`);
+    const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260628-20260719', { cache: 'no-store' });
+    if (!res.ok) {
+      throw new Error('ESPN API error: ' + res.status);
     }
-
-    const teamsJson = await teamsRes.json();
-    const gamesJson = await gamesRes.json();
+    const data = await res.json();
     
-    const teamsList = teamsJson.teams || [];
-    const gamesList = gamesJson.games || [];
-
-    // Map team IDs to team data for fast lookup
-    const teamMap: Record<string, any> = {};
-    teamsList.forEach((team: any) => {
-      teamMap[team.id] = team;
-    });
-
-    // We only want knockout rounds
-    const knockoutGroups = ['R32', 'R16', 'QF', 'SF', '3RD', 'FINAL'];
-    
-    const matches = gamesList
-      .filter((game: any) => knockoutGroups.includes(game.group.toUpperCase()))
-      .map((game: any) => {
-        // Map round names for the frontend
-        let roundName = game.group;
-        if (game.group.toUpperCase() === 'R32') roundName = 'Round of 32';
-        else if (game.group.toUpperCase() === 'R16') roundName = 'Round of 16';
-        else if (game.group.toUpperCase() === 'QF') roundName = 'Quarter-Finals';
-        else if (game.group.toUpperCase() === 'SF') roundName = 'Semi-Finals';
-        else if (game.group.toUpperCase() === '3RD') roundName = 'Third Place Play-off';
-        else if (game.group.toUpperCase() === 'FINAL') roundName = 'Final';
-
-        const team1 = teamMap[game.home_team_id];
-        const team2 = teamMap[game.away_team_id];
+    const matches = (data.events || []).map((e: any, index: number) => {
+        const home = e.competitions[0].competitors.find((c: any) => c.homeAway === 'home');
+        const away = e.competitions[0].competitors.find((c: any) => c.homeAway === 'away');
         
-        // Ensure scores are numbers, parse strings if necessary
-        const s1 = parseInt(game.home_score, 10);
-        const s2 = parseInt(game.away_score, 10);
-        
+        let round = 'Round of 32';
+        if (index >= 16 && index <= 23) round = 'Round of 16';
+        if (index >= 24 && index <= 27) round = 'Quarter-Finals';
+        if (index >= 28 && index <= 29) round = 'Semi-Finals';
+        if (index === 30) round = 'Third-Place';
+        if (index === 31) round = 'Final';
+
+        // ESPN index 0 is Match 73
+        let idNum = index + 73;
+        // Third place is match 103, Final is 104
+        if (index === 31) idNum = 104;
+
+        let pen1, pen2;
+        if (e.status.type.shortDetail === 'FT-Pens') {
+           // Parse penalties if available
+        }
+
+        const score1 = home.score ? parseInt(home.score) : null;
+        const score2 = away.score ? parseInt(away.score) : null;
+
         return {
-          id: game._id?.$oid || game.id,
-          match_id: `m${game.id}`,
-          round: roundName,
-          team1: team1 ? team1.name_en : 'TBD',
-          team2: team2 ? team2.name_en : 'TBD',
-          logo1: team1 ? team1.flag : '',
-          logo2: team2 ? team2.flag : '',
-          score1: isNaN(s1) ? null : s1,
-          score2: isNaN(s2) ? null : s2,
-          pen1: game.home_penalty ? parseInt(game.home_penalty, 10) : undefined,
-          pen2: game.away_penalty ? parseInt(game.away_penalty, 10) : undefined,
-          isPlaceholder: !team1 || !team2
+            id: String(idNum),
+            match_id: 'm' + idNum,
+            round,
+            team1: home.team.displayName,
+            team2: away.team.displayName,
+            logo1: home.team.logo,
+            logo2: away.team.logo,
+            score1: isNaN(score1 as any) ? null : score1,
+            score2: isNaN(score2 as any) ? null : score2,
+            pen1,
+            pen2,
+            isPlaceholder: home.team.displayName.includes('Winner') || home.team.displayName.includes('Loser') || home.team.displayName.includes('RD') || home.team.displayName.includes('QF') || home.team.displayName.includes('SF') || home.team.displayName.includes('L1') || home.team.displayName.includes('L2') || home.team.displayName.includes('W1') || home.team.displayName.includes('W2')
         };
-      })
-      .sort((a: any, b: any) => {
+    }).sort((a: any, b: any) => {
         const idA = a.match_id.replace('m', '');
         const idB = b.match_id.replace('m', '');
         
