@@ -111,6 +111,23 @@ Context:
 - Build passes with 0 errors
 - Settings control still intact
 
+--- Update: Preset Refinements - F1 & Football (2026-06-24T16:00:00+00:00) ---
+Changes made:
+- Applied preset system to Football Hub (3 presets with sidebar)
+- Refined F1 Preset 1: 65/35 split (Timing/Globe) with better space utilization
+- Redesigned F1 Preset 2: Single "Live" tab with Timing + Team Radio + Race Control + Live Track Map
+- Reorganized F1 Preset 3: Globe moved to RIGHT, 3-column layout
+- Created LiveTrackMap component for real-time race visualization
+- Removed tab switcher from Preset 2 (all content visible)
+- All presets controlled via Settings (not shown in hubs)
+- Football presets mirror F1 structure
+Context:
+- F1 and Football both use preset system
+- Settings expands sidebar for preset selection
+- Live data flowing correctly in all presets
+- Track map updates with race progress
+- Build passes with 0 errors
+
 --- Update: Monorepo & Game Simulator Setup (2026-06-30T16:25:00+05:30) ---
 Changes made:
 - Scaffolded `packages/ui` workspace for shared components (e.g., Button).
@@ -136,6 +153,20 @@ Changes made:
 Context:
 - All phases for the Paddock Simulator are now complete.
 - Game loop is fully functional (Start, Drive, Deploy ERS/DRS, Finish Race, Podium).
+
+--- Update: Monorepo Version Fix (2026-07-01T10:00:00+05:30) ---
+Changes made:
+- Fixed apps/hub/package.json: downgraded next from 16.2.9 to 14.2.35
+- Fixed apps/hub/package.json: corrected @clerk/nextjs to match original version
+- Fixed apps/game/package.json: pinned all versions to match hub exactly
+- Removed "type": "module" from hub package.json (was breaking Next.js)
+- Verified .env.local copied correctly to both apps
+- Fresh pnpm install completed successfully
+- Both apps verified running cleanly (hub on 3000, game on 3001)
+Context:
+- apps/hub: Next.js 14.2.35, fully working with Clerk auth and Supabase
+- apps/game: Next.js 14.2.35, placeholder page ready for game migration
+- Ready for Vercel Multi Zones setup
 
 --- Update: Project Restructuring for Workspace Boundaries (2026-07-01T12:09:00+05:30) ---
 Changes made:
@@ -170,3 +201,22 @@ Changes made:
 Context:
 - The bracket now displays real data from a reliable third-party API instead of static mocked data.
 - The UI will automatically update in real-time as live matches progress, fulfilling the auto-update requirement.
+
+--- Update: FastF1 Python Telemetry Backend (2026-07-03T17:40:00+05:30) ---
+Changes made:
+- Created apps/telemetry/ Python FastAPI service
+- Integrated FastF1 with ephemeral /tmp cache for distance-synchronized telemetry
+- /api/compare-laps: distance-synchronized telemetry comparison
+- /api/available-sessions: session list endpoint
+- /api/session-drivers: driver list endpoint
+- Proxy in apps/hub/src/app/api/f1/telemetry/route.ts
+- Completely refactored F1TelemetryTab.tsx with new data structure
+- Configured deployment target on Railway
+- Added Speed, Delta, Throttle, Gear chart tabs
+- Added pnpm dev:telemetry script in root package.json
+Context:
+- Cache: ephemeral /tmp (persistent volume to add at deployment)
+- Cold start: ~30-60s first load per session (downloads ~50MB)
+- Subsequent loads: sub-second from cache
+- Deploy target: Railway (pnpm dev:telemetry:railway when ready)
+- CORS configured for localhost:3000 + Vercel domain
