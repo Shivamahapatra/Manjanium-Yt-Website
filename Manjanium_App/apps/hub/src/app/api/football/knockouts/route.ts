@@ -14,10 +14,15 @@ export async function GET() {
       return NextResponse.json(cachedMatches);
     }
 
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept': 'application/json'
+    };
+
     // Fetch teams and matches concurrently from worldcup26 API
     const [teamsRes, gamesRes] = await Promise.all([
-      fetch('https://worldcup26.ir/get/teams', { next: { revalidate: 3600 } }), // Teams don't change often
-      fetch('https://worldcup26.ir/get/games', { cache: 'no-store' }) // Games update live
+      fetch('https://worldcup26.ir/get/teams', { headers, next: { revalidate: 3600 } }), // Teams don't change often
+      fetch('https://worldcup26.ir/get/games', { headers, cache: 'no-store' }) // Games update live
     ]);
 
     if (!teamsRes.ok || !gamesRes.ok) {
