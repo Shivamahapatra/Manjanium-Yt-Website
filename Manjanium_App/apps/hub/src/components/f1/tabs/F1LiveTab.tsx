@@ -180,9 +180,14 @@ export function F1LiveTab() {
         console.warn("Supabase is unreachable, falling back to REST API.", dbErr);
       }
 
-      if (payloadFromSupabase) {
-        applyPayload(payloadFromSupabase);
-        setLoading(false);
+      try {
+        if (payloadFromSupabase) {
+          try {
+            applyPayload(payloadFromSupabase);
+          } catch (e) {
+            console.error("Error applying Supabase payload:", e);
+          }
+          setLoading(false);
 
         // 3. Subscribe to Realtime updates
         channel = supabase.channel('f1-live')
@@ -204,12 +209,19 @@ export function F1LiveTab() {
       } else {
         // FALLBACK: Use the REST API /api/f1/live directly via polling
         const fetchLive = async () => {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 8000);
           try {
-            const res = await fetch('/api/f1/live');
+            const res = await fetch('/api/f1/live', { signal: controller.signal });
+            clearTimeout(timeoutId);
             if (!res.ok) throw new Error('API failed');
             const data = await res.json();
-            if (data.error) throw new Error(data.error);
-            applyPayload(data);
+            if (data.error && !data.error.includes("Initializing")) throw new Error(data.error);
+            try {
+              applyPayload(data);
+            } catch (e) {
+              console.error("Error applying live payload:", e);
+            }
             setLoading(false);
             setError(null);
           } catch (err) {
@@ -221,7 +233,10 @@ export function F1LiveTab() {
         await fetchLive();
         pingInterval = setInterval(fetchLive, 10000);
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
     init();
 
