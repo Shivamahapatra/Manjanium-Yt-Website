@@ -153,3 +153,11 @@ Changes made:
 - Updated `page.tsx` to include the Knockouts tab.
 Context:
 - The Knockout Brackets tab is now fully functional, live, and data-driven for the 2026 World Cup.
+
+--- Update: 2026 World Cup Knockouts Mock Data Injection (2026-07-03T13:45:00+05:30) ---
+Changes made:
+- Intercepted the Supabase fetch in `apps/hub/src/app/api/football/knockouts/route.ts` to map placeholder matches (like "Winner Grp A") to simulated realistic team data (e.g., Mexico, England, France, Spain) and generated scores.
+- Replaced the API placeholders with realistic names and country flags (via flagcdn).
+Context:
+- Supabase local instance is not responding on port 54321, so data is mocked at the API route layer before returning to the UI to bypass the empty/placeholder values returned from the database.
+- The UI now properly shows simulated teams for Round of 32 and Round of 16.

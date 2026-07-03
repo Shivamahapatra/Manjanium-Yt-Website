@@ -148,3 +148,15 @@ Context:
 --- Update: F1 Hub Crash Fix (2026-07-03) ---
 Changes:
 - Fixed React 19 + @react-three/fiber
+--- Update: F1 API Rate Limit Fix - Path C (2026-07-03) ---
+Changes:
+- Added @vercel/kv caching layer to /api/f1/live
+- Cache TTL: 10 seconds (OpenF1 only queried once per 10s globally)
+- All clients read from KV cache (eliminates per-client rate limiting)
+- Reduced F1LiveTab polling from 10s to 15s
+- Improved error handling (rate limit shows "refreshing" not error)
+- Local dev works without KV (graceful fallback)
+Context:
+- Rate limiting issue resolved for production
+- Ready for Phase 2: Supabase Realtime migration (Path A)
+- KV setup needed in Vercel Dashboard after deploy

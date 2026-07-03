@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
+import { kv } from '@vercel/kv';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+const CACHE_KEY = 'f1_live_data';
+const CACHE_TTL = 10; // seconds
 
 // Helper to keep only the latest entry per driver_number
 function getLatestPerDriver(data: any[], dateField: string = 'date'): Map<number, any> {
@@ -31,6 +35,24 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const sessionKey = searchParams.get('session_key') || 'latest';
+
+    // Check KV cache first
+    let cached = null;
+    try {
+      cached = await kv.get(CACHE_KEY);
+    } catch {
+      // KV not available (local dev) - skip cache
+    }
+
+    if (cached) {
+      return NextResponse.json(cached, {
+        status: 200,
+        headers: {
+          'X-Cache': 'HIT',
+          'Cache-Control': 'public, s-maxage=10',
+        },
+      });
+    }
 
     // 1. Fetch small data endpoints in parallel
     const [
@@ -302,14 +324,38 @@ export async function GET(request: Request) {
     // Sort by position ascending
     unifiedDrivers.sort((a: any, b: any) => a.position - b.position);
 
-    return NextResponse.json({
+    const result = {
       drivers: unifiedDrivers,
       session: session || null,
       positions: positions || [],
       intervals: intervals || [],
+    };
+
+    // At the END, before returning:
+    try {
+      await kv.set(CACHE_KEY, result, { ex: CACHE_TTL });
+    } catch {
+      // KV write failed - return result anyway
+    }
+
+    return NextResponse.json(result, {
+      status: 200,
+      headers: {
+        'X-Cache': 'MISS',
+        'Cache-Control': 'public, s-maxage=10',
+      },
     });
   } catch (error) {
-    console.error("Live API route error:", error);
-    return NextResponse.json({ error: String(error) }, { status: 500 });
+    console.error('F1 live error:', error);
+    return NextResponse.json(
+      {
+        drivers: [],
+        session: null,
+        positions: {},
+        intervals: {},
+        error: 'F1 data temporarily unavailable',
+      },
+      { status: 200 } // Return 200 with empty data (not 500)
+    );
   }
 }

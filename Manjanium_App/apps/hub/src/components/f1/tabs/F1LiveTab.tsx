@@ -138,7 +138,7 @@ export function F1LiveTab() {
         setError(null);
         const res = await fetch("/api/f1/live");
         if (res.status === 429) {
-          setError('API rate limited. Retrying in 30s...');
+          setError('rate_limited');
           setTimeout(fetchAllData, 30000);
           return;
         }
@@ -186,7 +186,7 @@ export function F1LiveTab() {
       }
     };
     fetchAllData();
-    const interval = setInterval(fetchAllData, 10000);
+    const interval = setInterval(fetchAllData, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -226,7 +226,7 @@ export function F1LiveTab() {
   // persisted value is applied.
   const { isMounted: presetHydrated } = usePresetWithHydration();
 
-  if (error) {
+  if (error && error !== 'rate_limited') {
     return (
       <div className="flex items-center justify-center h-96 text-[#FBBF24] text-center space-y-4">
         <div>
