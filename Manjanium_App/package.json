@@ -9,5 +9,13 @@
     "build": "pnpm --filter hub build && pnpm --filter game build",
     "lint": "pnpm --filter hub lint && pnpm --filter game lint"
   },
-  "packageManager": "pnpm@9.0.0"
+  "packageManager": "pnpm@9.0.0",
+  "resolutions": {
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0"
+  },
+  "overrides": {
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0"
+  }
 }

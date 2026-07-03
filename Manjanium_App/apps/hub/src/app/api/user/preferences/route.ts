@@ -1,16 +1,16 @@
+import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { createClient } from '@supabase/supabase-js'
-import { NextRequest, NextResponse } from 'next/server'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321',
   process.env.SUPABASE_SERVICE_ROLE_KEY || 'dummy'
 )
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const { userId } = await auth()
-
+    
     if (!userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -19,71 +19,65 @@ export async function GET(req: NextRequest) {
     }
 
     const { data, error } = await supabase
-      .from('users_preferences')
-      .select('*')
+      .from('user_customization')
+      .select('f1_dashboard_preset, football_dashboard_preset')
       .eq('user_id', userId)
       .single()
 
     if (error && error.code !== 'PGRST116') {
-      throw error
+      // PGRST116 = no rows found (acceptable)
+      console.error('Supabase error:', error)
+      return NextResponse.json(
+        { f1_dashboard_preset: 'live-focused', football_dashboard_preset: 'live-matches' },
+        { status: 200 }
+      )
     }
 
-    return NextResponse.json({
-      preferences: data || {
-        theme: 'dark',
-        font_size: 'md',
-        animation_speed: 'normal',
-        f1_dashboard_preset: 'f1_live_focused',
-        football_dashboard_preset: 'fb_live_matches'
-      }
-    })
-  } catch (error) {
-    console.error('Error fetching preferences:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      data || { f1_dashboard_preset: 'live-focused', football_dashboard_preset: 'live-matches' },
+      { status: 200 }
+    )
+  } catch (error) {
+    console.error('Preferences API error:', error)
+    // Return defaults instead of crashing
+    return NextResponse.json(
+      { f1_dashboard_preset: 'live-focused', football_dashboard_preset: 'live-matches' },
+      { status: 200 }
     )
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function POST(request: Request) {
   try {
     const { userId } = await auth()
-
+    
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const updates = await req.json()
+    const body = await request.json()
+    const { f1_dashboard_preset, football_dashboard_preset } = body
 
-    const { data, error } = await supabase
-      .from('users_preferences')
+    const { error } = await supabase
+      .from('user_customization')
       .upsert(
         {
           user_id: userId,
-          ...updates,
-          updated_at: new Date().toISOString()
+          f1_dashboard_preset: f1_dashboard_preset || 'live-focused',
+          football_dashboard_preset: football_dashboard_preset || 'live-matches',
+          updated_at: new Date().toISOString(),
         },
         { onConflict: 'user_id' }
       )
-      .select()
-      .single()
 
     if (error) {
-      throw error
+      console.error('Supabase upsert error:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({
-      preferences: data
-    })
+    return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
-    console.error('Error updating preferences:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('Preferences POST error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

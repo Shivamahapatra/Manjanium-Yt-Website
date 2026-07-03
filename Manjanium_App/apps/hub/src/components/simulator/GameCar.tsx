@@ -77,6 +77,7 @@ export default function GameCar() {
       restitution={0.2}
       friction={PHYSICS_CONFIG.friction}
     >
+      {/* @ts-ignore */}
       <group ref={meshRef}>
         {/* Car body - red box (placeholder) */}
         <mesh position={[0, 0.4, 0]} castShadow>

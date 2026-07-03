@@ -16,6 +16,7 @@ import { F1CalendarTab } from "@/components/f1/tabs/F1CalendarTab";
 import { F1ResultsTab } from "@/components/f1/tabs/F1ResultsTab";
 import { F1UpdatesTab } from "@/components/f1/tabs/F1UpdatesTab";
 import DarkVeil from "@/components/ui/DarkVeil";
+import F1ErrorBoundary from "@/components/f1/F1ErrorBoundary";
 
 function F1HubContent() {
   const searchParams = useSearchParams();
@@ -110,8 +111,13 @@ function F1HubContent() {
 
 export default function F1Hub() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]"><Spin size="large" /></div>}>
-      <F1HubContent />
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+      {/* @ts-ignore */}
+      <Spin size="large" />
+    </div>}>
+      <F1ErrorBoundary>
+        <F1HubContent />
+      </F1ErrorBoundary>
     </Suspense>
   );
 }

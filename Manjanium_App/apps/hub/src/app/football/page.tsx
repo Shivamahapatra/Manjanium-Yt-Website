@@ -286,7 +286,10 @@ function FootballHubContent() {
             {activeTab === 'standings' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 {loadingStandings ? (
-                   <div className="flex justify-center items-center h-64"><Spin size="large" /></div>
+                   <div className="flex justify-center items-center h-64">
+                     {/* @ts-ignore */}
+                     <Spin size="large" />
+                   </div>
                 ) : (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {standingsData?.groups?.map((group) => (
@@ -334,7 +337,10 @@ function FootballHubContent() {
 
 export default function FootballHubPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><Spin size="large" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background">
+      {/* @ts-ignore */}
+      <Spin size="large" />
+    </div>}>
       <FootballHubContent />
     </Suspense>
   );

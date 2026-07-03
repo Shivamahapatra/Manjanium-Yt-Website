@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback, Suspense } from "react";
 import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
 import ThreeGlobe from "three-globe";
 import { OrbitControls } from "@react-three/drei";
@@ -867,6 +867,11 @@ export const Globe = React.memo(function Globe({
               transition={{ duration: 0.1 }}
               className="w-full h-full"
             >
+              <Suspense fallback={
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-[#6B7280] text-xs">Loading globe...</div>
+                </div>
+              }>
               <Canvas 
                 camera={{ position: [0, 0, cameraZ], fov: 60 }}
                 role="img"
@@ -917,6 +922,7 @@ export const Globe = React.memo(function Globe({
                   autoRotateSpeed={mergedGlobeConfig.autoRotateSpeed ?? autoRotateSpeed}
                 />
               </Canvas>
+              </Suspense>
             </motion.div>
           </CanvasErrorBoundary>
         )}

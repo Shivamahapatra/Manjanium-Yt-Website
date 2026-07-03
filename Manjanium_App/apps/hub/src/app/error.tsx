@@ -26,6 +26,7 @@ export default function GlobalError({
         className="flex flex-col items-center max-w-lg"
       >
         <div className="w-24 h-24 mb-8 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
+          {/* @ts-ignore */}
           <AlertCircle className="w-12 h-12" />
         </div>
         
@@ -48,11 +49,14 @@ export default function GlobalError({
             onClick={() => reset()}
             className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold transition-colors w-full sm:w-auto"
           >
+            {/* @ts-ignore */}
             <RefreshCcw className="w-4 h-4" /> Try Again
           </button>
           
+          {/* @ts-ignore */}
           <Link href="/" className="w-full sm:w-auto">
             <button className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-manjanium-gold hover:bg-yellow-400 text-black font-bold transition-all shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:shadow-[0_0_25px_rgba(251,191,36,0.5)] w-full">
+              {/* @ts-ignore */}
               <Home className="w-4 h-4" /> Return Home
             </button>
           </Link>

@@ -144,3 +144,7 @@ Context:
 - Physics feels realistic (0-100 in 3-4s, max 320 km/h)
 - Oval track visible with proper geometry and barriers
 - Ready for Vercel Multi Zones deployment
+
+--- Update: F1 Hub Crash Fix (2026-07-03) ---
+Changes:
+- Fixed React 19 + @react-three/fiber
