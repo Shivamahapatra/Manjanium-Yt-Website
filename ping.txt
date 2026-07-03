@@ -160,3 +160,13 @@ Context:
 - Rate limiting issue resolved for production
 - Ready for Phase 2: Supabase Realtime migration (Path A)
 - KV setup needed in Vercel Dashboard after deploy
+--- Update: F1 API Realtime Migration - Phase 2 (2026-07-03) ---
+Changes:
+- Created f1_live_timing Supabase table & enabled Realtime
+- Moved heavy OpenF1 fetching (10+ parallel requests) to /api/f1/ping backend
+- Replaced frontend polling setInterval with Supabase Realtime WebSocket subscription
+- Reduced frontend payload overhead significantly
+- Kept 10-second updates globally via Vercel KV rate limit on the ping endpoint
+Context:
+- The app now boasts a highly scalable Push-Based Architecture
+- Client no longer suffers from OpenF1 connection limits

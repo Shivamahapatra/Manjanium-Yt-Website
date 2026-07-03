@@ -10,6 +10,9 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
+from live import live_timing_loop, get_live_timing
+import asyncio
+
 # Configure FastF1 cache
 # Use /tmp for ephemeral caching (acceptable cold start penalty)
 CACHE_DIR = Path(os.getenv("FASTF1_CACHE_DIR", tempfile.gettempdir())) / "fastf1_cache"
@@ -21,6 +24,10 @@ app = FastAPI(
     description="FastF1 powered F1 telemetry backend",
     version="1.0.0",
 )
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(live_timing_loop())
 
 # Allow requests from Next.js hub
 app.add_middleware(
@@ -39,6 +46,15 @@ app.add_middleware(
 @app.get("/health")
 async def health():
     return {"status": "ok", "cache_dir": str(CACHE_DIR)}
+
+@app.get("/api/live-timing")
+async def api_live_timing(
+    year: int = Query(default=2024),
+    round: int = Query(default=12),
+    session: str = Query(default="R"),
+):
+    """Get real-time live timing data powered by FastF1 background loop."""
+    return get_live_timing(year, round, session)
 
 
 @app.get("/api/compare-laps")

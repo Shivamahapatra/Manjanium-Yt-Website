@@ -155,10 +155,11 @@ export function F1LiveTab() {
     let channel: any;
 
     const init = async () => {
+      setLoading(true);
+      setError(null);
+      
+      let payloadFromSupabase = null;
       try {
-        setLoading(true);
-        setError(null);
-        
         // 1. Send immediate ping to ensure backend is fetching fresh data
         fetch("/api/f1/ping").catch(console.error);
 
@@ -171,11 +172,16 @@ export function F1LiveTab() {
           .single();
         
         if (data?.payload) {
-          applyPayload(data.payload);
+          payloadFromSupabase = data.payload;
         } else if (dbError && dbError.code !== 'PGRST116') { // PGRST116 is 'no rows returned'
           console.error("Supabase fetch error:", dbError);
         }
-        
+      } catch (dbErr) {
+        console.warn("Supabase is unreachable, falling back to REST API.", dbErr);
+      }
+
+      if (payloadFromSupabase) {
+        applyPayload(payloadFromSupabase);
         setLoading(false);
 
         // 3. Subscribe to Realtime updates
@@ -195,11 +201,25 @@ export function F1LiveTab() {
         pingInterval = setInterval(() => {
           fetch("/api/f1/ping").catch(console.error);
         }, 10000);
-
-      } catch (err) {
-        console.error("F1 init error:", err);
-        setError('Network error');
-        setLoading(false);
+      } else {
+        // FALLBACK: Use the REST API /api/f1/live directly via polling
+        const fetchLive = async () => {
+          try {
+            const res = await fetch('/api/f1/live');
+            if (!res.ok) throw new Error('API failed');
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+            applyPayload(data);
+            setLoading(false);
+            setError(null);
+          } catch (err) {
+            console.error("F1 REST fallback error:", err);
+            setError('Network error');
+            setLoading(false);
+          }
+        };
+        await fetchLive();
+        pingInterval = setInterval(fetchLive, 10000);
       }
     };
 
