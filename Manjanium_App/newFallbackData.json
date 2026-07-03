@@ -1,4 +1,4 @@
-export const fallbackData = [
+[
   {
     "id": "74",
     "round": "Round of 32",
@@ -359,4 +359,4 @@ export const fallbackData = [
     "score2": null,
     "isPlaceholder": true
   }
-];
+]
