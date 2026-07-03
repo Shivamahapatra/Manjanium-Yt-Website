@@ -24,8 +24,11 @@ export async function GET() {
       throw new Error(`API error: Teams ${teamsRes.status}, Games ${gamesRes.status}`);
     }
 
-    const teamsList = await teamsRes.json();
-    const gamesList = await gamesRes.json();
+    const teamsJson = await teamsRes.json();
+    const gamesJson = await gamesRes.json();
+    
+    const teamsList = teamsJson.teams || [];
+    const gamesList = gamesJson.data || [];
 
     // Map team IDs to team data for fast lookup
     const teamMap: Record<string, any> = {};

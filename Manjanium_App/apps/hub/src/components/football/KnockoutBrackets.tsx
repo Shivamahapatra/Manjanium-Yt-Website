@@ -43,11 +43,11 @@ export function KnockoutBrackets() {
 
   const displayData = brackets.length > 0 ? brackets : mockData;
 
-  const r32 = brackets.filter(b => b.round === 'Round of 32');
-  const r16 = brackets.filter(b => b.round === 'Round of 16');
-  const quarters = brackets.filter(b => b.round === 'Quarter-Finals');
-  const semis = brackets.filter(b => b.round === 'Semi-Finals');
-  const final = brackets.filter(b => b.round === 'Final');
+  const r32 = displayData.filter(b => b.round === 'Round of 32');
+  const r16 = displayData.filter(b => b.round === 'Round of 16');
+  const quarters = displayData.filter(b => b.round === 'Quarter-Finals');
+  const semis = displayData.filter(b => b.round === 'Semi-Finals');
+  const final = displayData.filter(b => b.round === 'Final');
 
   const MatchCard = ({ match }: { match: any }) => {
     if (!match) return <div className="w-56 h-[90px]" />; // Spacer if missing
