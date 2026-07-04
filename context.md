@@ -218,5 +218,12 @@ Context:
 - Cache: ephemeral /tmp (persistent volume to add at deployment)
 - Cold start: ~30-60s first load per session (downloads ~50MB)
 - Subsequent loads: sub-second from cache
-- Deploy target: Railway (pnpm dev:telemetry:railway when ready)
 - CORS configured for localhost:3000 + Vercel domain
+
+--- Update: F1 Live Tab Skeleton Fix & Timeout (2026-07-04T06:37:00+05:30) ---
+Changes made:
+- Modified apps/hub/src/components/f1/tabs/F1LiveTab.tsx to include try/catch error handling around applyPayload.
+- Added a finally block to the initialization routine to ensure the loading state is safely set to false.
+- Added an AbortController with an 8000ms timeout to the /api/f1/live fetch fallback to prevent infinite hanging when the backend is unreachable.
+Context:
+- Addressed an issue where the frontend was getting stuck on the HUDSkeleton. It now gracefully fails and shows "F1 Data Unavailable" or initialization text if the Python backend is unlinked or unresponsive.
