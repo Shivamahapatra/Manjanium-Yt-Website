@@ -210,13 +210,22 @@ export function F1LiveTab() {
         // FALLBACK: Use the REST API /api/f1/live directly via polling
         const fetchLive = async () => {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 8000);
+          const timeoutId = setTimeout(() => controller.abort(), 30000);
           try {
             const res = await fetch('/api/f1/live', { signal: controller.signal });
             clearTimeout(timeoutId);
             if (!res.ok) throw new Error('API failed');
             const data = await res.json();
             if (data.error && !data.error.includes("Initializing")) throw new Error(data.error);
+            
+            if (data.stale || !data.session || data.drivers?.length === 0) {
+              setSession(data.session || null)
+              setDrivers([])
+              setError(null) // Not an error, just no active session
+              setLoading(false)
+              return
+            }
+
             try {
               applyPayload(data);
             } catch (e) {
@@ -307,6 +316,21 @@ export function F1LiveTab() {
         <HUDSkeleton />
       </div>
     );
+
+  if (!session && !loading && !error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <div className="text-6xl">🏎️</div>
+        <div className="text-white font-bold text-xl">No Active F1 Session</div>
+        <div className="text-[#6B7280] text-sm text-center max-w-md">
+          The next session will appear here automatically when it goes live.
+        </div>
+        <div className="text-xs text-[#FBBF24] font-bold">
+          NEXT: Check F1 Hub Calendar for upcoming events
+        </div>
+      </div>
+    )
+  }
 
   const presetProps = {
     sessionKey,

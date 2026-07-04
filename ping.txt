@@ -170,3 +170,22 @@ Changes:
 Context:
 - The app now boasts a highly scalable Push-Based Architecture
 - Client no longer suffers from OpenF1 connection limits
+
+--- Update: Data Quality Fixes - Football + F1 (2026-07-04) ---
+Changes:
+- Fixed XML attribute names: hScor→hScore, aScor→aScore, Status→Status
+- Fixed kickoff time parsing from "03.07.2026 20:00" format
+- Added worldcup26.ir team resolver (hId/aId → real team names)
+- Added parse_lap_time_to_seconds() (pandas timedelta → float seconds)
+- Added session staleness check (returns empty if >6h old)
+- Increased AbortController timeout 8s→30s (FastF1 cold starts)
+- Added "No Active F1 Session" UI state
+- Fixed standings empty state (shows helpful message)
+- Added flag support to match cards
+- Added kickoff datetime + stage for upcoming matches
+Context:
+- Football: World Cup 2026 knockout teams resolve from worldcup26.ir
+- Football: Placeholder codes "2D"/"1J" now show group context
+- F1: Lap times now numeric seconds (not pandas timedelta strings)
+- F1: No stale 2024 data shown when no live session active
+- Both hubs gracefully handle no-data states

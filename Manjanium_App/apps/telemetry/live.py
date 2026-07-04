@@ -2,9 +2,62 @@ import asyncio
 import fastf1
 import pandas as pd
 from typing import Optional, Tuple
+from datetime import datetime, timezone, timedelta
+import math
 
 GLOBAL_LIVE_TIMING = {}
 CURRENT_TRACKING: Optional[Tuple[int, int, str]] = None
+
+def parse_lap_time_to_seconds(time_val) -> float | None:
+    if time_val is None:
+        return None
+    try:
+        if pd.isna(time_val):
+            return None
+    except (TypeError, ValueError):
+        pass
+    if isinstance(time_val, (int, float)):
+        if math.isnan(time_val):
+            return None
+        return float(time_val)
+    if hasattr(time_val, 'total_seconds'):
+        secs = time_val.total_seconds()
+        return None if math.isnan(secs) else round(secs, 3)
+    if isinstance(time_val, str):
+        time_val = time_val.strip()
+        if not time_val or time_val == '-' or time_val == 'nan':
+            return None
+        if 'days' in time_val:
+            parts = time_val.split(' days ')
+            time_val = parts[-1].strip()
+        try:
+            parts = time_val.split(':')
+            if len(parts) == 3:
+                h = int(parts[0])
+                m = int(parts[1])
+                s = float(parts[2])
+                total = h * 3600 + m * 60 + s
+                return round(total, 3)
+        except (ValueError, IndexError):
+            pass
+    return None
+
+def is_session_live_or_recent(session_date_str: str) -> bool:
+    if not session_date_str:
+        return False
+    try:
+        if isinstance(session_date_str, str):
+            session_date_str = session_date_str.replace("Z", "+00:00")
+            session_dt = datetime.fromisoformat(session_date_str)
+        else:
+            session_dt = session_date_str
+        if session_dt.tzinfo is None:
+            session_dt = session_dt.replace(tzinfo=timezone.utc)
+        now = datetime.now(timezone.utc)
+        diff = now - session_dt
+        return diff.total_seconds() < 6 * 3600
+    except Exception:
+        return False
 
 async def live_timing_loop():
     global GLOBAL_LIVE_TIMING, CURRENT_TRACKING
@@ -16,6 +69,28 @@ async def live_timing_loop():
                 f1_session = fastf1.get_session(year, round, session)
                 f1_session.load(telemetry=False, weather=False, messages=False)
                 
+                session_date = str(f1_session.date) if hasattr(f1_session, 'date') else ""
+                is_current = is_session_live_or_recent(session_date)
+                
+                if not is_current:
+                    GLOBAL_LIVE_TIMING = {
+                        "session": {
+                            "session_key": None,
+                            "session_name": "No Active Session",
+                            "session_type": None,
+                            "is_live": False,
+                            "date": session_date,
+                        },
+                        "drivers": [],
+                        "weatherData": None,
+                        "raceControlMsgs": [],
+                        "radioMsgs": [],
+                        "stale": True,
+                        "next_session": "Check F1 calendar for next event",
+                    }
+                    await asyncio.sleep(15)
+                    continue
+
                 results = f1_session.results
                 laps = f1_session.laps
                 
@@ -43,17 +118,17 @@ async def live_timing_loop():
                         if not d_laps.empty:
                             bestLap = d_laps.pick_fastest()
                             if not bestLap.empty and pd.notna(bestLap.get("LapTime")):
-                                bestLapTime = str(bestLap["LapTime"])
+                                bestLapTime = bestLap["LapTime"]
                             
                             # Find last lap
                             valid_laps = d_laps.dropna(subset=["LapTime"])
                             if not valid_laps.empty:
                                 lastLap = valid_laps.iloc[-1]
-                                lastLapTimeStr = str(lastLap["LapTime"])
+                                lastLapTimeStr = lastLap["LapTime"]
                                 
-                                s1Last = lastLap["Sector1Time"].total_seconds() if pd.notna(lastLap["Sector1Time"]) else None
-                                s2Last = lastLap["Sector2Time"].total_seconds() if pd.notna(lastLap["Sector2Time"]) else None
-                                s3Last = lastLap["Sector3Time"].total_seconds() if pd.notna(lastLap["Sector3Time"]) else None
+                                s1Last = lastLap["Sector1Time"]
+                                s2Last = lastLap["Sector2Time"]
+                                s3Last = lastLap["Sector3Time"]
                                 
                             s1Best = d_laps["Sector1Time"].min().total_seconds() if not d_laps["Sector1Time"].isnull().all() else None
                             s2Best = d_laps["Sector2Time"].min().total_seconds() if not d_laps["Sector2Time"].isnull().all() else None
@@ -96,11 +171,11 @@ async def live_timing_loop():
                             "teamColor": str(driver["TeamColor"]),
                             "gapToLeader": str(driver["Time"]).split(" ")[-1] if pd.notna(driver["Time"]) else "-",
                             "interval": "-", 
-                            "lastLapTime": lastLapTimeStr,
-                            "bestLapTime": bestLapTime,
-                            "s1Last": s1Last,
-                            "s2Last": s2Last,
-                            "s3Last": s3Last,
+                            "lastLapTime": parse_lap_time_to_seconds(lastLapTimeStr),
+                            "bestLapTime": parse_lap_time_to_seconds(bestLapTime),
+                            "s1Last": parse_lap_time_to_seconds(s1Last),
+                            "s2Last": parse_lap_time_to_seconds(s2Last),
+                            "s3Last": parse_lap_time_to_seconds(s3Last),
                             "s1Best": s1Best,
                             "s2Best": s2Best,
                             "s3Best": s3Best,

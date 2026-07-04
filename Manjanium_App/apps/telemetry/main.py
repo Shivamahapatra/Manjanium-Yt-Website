@@ -16,6 +16,51 @@ from live import live_timing_loop, get_live_timing
 import asyncio
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import ParseError
+import re
+
+# Cache for resolved team names
+_team_name_cache = {}
+
+async def resolve_team_name(team_code: str, client: httpx.AsyncClient) -> dict:
+    """
+    Resolve World Cup placeholder codes to real team names.
+    """
+    if not team_code:
+        return {"name": "TBD", "flag": ""}
+    
+    if team_code in _team_name_cache:
+        return _team_name_cache[team_code]
+    
+    if re.match(r'^[0-9]+[A-Z]+$', team_code):
+        result = {"name": f"Group {team_code[-1]} ({team_code[:-1]}{'st' if team_code[0]=='1' else 'nd'})", "flag": ""}
+        _team_name_cache[team_code] = result
+        return result
+    
+    return {"name": team_code, "flag": ""}
+
+async def get_worldcup_teams() -> dict:
+    """Fetch real team data from worldcup26.ir."""
+    global _team_name_cache
+    if _team_name_cache:
+        return _team_name_cache
+    
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.get("https://worldcup26.ir/api/teams")
+            if resp.status_code == 200:
+                teams = resp.json()
+                for team in teams:
+                    name = team.get("name") or team.get("name_en", "")
+                    team_id = str(team.get("id", ""))
+                    fifa_code = team.get("fifa_code", "")
+                    if name and (team_id or fifa_code):
+                        _team_name_cache[team_id] = {"name": name, "flag": team.get("flag", "")}
+                        if fifa_code:
+                            _team_name_cache[fifa_code] = {"name": name, "flag": team.get("flag", "")}
+    except Exception as e:
+        print(f"Could not load worldcup teams: {e}")
+    
+    return _team_name_cache
 
 # Configure FastF1 cache
 # Use /tmp for ephemeral caching (acceptable cold start penalty)
@@ -319,45 +364,62 @@ async def get_matches_by_date(date_str: str = Query(default=None)):
                 match_id = match_el.get("id", "")
                 h_team = match_el.get("hTeam", "")
                 a_team = match_el.get("aTeam", "")
-                h_score = match_el.get("hScor", "")
-                a_score = match_el.get("aScor", "")
-                status = match_el.get("status", "")
-                started = match_el.get("started", "false") == "true"
-                finished = match_el.get("finished", "false") == "true"
-                utc_time = match_el.get("utcTime", "")
+                h_score = match_el.get("hScore", "")
+                a_score = match_el.get("aScore", "")
+                raw_time = match_el.get("time", "")
+                status_code = match_el.get("Status", "N")
+                stage = match_el.get("stage", "")
+                
+                # Convert time string to ISO format
+                utc_time = ""
+                if raw_time:
+                    try:
+                        from datetime import datetime
+                        dt = datetime.strptime(raw_time, "%d.%m.%Y %H:%M")
+                        utc_time = dt.isoformat() + "Z"
+                    except ValueError:
+                        utc_time = raw_time
 
-                # Try to get team names from child elements
-                h_team_el = match_el.find("hTeam")
-                a_team_el = match_el.find("aTeam")
-                if h_team_el is not None:
-                    h_team = h_team_el.get("name", h_team)
-                if a_team_el is not None:
-                    a_team = a_team_el.get("name", a_team)
+                # Status mapping
+                started = status_code in ["FT", "HT", "1H", "2H", "ET", "PEN"]
+                finished = status_code == "FT"
+                is_live = status_code in ["1H", "2H", "HT", "ET", "PEN"]
 
                 # Parse scores
                 try:
-                    home_score = int(h_score) if h_score.isdigit() else None
-                    away_score = int(a_score) if a_score.isdigit() else None
+                    home_score = int(h_score) if h_score.isdigit() and started else None
+                    away_score = int(a_score) if a_score.isdigit() and started else None
                 except (ValueError, AttributeError):
                     home_score = None
                     away_score = None
 
-                is_live = started and not finished
+                # Get team IDs from XML
+                home_id = match_el.get("hId", "")
+                away_id = match_el.get("aId", "")
+
+                # Resolve names
+                teams_cache = await get_worldcup_teams()
+                home_info = teams_cache.get(home_id, {"name": h_team or "TBD", "flag": ""})
+                away_info = teams_cache.get(away_id, {"name": a_team or "TBD", "flag": ""})
 
                 matches.append({
                     "match_id": match_id,
-                    "home_team": h_team or "Home",
-                    "home_team_id": match_el.get("hTeamId", match_id + "_h"),
+                    "home_team": home_info["name"],
+                    "home_team_id": home_id,
+                    "home_flag": home_info.get("flag", ""),
                     "home_score": home_score,
-                    "away_team": a_team or "Away",
-                    "away_team_id": match_el.get("aTeamId", match_id + "_a"),
+                    "away_team": away_info["name"],
+                    "away_team_id": away_id,
+                    "away_flag": away_info.get("flag", ""),
                     "away_score": away_score,
-                    "status": f"{h_score}-{a_score}" if started else "vs",
+                    "status": status_code,
+                    "stage": stage,
                     "started": started,
                     "finished": finished,
                     "live": is_live,
                     "kickoff": utc_time,
                     "minute": match_el.get("liveTime", ""),
+                    "is_placeholder": bool(re.match(r'^[0-9]+[A-Z]+$', h_team)) if h_team else False,
                 })
 
             if matches:

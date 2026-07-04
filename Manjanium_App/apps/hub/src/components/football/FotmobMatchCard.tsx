@@ -9,11 +9,14 @@ interface MatchCardProps {
     match_id: string
     home_team: string
     home_team_id: string
+    home_flag?: string
     home_score: number | null
     away_team: string
     away_team_id: string
+    away_flag?: string
     away_score: number | null
     status: string
+    stage?: string
     started: boolean
     finished: boolean
     live: boolean
@@ -61,9 +64,9 @@ export default function FotmobMatchCard({ match }: MatchCardProps) {
           {/* Home Team */}
           <div className="flex-1 flex items-center gap-3">
             <img
-              src={`https://images.fotmob.com/image_resources/logo/teamlogo/${match.home_team_id}_small.png`}
+              src={match.home_flag || `https://flagcdn.com/w40/${match.home_team_id ? '' : ''}.png`}
               alt={match.home_team}
-              className="w-8 h-8 object-contain"
+              className="w-6 h-4 object-cover rounded-sm"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none'
               }}
@@ -90,14 +93,27 @@ export default function FotmobMatchCard({ match }: MatchCardProps) {
                 </span>
               </div>
             ) : (
-              <span className="text-sm text-[#6B7280]">
-                {match.kickoff
-                  ? new Date(match.kickoff).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : 'TBD'}
-              </span>
+              <div className="text-center">
+                {match.kickoff ? (
+                  <>
+                    <div className="text-xs text-[#6B7280]">
+                      {new Date(match.kickoff).toLocaleDateString('en-GB', {
+                        weekday: 'short', day: 'numeric', month: 'short'
+                      })}
+                    </div>
+                    <div className="text-sm font-bold text-white">
+                      {new Date(match.kickoff).toLocaleTimeString([], {
+                        hour: '2-digit', minute: '2-digit'
+                      })}
+                    </div>
+                  </>
+                ) : (
+                  <span className="text-sm text-[#6B7280]">TBD</span>
+                )}
+                {match.stage && (
+                  <div className="text-xs text-[#FBBF24] mt-1">{match.stage}</div>
+                )}
+              </div>
             )}
 
             {/* Live indicator */}
@@ -124,9 +140,9 @@ export default function FotmobMatchCard({ match }: MatchCardProps) {
               {match.away_team}
             </span>
             <img
-              src={`https://images.fotmob.com/image_resources/logo/teamlogo/${match.away_team_id}_small.png`}
+              src={match.away_flag || `https://flagcdn.com/w40/${match.away_team_id ? '' : ''}.png`}
               alt={match.away_team}
-              className="w-8 h-8 object-contain"
+              className="w-6 h-4 object-cover rounded-sm"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none'
               }}

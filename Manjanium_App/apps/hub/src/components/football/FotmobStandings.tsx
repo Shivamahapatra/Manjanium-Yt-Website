@@ -78,6 +78,16 @@ export default function FotmobStandings({
         <div className="text-[#EF4444] text-sm text-center py-4">{error}</div>
       )}
 
+      {!loading && standings.length === 0 && (
+        <div className="text-center py-8 space-y-2">
+          <div className="text-[#6B7280]">No standings available</div>
+          <div className="text-xs text-[#333333]">
+            Standings are not available for knockout stages.
+            Try Premier League or La Liga.
+          </div>
+        </div>
+      )}
+
       {!loading && standings.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
