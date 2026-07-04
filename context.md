@@ -263,3 +263,14 @@ Context:
 - 30s auto-refresh on live matches
 - All 3 presets now show real FotMob data
 - Build passes 0 errors
+
+--- Update: FotMob XML Integration & F1 Data Fixes (2026-07-04T17:15:00+05:30) ---
+Changes made:
+- Switched FotMob API base URL from `www.fotmob.com/api` to `api.fotmob.com` in `apps/telemetry/main.py`.
+- Replaced JSON parsing with `xml.etree.ElementTree` to parse the new XML responses from FotMob and convert them to JSON for the frontend.
+- Updated `apps/telemetry/live.py` to map F1 driver properties to `camelCase` (e.g., `driverNumber`, `teamName`) to align with `F1PresetCompactOverview` and `F1PresetDetailedTiming`.
+- Fixed TypeScript missing property `source` in `MatchDetailProps` for `FotmobMatchDetail.tsx`.
+Context:
+- The telemetry backend now correctly handles FotMob's undocumented API changes (XML format).
+- F1 frontend presets correctly receive data mappings without undefined errors.
+- Build passes with 0 errors.
