@@ -5,7 +5,7 @@ The FotMob API is an unofficial, public API used by Manjanium Sports UI to fetch
 ## Integration Architecture
 
 We use a proxy pattern to interact with FotMob:
-1. **Python FastAPI Backend (`apps/telemetry`)**: Fetches data from FotMob using `httpx`. Sets specific headers (`User-Agent`, `Referer`, `Origin`) to mimic a standard browser request and avoid 403 Forbidden errors.
+1. **Python FastAPI Backend (`apps/telemetry`)**: Fetches data from FotMob using `httpx`. The API base is now `api.fotmob.com` and returns XML data instead of JSON. The backend parses this using `xml.etree.ElementTree` and checks `Content-Type` headers to handle fallback JSON routes. It also sets specific headers (`User-Agent`, `Referer`, `Origin`) to mimic a standard browser request and avoid 403 Forbidden errors.
 2. **Next.js API Routes (`apps/hub/api/football/fotmob/*`)**: Proxies the requests from the frontend client to the Python backend.
 
 ## Key Endpoints

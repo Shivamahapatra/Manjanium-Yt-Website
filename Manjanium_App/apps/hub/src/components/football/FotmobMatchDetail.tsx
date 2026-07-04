@@ -13,13 +13,16 @@ interface MatchDetailProps {
     player_stats: any
     timeline: any[]
     momentum: any[]
+    source?: string
   }
 }
 
 export default function FotmobMatchDetail({ data }: MatchDetailProps) {
-  const [activeTab, setActiveTab] = useState<'stats' | 'lineup' | 'shotmap' | 'timeline'>('stats')
+  const [activeTab, setActiveTab] = useState<'stats' | 'lineup' | 'shotmap' | 'timeline' | 'raw'>('stats')
 
-  const tabs = ['stats', 'lineup', 'shotmap', 'timeline'] as const
+  const tabs = data.source === 'xml' 
+    ? ['stats', 'lineup', 'shotmap', 'timeline', 'raw'] as const 
+    : ['stats', 'lineup', 'shotmap', 'timeline'] as const
 
   // Extract xG from stats
   const xgStats = data.stats?.expected_goals_xg_?.[0] ||
@@ -250,6 +253,15 @@ export default function FotmobMatchDetail({ data }: MatchDetailProps) {
               </div>
             )
           })}
+        </div>
+      )}
+      {/* RAW TAB (For XML Debugging) */}
+      {activeTab === 'raw' && (data as any).raw && (
+        <div className="space-y-2">
+          <div className="text-xs text-[#6B7280]">Raw XML Data Structure</div>
+          <pre className="text-xs text-[#10B981] bg-[#1F2937] p-2 rounded overflow-auto max-h-96">
+            {JSON.stringify((data as any).raw, null, 2)}
+          </pre>
         </div>
       )}
     </div>

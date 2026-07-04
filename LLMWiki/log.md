@@ -34,3 +34,4 @@ Processed quick captures. Created pages: `[[ClerkAuthVersionCompatibility]]`, `[
 
 ## [2026-07-04] ingest | session-2026-07-04-fotmob-frontend.md
 - [2026-07-04 02:14:00] Ingested: session-2026-07-04-fotmob-frontend.md -> Created: [[FotMobAPI]], [[FotMobReactComponents]], [[ReactSVGShotmap]]
+- [2026-07-04 14:44:29] Ingested: session-2026-07-04-fotmob-frontend.md -> Created: [[XMLParsingFastAPI]], [[ReactServerComponentPropSpreading]], Updated: [[FotMobAPI]]

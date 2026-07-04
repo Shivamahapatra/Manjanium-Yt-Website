@@ -33,6 +33,8 @@ This is the content catalog for the wiki. It is updated automatically on every i
 - [[GhostTelemetryRecording]] — Frame-by-frame physics interpolation
 - [[MultiZoneDeploymentConfig]] — Next.js fallback URLs for proxy rewrites
 - [[ReactSVGShotmap]] — UX pattern for drawing lightweight, lazy-loaded shotmaps without Canvas/WebGL
+- [[XMLParsingFastAPI]] — Fallback parsing mechanism for external telemetry APIs
+- [[ReactServerComponentPropSpreading]] — Handling dynamic className props in Next.js Server Components
 
 ## 🎮 Game & Physics
 - [[RaycastVehicleController]] — Advanced suspension simulation

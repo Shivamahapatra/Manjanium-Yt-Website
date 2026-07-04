@@ -89,11 +89,11 @@ async def live_timing_loop():
 
                         unifiedDrivers.append({
                             "position": int(driver["Position"]) if pd.notna(driver["Position"]) else 20,
-                            "driver_number": dNum,
-                            "name_acronym": str(driver["Abbreviation"]),
-                            "full_name": str(driver["FullName"]),
-                            "team_name": str(driver["TeamName"]),
-                            "team_colour": str(driver["TeamColor"]),
+                            "driverNumber": dNum,
+                            "nameAcronym": str(driver["Abbreviation"]),
+                            "fullName": str(driver["FullName"]),
+                            "teamName": str(driver["TeamName"]),
+                            "teamColor": str(driver["TeamColor"]),
                             "gapToLeader": str(driver["Time"]).split(" ")[-1] if pd.notna(driver["Time"]) else "-",
                             "interval": "-", 
                             "lastLapTime": lastLapTimeStr,

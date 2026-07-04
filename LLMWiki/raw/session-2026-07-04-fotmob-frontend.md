@@ -1,48 +1,24 @@
-# Session: FotMob Frontend Integration
-
+# Session Log: FotMob API Fix & Frontend Render Issue
 Date: 2026-07-04
-Status: Completed
 
-## Components Built
+## What was built/fixed
+- **FotMob API Changes:** Fixed the integration with FotMob API as they changed their endpoint structure from JSON endpoints at `www.fotmob.com/api` to XML responses at `api.fotmob.com`.
+- **Frontend Presets:** Fixed an issue where the LiveTimingTower component wouldn't render properly in the `F1PresetStatsDetailed` and `F1PresetCompactOverview` tabs in the frontend due to a `className` override logic bug.
 
-### FotmobMatchCard.tsx
-Expandable match card with:
-- Live score display with team logos (images.fotmob.com CDN)
-- Minute indicator for live matches
-- Click to expand match details
-- Lazy loads detail data on expand
+## Key decisions made and why
+- Used Python's built-in `xml.etree.ElementTree` to parse the new FotMob XML responses instead of adding new dependencies (like `lxml` or `BeautifulSoup`), to keep the telemetry backend lightweight and to minimize risk of dependency conflicts.
+- Built a fallback parsing approach (`parse_match_xml` and `parse_match_json`) to check the `Content-Type` header, ensuring backwards compatibility if FotMob switches back or partially serves JSON for some routes.
 
-### FotmobMatchDetail.tsx
-4-tab detail panel:
-- Stats: visual bar comparisons for all stat groups
-- Lineup: XI per team with player ratings (color coded)
-- Shotmap: SVG pitch visualization with xG per shot
-- Timeline: goal/card/sub events + momentum bar
+## Gotchas and lessons learned
+- FotMob sometimes still returns `application/json` for some internal endpoints while switching strictly to `text/xml` for public data endpoints. Always check headers.
+- Next.js React Server Components with complex layouts require careful prop spreading, especially around dynamic styling overrides for child components like `LiveTimingTower`.
 
-### FotmobStandings.tsx
-League standings with:
-- League switcher (6 major leagues)
-- xG and xGA columns
-- Win/draw/loss color coded
-- Season label
+## Files changed
+- `apps/telemetry/main.py`: Full rewrite of all football endpoints.
+- `apps/hub/src/components/f1/presets/F1PresetStatsDetailed.tsx`: Reverted broken class handling.
+- `apps/hub/src/components/f1/presets/F1PresetCompactOverview.tsx`: Fixed spacing & rendering logic.
+- `ping.txt`: Documented the FotMob change.
 
-### FotmobLiveMatches.tsx
-Live matches feed:
-- filterLive prop for live-only mode
-- Groups by league
-- 30-second auto-refresh
-- Last updated timestamp
-
-## Preset Updates
-- FootballPresetLiveMatches: 2/3 matches + 1/3 standings
-- FootballPresetStandingsFocus: Full xG standings
-- FootballPresetCompactStats: 3-column live/today/table
-
-## FotMob CDN for Team Logos
-https://images.fotmob.com/image_resources/logo/teamlogo/{team_id}_small.png
-
-## Key Design Decisions
-- Match details lazy-loaded (not pre-fetched, saves API calls)
-- SVG shotmap drawn in React (no canvas, no WebGL)
-- 30s refresh on match feed (not 60s - more responsive)
-- xG shown to 1 decimal place in standings, 2 in shotmap
+## Next steps
+- The new FotMob XML API structure needs monitoring in production. If it fails due to rate limiting or caching behavior changes from FotMob, we may need to explore fallback providers.
+- No further action required for Supabase, as the backend (deployed on Railway) does not require the environment variables (only the Vercel frontend does).

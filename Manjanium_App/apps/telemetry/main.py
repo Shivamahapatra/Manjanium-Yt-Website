@@ -29,9 +29,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
+background_tasks = set()
+
 @app.on_event("startup")
 async def startup_event():
-    asyncio.create_task(live_timing_loop())
+    task = asyncio.create_task(live_timing_loop())
+    background_tasks.add(task)
+    task.add_done_callback(background_tasks.discard)
 
 # Allow requests from Next.js hub
 app.add_middleware(
