@@ -13,6 +13,8 @@ This is the content catalog for the wiki. It is updated automatically on every i
 - [[PaddockSimulator]] — Full game feature map
 - [[ManjaniumSportsHub]] — F1 + Football hub architecture
 - [[GhostRacingSystem]] — Ghost recording, playback, and rendering
+- [[FotMobAPI]] — Unofficial API for football data
+- [[FotMobReactComponents]] — Core React components for football data
 
 ## Concepts
 *(Thematic pages, ideas, high-level synthesis, etc.)*
@@ -30,6 +32,7 @@ This is the content catalog for the wiki. It is updated automatically on every i
 - [[SupabaseSubscriptionHoisting]] — Realtime listener optimization pattern
 - [[GhostTelemetryRecording]] — Frame-by-frame physics interpolation
 - [[MultiZoneDeploymentConfig]] — Next.js fallback URLs for proxy rewrites
+- [[ReactSVGShotmap]] — UX pattern for drawing lightweight, lazy-loaded shotmaps without Canvas/WebGL
 
 ## 🎮 Game & Physics
 - [[RaycastVehicleController]] — Advanced suspension simulation

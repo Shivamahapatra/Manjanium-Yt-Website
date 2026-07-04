@@ -31,3 +31,6 @@ MCP: Added LLMWiki path to LocalFilesystem (Skipped due to system permissions)
 
 ## [2026-07-01] ingest | INBOX.md
 Processed quick captures. Created pages: `[[ClerkAuthVersionCompatibility]]`, `[[MCPConfigFixes]]`, `[[SupabaseSubscriptionHoisting]]`. Updated `index.md` and cleared the INBOX.
+
+## [2026-07-04] ingest | session-2026-07-04-fotmob-frontend.md
+- [2026-07-04 02:14:00] Ingested: session-2026-07-04-fotmob-frontend.md -> Created: [[FotMobAPI]], [[FotMobReactComponents]], [[ReactSVGShotmap]]
