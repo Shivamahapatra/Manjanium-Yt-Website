@@ -36,3 +36,16 @@ Context:
 - 30s auto-refresh on live matches
 - All 3 presets now show real FotMob data
 - Build passes 0 errors
+
+--- Update: FotMob XML API Fix (2026-07-04T14:00:41+05:30) ---
+Changes:
+- Fixed base URL from www.fotmob.com/api -> api.fotmob.com
+- Added XML parser (FotMob returns text/xml not JSON)
+- Added /api/football/raw-xml debug endpoint
+- Added parse_match_xml() and parse_match_json() helpers
+- Match endpoint now working with correct URL + XML parsing
+Context:
+- FotMob API subdomain changed to api.fotmob.com
+- Response format is XML (old API format) not JSON
+- Basic match data works (IDs, scores, leagues)
+- Match details format TBD (need to inspect XML structure)

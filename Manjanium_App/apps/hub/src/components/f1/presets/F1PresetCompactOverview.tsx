@@ -3,13 +3,14 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { F1Card } from '@/components/f1/F1Card';
 import { F1PresetProps } from './F1PresetLiveFocused';
+import { LiveTimingTower } from '@/components/f1/LiveTimingTower';
 
 const Globe = dynamic(
   () => import("@/components/ui/Globe").then((m) => m.Globe),
   { ssr: false, loading: () => <div className="w-full h-full rounded-2xl bg-neutral-900 animate-pulse" /> }
 );
 
-export function F1PresetCompactOverview({ session, currentVenue, globeArcs, globeConfig }: F1PresetProps) {
+export function F1PresetCompactOverview({ session, currentVenue, globeArcs, globeConfig, drivers }: F1PresetProps) {
   return (
     <div className="h-[calc(100vh-200px)] grid grid-cols-3 gap-4 px-6 pb-6">
       {/* LEFT: Session Status + Top 10 Timing */}
@@ -44,18 +45,7 @@ export function F1PresetCompactOverview({ session, currentVenue, globeArcs, glob
         <div className="flex-[0.7]">
           <F1Card title="Top 10" className="h-full flex flex-col p-4">
             <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-              <table className="w-full text-xs">
-                <thead className="sticky top-0 bg-[#131313]">
-                  <tr className="text-[#6B7280] text-xs">
-                    <th className="text-left p-1">Pos</th>
-                    <th className="text-left p-1">Driver</th>
-                    <th className="text-right p-1">Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* LiveTimingTower data flows through */}
-                </tbody>
-              </table>
+              <LiveTimingTower drivers={drivers} sessionInfo={session} />
             </div>
           </F1Card>
         </div>

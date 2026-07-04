@@ -3,13 +3,14 @@ import dynamic from 'next/dynamic';
 import { F1Card } from '@/components/f1/F1Card';
 import { F1PresetProps } from './F1PresetLiveFocused';
 import { WeatherWidget, RaceControlFeed, TeamRadioPanel } from '@/components/f1/tabs/F1LiveTab';
+import { LiveTimingTower } from '@/components/f1/LiveTimingTower';
 
 const LiveTrackMap = dynamic(
   () => import('@/components/f1/LiveTrackMap').then((m) => m.LiveTrackMap),
   { ssr: false, loading: () => <div className="w-full h-full rounded-lg bg-neutral-900 animate-pulse" /> }
 );
 
-export function F1PresetStatsDetailed({ weatherData, raceControlMsgs, radioMsgs }: F1PresetProps) {
+export function F1PresetStatsDetailed({ weatherData, raceControlMsgs, radioMsgs, session, drivers }: F1PresetProps) {
   return (
     <div className="h-[calc(100vh-200px)] flex flex-col gap-4 px-6 pb-6">
       {/* Tab label - just "Live" */}
@@ -28,18 +29,7 @@ export function F1PresetStatsDetailed({ weatherData, raceControlMsgs, radioMsgs 
         <div className="col-span-1 row-span-2">
           <F1Card title="Live Timing" className="h-full flex flex-col p-4">
             <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-              <table className="w-full text-xs">
-                <thead className="sticky top-0 bg-surface">
-                  <tr className="text-[#6B7280] uppercase text-xs">
-                    <th className="text-left p-1">Pos</th>
-                    <th className="text-left p-1">Driver</th>
-                    <th className="text-right p-1">Time</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-surface">
-                  {/* Placeholder - LiveTimingTower data flows through */}
-                </tbody>
-              </table>
+              <LiveTimingTower drivers={drivers} sessionInfo={session} />
             </div>
           </F1Card>
         </div>

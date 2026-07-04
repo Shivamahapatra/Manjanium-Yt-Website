@@ -14,6 +14,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from live import live_timing_loop, get_live_timing
 import asyncio
+import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import ParseError
 
 # Configure FastF1 cache
 # Use /tmp for ephemeral caching (acceptable cold start penalty)
@@ -251,7 +253,8 @@ async def session_drivers(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-FOTMOB_BASE = "https://www.fotmob.com/api"
+# FotMob API - updated endpoints (2026)
+FOTMOB_API_BASE = "https://api.fotmob.com"  # NEW correct base
 
 # Shared headers to avoid rate limiting
 FOTMOB_HEADERS = {
@@ -262,148 +265,269 @@ FOTMOB_HEADERS = {
     "Origin": "https://www.fotmob.com",
 }
 
+def get_fotmob_headers():
+    return FOTMOB_HEADERS
+
 @app.get("/api/football/matches")
 async def get_matches_by_date(date_str: str = Query(default=None)):
-    """Get all football matches for a date (YYYYMMDD format)."""
+    """Get all football matches for a date. FotMob returns XML."""
     if not date_str:
         date_str = datetime.now().strftime("%Y%m%d")
-    
+
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
+        async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
             response = await client.get(
-                f"{FOTMOB_BASE}/matches",
+                f"{FOTMOB_API_BASE}/matches",
                 params={"date": date_str},
-                headers=FOTMOB_HEADERS,
+                headers=get_fotmob_headers(),
             )
             response.raise_for_status()
-            data = response.json()
-        
-        # Parse and normalize the response
+
+        # FotMob returns XML - parse it
+        try:
+            root = ET.fromstring(response.content)
+        except ParseError as e:
+            raise HTTPException(status_code=502, detail=f"XML parse error: {e}")
+
         leagues = []
-        for league in data.get("leagues", []):
+
+        # XML structure:
+        # <live>
+        #   <exmatches>
+        #     <league id="" name="" ccode="">
+        #       <match id="" hTeam="" aTeam="" hScor="" aScor="" status="" .../>
+        #     </league>
+        #   </exmatches>
+        # </live>
+
+        exmatches = root.find("exmatches")
+        if exmatches is None:
+            # Try root directly
+            exmatches = root
+
+        for league_el in exmatches.findall("league"):
+            league_id = league_el.get("id", "")
+            league_name = league_el.get("name", "")
+            country = league_el.get("ccode", "")
+
             matches = []
-            for match in league.get("matches", []):
-                home = match.get("home", {})
-                away = match.get("away", {})
-                status = match.get("status", {})
+            for match_el in league_el.findall("match"):
+                match_id = match_el.get("id", "")
+                h_team = match_el.get("hTeam", "")
+                a_team = match_el.get("aTeam", "")
+                h_score = match_el.get("hScor", "")
+                a_score = match_el.get("aScor", "")
+                status = match_el.get("status", "")
+                started = match_el.get("started", "false") == "true"
+                finished = match_el.get("finished", "false") == "true"
+                utc_time = match_el.get("utcTime", "")
+
+                # Try to get team names from child elements
+                h_team_el = match_el.find("hTeam")
+                a_team_el = match_el.find("aTeam")
+                if h_team_el is not None:
+                    h_team = h_team_el.get("name", h_team)
+                if a_team_el is not None:
+                    a_team = a_team_el.get("name", a_team)
+
+                # Parse scores
+                try:
+                    home_score = int(h_score) if h_score.isdigit() else None
+                    away_score = int(a_score) if a_score.isdigit() else None
+                except (ValueError, AttributeError):
+                    home_score = None
+                    away_score = None
+
+                is_live = started and not finished
+
                 matches.append({
-                    "match_id": str(match.get("id")),
-                    "home_team": home.get("name"),
-                    "home_team_id": str(home.get("id")),
-                    "home_score": home.get("score"),
-                    "away_team": away.get("name"),
-                    "away_team_id": str(away.get("id")),
-                    "away_score": away.get("score"),
-                    "status": status.get("scoreStr", "--"),
-                    "started": status.get("started", False),
-                    "finished": status.get("finished", False),
-                    "live": status.get("started") and not status.get("finished"),
-                    "kickoff": match.get("status", {}).get("utcTime"),
-                    "minute": status.get("liveTime", {}).get("short"),
+                    "match_id": match_id,
+                    "home_team": h_team or "Home",
+                    "home_team_id": match_el.get("hTeamId", match_id + "_h"),
+                    "home_score": home_score,
+                    "away_team": a_team or "Away",
+                    "away_team_id": match_el.get("aTeamId", match_id + "_a"),
+                    "away_score": away_score,
+                    "status": f"{h_score}-{a_score}" if started else "vs",
+                    "started": started,
+                    "finished": finished,
+                    "live": is_live,
+                    "kickoff": utc_time,
+                    "minute": match_el.get("liveTime", ""),
                 })
+
             if matches:
                 leagues.append({
-                    "league_id": str(league.get("id")),
-                    "league_name": league.get("name"),
-                    "country": league.get("ccode"),
+                    "league_id": league_id,
+                    "league_name": league_name,
+                    "country": country,
                     "matches": matches,
                 })
-        
+
         return {
             "date": date_str,
             "total_matches": sum(len(l["matches"]) for l in leagues),
             "leagues": leagues,
+            "source": "fotmob_xml",
         }
-    except httpx.HTTPError as e:
-        raise HTTPException(status_code=502, detail=f"FotMob error: {str(e)}")
 
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"FotMob error: {e.response.status_code}"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/football/raw-xml")
+async def get_raw_xml(date_str: str = Query(default=None)):
+    """Return raw XML response from FotMob for inspection."""
+    if not date_str:
+        date_str = datetime.now().strftime("%Y%m%d")
+    
+    async with httpx.AsyncClient(timeout=20) as client:
+        response = await client.get(
+            f"{FOTMOB_API_BASE}/matches",
+            params={"date": date_str},
+            headers=get_fotmob_headers(),
+        )
+    
+    # Return raw XML as text for inspection
+    return {
+        "status": response.status_code,
+        "content_type": response.headers.get("content-type"),
+        "raw_xml": response.text[:5000],  # First 5000 chars
+        "size_bytes": len(response.content),
+    }
 
 @app.get("/api/football/match/{match_id}")
 async def get_match_details(match_id: str):
-    """Get full match details including xG, shots, lineups, player stats."""
-    try:
-        async with httpx.AsyncClient(timeout=20) as client:
+    """Get match details. Try both JSON and XML formats."""
+    
+    async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
+        # Try new API base first
+        try:
             response = await client.get(
-                f"{FOTMOB_BASE}/matchDetails",
+                f"{FOTMOB_API_BASE}/matchDetails",
                 params={"matchId": match_id},
-                headers=FOTMOB_HEADERS,
+                headers=get_fotmob_headers(),
             )
-            response.raise_for_status()
-            data = response.json()
+            
+            content_type = response.headers.get("content-type", "")
+            
+            if response.status_code == 200:
+                if "json" in content_type:
+                    # JSON response - use existing parsing
+                    data = response.json()
+                    return parse_match_json(data, match_id)
+                elif "xml" in content_type:
+                    # XML response - parse XML
+                    return parse_match_xml(response.content, match_id)
+                    
+        except Exception as e:
+            print(f"Match details error: {e}")
+    
+    # Return minimal response if all fails
+    return {
+        "match_id": match_id,
+        "error": "Match details unavailable",
+        "general": {},
+        "score": {},
+        "stats": {},
+        "shotmap": [],
+        "lineup": {},
+        "player_stats": {},
+        "timeline": [],
+        "momentum": [],
+    }
+
+def parse_match_xml(content: bytes, match_id: str) -> dict:
+    """Parse FotMob XML match details response."""
+    try:
+        root = ET.fromstring(content)
         
-        general = data.get("general", {})
-        header = data.get("header", {})
-        content = data.get("content", {})
-        
-        # Parse stats
-        stats_raw = content.get("stats", {}).get("stats", [])
-        stats_parsed = {}
-        for stat_group in stats_raw:
-            title = stat_group.get("title", "").lower().replace(" ", "_")
-            stats_parsed[title] = stat_group.get("stats", [])
-        
-        # Parse shotmap
-        shotmap = content.get("shotmap", {}).get("shots", [])
-        shots_parsed = []
-        for shot in shotmap:
-            shots_parsed.append({
-                "player": shot.get("playerName"),
-                "team_id": str(shot.get("teamId")),
-                "minute": shot.get("min"),
-                "type": shot.get("situation"),
-                "result": shot.get("shotType"),
-                "xg": shot.get("expectedGoals"),
-                "x": shot.get("x"),      # shot map coordinates
-                "y": shot.get("y"),
-            })
-        
-        # Parse lineups
-        lineup = content.get("lineup", {})
-        
-        # Parse player ratings
-        player_stats = content.get("playerStats", {})
-        
-        # Parse events timeline
-        events = content.get("matchFacts", {}).get("events", {}).get("events", [])
-        timeline = []
-        for event in events:
-            if event.get("type") in ["Goal", "Card", "SubstitutionIn", "YellowCard", "RedCard"]:
-                timeline.append({
-                    "type": event.get("type"),
-                    "minute": event.get("time"),
-                    "player": event.get("player", {}).get("name") if isinstance(event.get("player"), dict) else event.get("player"),
-                    "team": event.get("teamId"),
-                })
-        
-        # Parse momentum
-        momentum = content.get("momentum", {}).get("main", {}).get("data", [])
+        # Extract what we can from XML
+        # (XML structure varies - extract all attributes)
+        def el_to_dict(el):
+            result = dict(el.attrib)
+            children = list(el)
+            if children:
+                result['children'] = [el_to_dict(c) for c in children]
+            if el.text and el.text.strip():
+                result['text'] = el.text.strip()
+            return result
         
         return {
             "match_id": match_id,
-            "general": {
-                "home_team": general.get("homeTeam", {}),
-                "away_team": general.get("awayTeam", {}),
-                "league": general.get("leagueName"),
-                "round": general.get("leagueRoundName"),
-                "season": general.get("parentLeagueSeason"),
-                "venue": general.get("venue"),
-                "referee": general.get("referee"),
-            },
-            "score": {
-                "home": header.get("teams", [{}])[0].get("score"),
-                "away": header.get("teams", [{}])[1].get("score") if len(header.get("teams", [])) > 1 else None,
-                "status": header.get("status", {}).get("scoreStr"),
-                "finished": header.get("status", {}).get("finished"),
-            },
-            "stats": stats_parsed,
-            "shotmap": shots_parsed,
-            "lineup": lineup,
-            "player_stats": player_stats,
-            "timeline": timeline,
-            "momentum": momentum,
+            "source": "xml",
+            "raw": el_to_dict(root),
+            "general": {},
+            "score": {},
+            "stats": {},
+            "shotmap": [],
+            "lineup": {},
+            "player_stats": {},
+            "timeline": [],
+            "momentum": [],
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except ParseError:
+        return {"match_id": match_id, "error": "XML parse failed"}
+
+def parse_match_json(data: dict, match_id: str) -> dict:
+    """Parse FotMob JSON match details response (original parser)."""
+    general = data.get("general", {})
+    header = data.get("header", {})
+    content = data.get("content", {})
+    
+    stats_raw = content.get("stats", {}).get("stats", [])
+    stats_parsed = {}
+    for stat_group in stats_raw:
+        title = stat_group.get("title", "").lower().replace(" ", "_")
+        stats_parsed[title] = stat_group.get("stats", [])
+    
+    shotmap = content.get("shotmap", {}).get("shots", [])
+    shots_parsed = [{
+        "player": shot.get("playerName"),
+        "team_id": str(shot.get("teamId")),
+        "minute": shot.get("min"),
+        "type": shot.get("situation"),
+        "result": shot.get("shotType"),
+        "xg": shot.get("expectedGoals"),
+        "x": shot.get("x"),
+        "y": shot.get("y"),
+    } for shot in shotmap]
+    
+    events = content.get("matchFacts", {}).get("events", {}).get("events", [])
+    timeline = [{
+        "type": e.get("type"),
+        "minute": e.get("time"),
+        "player": e.get("player", {}).get("name") if isinstance(e.get("player"), dict) else e.get("player"),
+        "team": e.get("teamId"),
+    } for e in events if e.get("type") in ["Goal", "Card", "SubstitutionIn", "YellowCard", "RedCard"]]
+
+    return {
+        "match_id": match_id,
+        "source": "json",
+        "general": {
+            "home_team": general.get("homeTeam", {}),
+            "away_team": general.get("awayTeam", {}),
+            "league": general.get("leagueName"),
+            "round": general.get("leagueRoundName"),
+            "venue": general.get("venue"),
+        },
+        "score": {
+            "home": header.get("teams", [{}])[0].get("score"),
+            "away": header.get("teams", [{}])[1].get("score") if len(header.get("teams", [])) > 1 else None,
+            "status": header.get("status", {}).get("scoreStr"),
+            "finished": header.get("status", {}).get("finished"),
+        },
+        "stats": stats_parsed,
+        "shotmap": shots_parsed,
+        "lineup": content.get("lineup", {}),
+        "player_stats": content.get("playerStats", {}),
+        "timeline": timeline,
+        "momentum": content.get("momentum", {}).get("main", {}).get("data", []),
+    }
 
 
 @app.get("/api/football/league/{league_id}")
@@ -419,9 +543,9 @@ async def get_league_standings(
         
         async with httpx.AsyncClient(timeout=15) as client:
             response = await client.get(
-                f"{FOTMOB_BASE}/leagues",
+                f"{FOTMOB_API_BASE}/leagues",
                 params=params,
-                headers=FOTMOB_HEADERS,
+                headers=get_fotmob_headers(),
             )
             response.raise_for_status()
             data = response.json()
@@ -464,9 +588,9 @@ async def get_team_details(team_id: str):
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             response = await client.get(
-                f"{FOTMOB_BASE}/teams",
+                f"{FOTMOB_API_BASE}/teams",
                 params={"id": team_id},
-                headers=FOTMOB_HEADERS,
+                headers=get_fotmob_headers(),
             )
             response.raise_for_status()
             data = response.json()
@@ -498,9 +622,9 @@ async def search_football(term: str = Query(...)):
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             response = await client.get(
-                f"{FOTMOB_BASE}/searchapi/",
+                f"{FOTMOB_API_BASE}/searchapi/",
                 params={"term": term, "lang": "en"},
-                headers=FOTMOB_HEADERS,
+                headers=get_fotmob_headers(),
             )
             response.raise_for_status()
             data = response.json()
