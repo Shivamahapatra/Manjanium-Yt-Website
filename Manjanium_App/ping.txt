@@ -18,3 +18,21 @@ Context:
 - Data available: xG, shotmaps, player ratings, momentum, lineups
 - 150+ leagues covered (vs ESPN's limited coverage)
 - Use Supabase caching pattern to avoid rate limits
+
+--- Update: FotMob Frontend Components (2026-07-04T07:25:00+05:30) ---
+Changes:
+- Created FotmobMatchCard.tsx (expandable live score card)
+- Created FotmobMatchDetail.tsx (4-tab: stats/lineup/shotmap/timeline)
+- Created FotmobStandings.tsx (xG standings with league switcher)
+- Created FotmobLiveMatches.tsx (auto-refreshing match feed)
+- Updated FootballPresetLiveMatches.tsx (FotMob powered)
+- Updated FootballPresetStandingsFocus.tsx (xG standings)
+- Updated FootballPresetCompactStats.tsx (3-col compact)
+- Added Matches tab to football page.tsx
+Context:
+- FotMob team logos from CDN (images.fotmob.com)
+- Match details lazy-loaded on click (saves API calls)
+- SVG shotmap rendered in React (no canvas needed)
+- 30s auto-refresh on live matches
+- All 3 presets now show real FotMob data
+- Build passes 0 errors

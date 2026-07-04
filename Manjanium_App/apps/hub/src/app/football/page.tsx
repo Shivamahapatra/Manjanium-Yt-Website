@@ -15,13 +15,14 @@ import { PastMatches } from "@/components/football/PastMatches";
 import { MatchSummary } from "@/types/match";
 import { useFootballDashboardPreset } from "@/hooks/useFootballDashboardPreset";
 import { useFootballRealtime } from "@/hooks/useFootballRealtime";
-import { FootballPresetLiveMatches } from "@/components/football/presets/FootballPresetLiveMatches";
-import { FootballPresetStandingsFocus } from "@/components/football/presets/FootballPresetStandingsFocus";
-import { FootballPresetCompactStats } from "@/components/football/presets/FootballPresetCompactStats";
+import FootballPresetLiveMatches from "@/components/football/presets/FootballPresetLiveMatches";
+import FootballPresetStandingsFocus from "@/components/football/presets/FootballPresetStandingsFocus";
+import FootballPresetCompactStats from "@/components/football/presets/FootballPresetCompactStats";
 import { KnockoutBrackets } from "@/components/football/KnockoutBrackets";
 import { TerminalChat } from "@/components/chat/TerminalChat";
 import { FootballBadge } from "@/components/football/FootballBadge";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import FotmobLiveMatches from "@/components/football/FotmobLiveMatches";
 import "@/styles/football-design-tokens.css";
 
 function FootballHubContent() {
@@ -235,6 +236,9 @@ function FootballHubContent() {
             <TabsTrigger value="live" className="gap-2 px-6 rounded-lg data-[state=active]:bg-[#0EA5E9] data-[state=active]:text-white text-[#6B7280] font-bold text-xs uppercase tracking-wider transition-all">
               <Activity className="w-4 h-4" /> Live
             </TabsTrigger>
+            <TabsTrigger value="matches" className="gap-2 px-6 rounded-lg data-[state=active]:bg-[#10B981] data-[state=active]:text-white font-bold text-xs uppercase tracking-wider transition-all">
+              ⚽ Matches
+            </TabsTrigger>
             <TabsTrigger value="standings" className="gap-2 px-6 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-background font-bold text-xs uppercase tracking-wider transition-all">
               <Trophy className="w-4 h-4" /> Standings
             </TabsTrigger>
@@ -256,29 +260,26 @@ function FootballHubContent() {
             {activeTab === 'live' && (
               <>
                 {preset === 'live-matches' && (
-                  <FootballPresetLiveMatches
-                    fixtures={fixtures}
-                    loadingLive={loadingLive}
-                  />
+                  <FootballPresetLiveMatches />
                 )}
                 {preset === 'standings-focus' && (
-                  <FootballPresetStandingsFocus
-                    standingsData={standingsData}
-                    loadingStandings={loadingStandings}
-                  />
+                  <FootballPresetStandingsFocus />
                 )}
                 {preset === 'compact-stats' && (
-                  <FootballPresetCompactStats
-                    fixtures={fixtures}
-                    loadingLive={loadingLive}
-                    standingsData={standingsData}
-                    loadingStandings={loadingStandings}
-                  />
+                  <FootballPresetCompactStats />
                 )}
 
                 {/* Terminal Chat Widget for Football */}
                 <TerminalChat context="football" />
               </>
+            )}
+          </TabsContent>
+
+          <TabsContent value="matches" className="mt-0 outline-none">
+            {activeTab === 'matches' && (
+              <div className="p-6">
+                <FotmobLiveMatches filterLive={false} maxLeagues={15} />
+              </div>
             )}
           </TabsContent>
 
