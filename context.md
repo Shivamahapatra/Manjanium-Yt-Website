@@ -227,3 +227,21 @@ Changes made:
 - Added an AbortController with an 8000ms timeout to the /api/f1/live fetch fallback to prevent infinite hanging when the backend is unreachable.
 Context:
 - Addressed an issue where the frontend was getting stuck on the HUDSkeleton. It now gracefully fails and shows "F1 Data Unavailable" or initialization text if the Python backend is unlinked or unresponsive.
+
+--- Update: FotMob API Integration (2026-07-04T07:10:00+05:30) ---
+Changes made:
+- Added 5 FotMob endpoints to apps/telemetry/main.py:
+  /api/football/matches (by date, 150+ leagues)
+  /api/football/match/{id} (xG, shotmap, lineups, ratings, momentum)
+  /api/football/league/{id} (standings with xG)
+  /api/football/team/{id} (squad, form, fixtures)
+  /api/football/search (teams, players, leagues)
+- Created Next.js proxy routes in apps/hub/api/football/fotmob/
+- Added FOTMOB_LEAGUES constants in football-utils.ts
+- FotMob base URL: https://www.fotmob.com/api (unofficial)
+Context:
+- No API key required (unofficial public endpoints)
+- Rate limit: use with headers + reasonable polling intervals
+- Data available: xG, shotmaps, player ratings, momentum, lineups
+- 150+ leagues covered (vs ESPN's limited coverage)
+- Use Supabase caching pattern to avoid rate limits

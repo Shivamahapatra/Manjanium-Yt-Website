@@ -2,7 +2,9 @@ import os
 import tempfile
 from pathlib import Path
 from typing import Optional
+from datetime import datetime, date
 
+import httpx
 import fastf1
 import numpy as np
 import pandas as pd
@@ -246,6 +248,269 @@ async def session_drivers(
                 "number": str(info["DriverNumber"]),
             })
         return {"drivers": drivers}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+FOTMOB_BASE = "https://www.fotmob.com/api"
+
+# Shared headers to avoid rate limiting
+FOTMOB_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "Accept": "application/json",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://www.fotmob.com/",
+    "Origin": "https://www.fotmob.com",
+}
+
+@app.get("/api/football/matches")
+async def get_matches_by_date(date_str: str = Query(default=None)):
+    """Get all football matches for a date (YYYYMMDD format)."""
+    if not date_str:
+        date_str = datetime.now().strftime("%Y%m%d")
+    
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(
+                f"{FOTMOB_BASE}/matches",
+                params={"date": date_str},
+                headers=FOTMOB_HEADERS,
+            )
+            response.raise_for_status()
+            data = response.json()
+        
+        # Parse and normalize the response
+        leagues = []
+        for league in data.get("leagues", []):
+            matches = []
+            for match in league.get("matches", []):
+                home = match.get("home", {})
+                away = match.get("away", {})
+                status = match.get("status", {})
+                matches.append({
+                    "match_id": str(match.get("id")),
+                    "home_team": home.get("name"),
+                    "home_team_id": str(home.get("id")),
+                    "home_score": home.get("score"),
+                    "away_team": away.get("name"),
+                    "away_team_id": str(away.get("id")),
+                    "away_score": away.get("score"),
+                    "status": status.get("scoreStr", "--"),
+                    "started": status.get("started", False),
+                    "finished": status.get("finished", False),
+                    "live": status.get("started") and not status.get("finished"),
+                    "kickoff": match.get("status", {}).get("utcTime"),
+                    "minute": status.get("liveTime", {}).get("short"),
+                })
+            if matches:
+                leagues.append({
+                    "league_id": str(league.get("id")),
+                    "league_name": league.get("name"),
+                    "country": league.get("ccode"),
+                    "matches": matches,
+                })
+        
+        return {
+            "date": date_str,
+            "total_matches": sum(len(l["matches"]) for l in leagues),
+            "leagues": leagues,
+        }
+    except httpx.HTTPError as e:
+        raise HTTPException(status_code=502, detail=f"FotMob error: {str(e)}")
+
+
+@app.get("/api/football/match/{match_id}")
+async def get_match_details(match_id: str):
+    """Get full match details including xG, shots, lineups, player stats."""
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            response = await client.get(
+                f"{FOTMOB_BASE}/matchDetails",
+                params={"matchId": match_id},
+                headers=FOTMOB_HEADERS,
+            )
+            response.raise_for_status()
+            data = response.json()
+        
+        general = data.get("general", {})
+        header = data.get("header", {})
+        content = data.get("content", {})
+        
+        # Parse stats
+        stats_raw = content.get("stats", {}).get("stats", [])
+        stats_parsed = {}
+        for stat_group in stats_raw:
+            title = stat_group.get("title", "").lower().replace(" ", "_")
+            stats_parsed[title] = stat_group.get("stats", [])
+        
+        # Parse shotmap
+        shotmap = content.get("shotmap", {}).get("shots", [])
+        shots_parsed = []
+        for shot in shotmap:
+            shots_parsed.append({
+                "player": shot.get("playerName"),
+                "team_id": str(shot.get("teamId")),
+                "minute": shot.get("min"),
+                "type": shot.get("situation"),
+                "result": shot.get("shotType"),
+                "xg": shot.get("expectedGoals"),
+                "x": shot.get("x"),      # shot map coordinates
+                "y": shot.get("y"),
+            })
+        
+        # Parse lineups
+        lineup = content.get("lineup", {})
+        
+        # Parse player ratings
+        player_stats = content.get("playerStats", {})
+        
+        # Parse events timeline
+        events = content.get("matchFacts", {}).get("events", {}).get("events", [])
+        timeline = []
+        for event in events:
+            if event.get("type") in ["Goal", "Card", "SubstitutionIn", "YellowCard", "RedCard"]:
+                timeline.append({
+                    "type": event.get("type"),
+                    "minute": event.get("time"),
+                    "player": event.get("player", {}).get("name") if isinstance(event.get("player"), dict) else event.get("player"),
+                    "team": event.get("teamId"),
+                })
+        
+        # Parse momentum
+        momentum = content.get("momentum", {}).get("main", {}).get("data", [])
+        
+        return {
+            "match_id": match_id,
+            "general": {
+                "home_team": general.get("homeTeam", {}),
+                "away_team": general.get("awayTeam", {}),
+                "league": general.get("leagueName"),
+                "round": general.get("leagueRoundName"),
+                "season": general.get("parentLeagueSeason"),
+                "venue": general.get("venue"),
+                "referee": general.get("referee"),
+            },
+            "score": {
+                "home": header.get("teams", [{}])[0].get("score"),
+                "away": header.get("teams", [{}])[1].get("score") if len(header.get("teams", [])) > 1 else None,
+                "status": header.get("status", {}).get("scoreStr"),
+                "finished": header.get("status", {}).get("finished"),
+            },
+            "stats": stats_parsed,
+            "shotmap": shots_parsed,
+            "lineup": lineup,
+            "player_stats": player_stats,
+            "timeline": timeline,
+            "momentum": momentum,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/football/league/{league_id}")
+async def get_league_standings(
+    league_id: str,
+    season: str = Query(default=None),
+):
+    """Get league standings table with xG."""
+    try:
+        params = {"id": league_id}
+        if season:
+            params["season"] = season
+        
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(
+                f"{FOTMOB_BASE}/leagues",
+                params=params,
+                headers=FOTMOB_HEADERS,
+            )
+            response.raise_for_status()
+            data = response.json()
+        
+        # Extract standings
+        table_data = data.get("table", [{}])[0]
+        standings = []
+        for team in table_data.get("data", {}).get("table", {}).get("all", []):
+            standings.append({
+                "position": team.get("idx"),
+                "team": team.get("name"),
+                "team_id": str(team.get("id")),
+                "played": team.get("played"),
+                "wins": team.get("wins"),
+                "draws": team.get("draws"),
+                "losses": team.get("losses"),
+                "goals_for": team.get("scoresStr", "0-0").split("-")[0] if "-" in str(team.get("scoresStr","")) else 0,
+                "goals_against": team.get("scoresStr", "0-0").split("-")[1] if "-" in str(team.get("scoresStr","")) else 0,
+                "goal_diff": team.get("goalConDiff"),
+                "points": team.get("pts"),
+                "form": team.get("qualColor"),
+                "xg_for": team.get("xgData", {}).get("xg"),
+                "xg_against": team.get("xgData", {}).get("xgAgainst"),
+            })
+        
+        return {
+            "league_id": league_id,
+            "league_name": data.get("details", {}).get("name"),
+            "season": data.get("details", {}).get("selectedSeason"),
+            "available_seasons": data.get("details", {}).get("allAvailableSeasons", []),
+            "standings": standings,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/football/team/{team_id}")
+async def get_team_details(team_id: str):
+    """Get team info, squad, form, and recent fixtures."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(
+                f"{FOTMOB_BASE}/teams",
+                params={"id": team_id},
+                headers=FOTMOB_HEADERS,
+            )
+            response.raise_for_status()
+            data = response.json()
+        
+        details = data.get("details", {})
+        squad = data.get("squad", [])
+        fixtures = data.get("fixtures", {})
+        
+        return {
+            "team_id": team_id,
+            "name": details.get("name"),
+            "country": details.get("country"),
+            "stadium": details.get("stadium", {}).get("name"),
+            "stadium_capacity": details.get("stadium", {}).get("capacity"),
+            "league_position": details.get("tableData", {}).get("idx"),
+            "league": details.get("shortName"),
+            "form": details.get("form", []),
+            "squad": squad,
+            "upcoming_fixtures": fixtures.get("upcoming", [])[:5],
+            "recent_results": fixtures.get("previousMatches", [])[:5],
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/football/search")
+async def search_football(term: str = Query(...)):
+    """Search for teams, players, leagues."""
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.get(
+                f"{FOTMOB_BASE}/searchapi/",
+                params={"term": term, "lang": "en"},
+                headers=FOTMOB_HEADERS,
+            )
+            response.raise_for_status()
+            data = response.json()
+        
+        return {
+            "term": term,
+            "teams": data.get("squadMemberTeamItems", [])[:5],
+            "players": data.get("squadMemberItems", [])[:5],
+            "leagues": data.get("tournaments", [])[:5],
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

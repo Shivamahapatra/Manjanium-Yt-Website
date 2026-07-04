@@ -158,3 +158,14 @@ export function calculateGoalsPerGame(goals: number, gamesPlayed: number): numbe
 export function sortPlayersByGoals(players: Player[]): Player[] {
   return [...players].sort((a, b) => b.goals - a.goals);
 }
+
+export const FOTMOB_LEAGUES = {
+  'premier-league': { id: '47', name: 'Premier League', country: 'England' },
+  'la-liga': { id: '87', name: 'La Liga', country: 'Spain' },
+  'bundesliga': { id: '54', name: 'Bundesliga', country: 'Germany' },
+  'serie-a': { id: '55', name: 'Serie A', country: 'Italy' },
+  'ligue-1': { id: '53', name: 'Ligue 1', country: 'France' },
+  'champions-league': { id: '42', name: 'Champions League', country: 'Europe' },
+  'world-cup': { id: '77', name: 'FIFA World Cup', country: 'World' },
+  'world-cup-2026': { id: '107', name: 'FIFA World Cup 2026', country: 'World' },
+};
