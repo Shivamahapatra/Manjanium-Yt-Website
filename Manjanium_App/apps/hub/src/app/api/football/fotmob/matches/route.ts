@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const date = searchParams.get('date') || ''
     
     const response = await fetch(
-      `${TELEMETRY_URL}/api/football/matches${date ? `?date_str=${date}` : ''}`,
+      `${TELEMETRY_URL}/api/football/combined-matches${date ? `?date_str=${date}` : ''}`,
       { cache: 'no-store', signal: AbortSignal.timeout(20000) }
     )
     const data = await response.json()

@@ -474,6 +474,225 @@ async def get_raw_xml(date_str: str = Query(default=None)):
         "size_bytes": len(response.content),
     }
 
+@app.get("/api/football/combined-matches")
+async def get_combined_matches(date_str: str = Query(default=None)):
+    """
+    Get matches from multiple sources:
+    - worldcup26.ir for World Cup 2026 (authoritative)
+    - FotMob for club leagues (Premier League, La Liga, etc.)
+    """
+    if not date_str:
+        date_str = datetime.now().strftime("%Y%m%d")
+    
+    # Parse date for worldcup26.ir format
+    try:
+        match_date = datetime.strptime(date_str, "%Y%m%d")
+        wc_date = match_date.strftime("%Y-%m-%d")
+    except ValueError:
+        wc_date = datetime.now().strftime("%Y-%m-%d")
+    
+    all_leagues = []
+    
+    # === SOURCE 1: worldcup26.ir (World Cup) ===
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            # Get teams first
+            teams_resp = await client.get("https://worldcup26.ir/api/teams")
+            teams_data = teams_resp.json() if teams_resp.status_code == 200 else []
+            
+            # Build team lookup by id
+            team_lookup = {}
+            for t in teams_data:
+                tid = str(t.get("id", ""))
+                if tid:
+                    team_lookup[tid] = {
+                        "name": t.get("name_en") or t.get("name", "Unknown"),
+                        "flag": t.get("flag", ""),
+                        "fifa_code": t.get("fifa_code", ""),
+                    }
+            
+            # Get games for the date
+            games_resp = await client.get(
+                "https://worldcup26.ir/api/games",
+                params={"date": wc_date}
+            )
+            
+            if games_resp.status_code == 200:
+                games = games_resp.json()
+                print(f"worldcup26.ir teams: {len(teams_data)} teams loaded")
+                print(f"worldcup26.ir games for {wc_date}: {len(games if isinstance(games, list) else games.get('games', []))} games")
+                print(f"Sample game keys: {list(games[0].keys()) if (isinstance(games, list) and games) else 'empty'}")
+                
+                wc_matches = []
+                for game in (games if isinstance(games, list) else games.get("games", [])):
+                    home_id = str(game.get("home_team_id") or game.get("home_id", ""))
+                    away_id = str(game.get("away_team_id") or game.get("away_id", ""))
+                    
+                    home_info = team_lookup.get(home_id, {
+                        "name": game.get("home_team") or game.get("home_name", "TBD"),
+                        "flag": "",
+                        "fifa_code": "",
+                    })
+                    away_info = team_lookup.get(away_id, {
+                        "name": game.get("away_team") or game.get("away_name", "TBD"),
+                        "flag": "",
+                        "fifa_code": "",
+                    })
+                    
+                    # Parse score
+                    home_score = game.get("home_score") or game.get("home_result")
+                    away_score = game.get("away_score") or game.get("away_result")
+                    
+                    # Parse status
+                    status = game.get("status", "") or game.get("state", "")
+                    started = status in ["finished", "in_progress", "live", "FT", "HT", "1H", "2H"]
+                    finished = status in ["finished", "FT", "completed"]
+                    is_live = status in ["in_progress", "live", "1H", "2H", "HT"]
+                    
+                    # Parse kickoff
+                    kickoff_raw = game.get("kickoff") or game.get("time") or game.get("date", "")
+                    try:
+                        if kickoff_raw and "T" not in str(kickoff_raw):
+                            dt = datetime.strptime(str(kickoff_raw), "%Y-%m-%d %H:%M:%S")
+                            kickoff_iso = dt.isoformat() + "Z"
+                        else:
+                            kickoff_iso = str(kickoff_raw)
+                    except Exception:
+                        kickoff_iso = str(kickoff_raw)
+                    
+                    wc_matches.append({
+                        "match_id": str(game.get("id", "")),
+                        "home_team": home_info["name"],
+                        "home_team_id": home_id,
+                        "home_flag": home_info.get("flag", ""),
+                        "home_score": int(home_score) if home_score is not None and str(home_score).isdigit() else None,
+                        "away_team": away_info["name"],
+                        "away_team_id": away_id,
+                        "away_flag": away_info.get("flag", ""),
+                        "away_score": int(away_score) if away_score is not None and str(away_score).isdigit() else None,
+                        "status": status,
+                        "stage": game.get("stage") or game.get("round", ""),
+                        "started": started,
+                        "finished": finished,
+                        "live": is_live,
+                        "kickoff": kickoff_iso,
+                        "minute": str(game.get("minute", "")),
+                        "source": "worldcup26",
+                    })
+                
+                if wc_matches:
+                    all_leagues.append({
+                        "league_id": "wc2026",
+                        "league_name": "FIFA World Cup 2026",
+                        "country": "WORLD",
+                        "source": "worldcup26.ir",
+                        "matches": wc_matches,
+                    })
+    except Exception as e:
+        print(f"worldcup26.ir error: {e}")
+    
+    # === SOURCE 2: FotMob (Club Leagues) ===
+    # Only use FotMob for NON-World Cup leagues
+    try:
+        async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
+            response = await client.get(
+                f"{FOTMOB_API_BASE}/matches",
+                params={"date": date_str},
+                headers=get_fotmob_headers(),
+            )
+            
+            if response.status_code == 200 and "xml" in response.headers.get("content-type", ""):
+                root = ET.fromstring(response.content)
+                exmatches = root.find("exmatches")
+                if exmatches is None:
+                    exmatches = root
+                
+                for league_el in exmatches.findall("league"):
+                    league_name = league_el.get("name", "")
+                    
+                    # Skip World Cup leagues (worldcup26.ir covers these)
+                    skip_keywords = ["world cup", "worldcup", "fifa world", "final stage"]
+                    if any(kw in league_name.lower() for kw in skip_keywords):
+                        continue
+                    
+                    league_id = league_el.get("id", "")
+                    country = league_el.get("ccode", "")
+                    
+                    matches = []
+                    for match_el in league_el.findall("match"):
+                        h_team = match_el.get("hTeam", "")
+                        a_team = match_el.get("aTeam", "")
+                        h_score = match_el.get("hScore", "")
+                        a_score = match_el.get("aScore", "")
+                        status_code = match_el.get("Status", "N")
+                        stage = match_el.get("stage", "")
+                        home_id = match_el.get("hId", "")
+                        away_id = match_el.get("aId", "")
+                        
+                        # Skip if team names look like bracket placeholders
+                        placeholder_pattern = re.compile(r'^[0-9]+[A-Z/]+[A-Z0-9]*$')
+                        if placeholder_pattern.match(h_team) or placeholder_pattern.match(a_team):
+                            continue
+                        
+                        # Parse time
+                        raw_time = match_el.get("time", "")
+                        utc_time = ""
+                        if raw_time:
+                            try:
+                                dt = datetime.strptime(raw_time, "%d.%m.%Y %H:%M")
+                                utc_time = dt.isoformat() + "Z"
+                            except ValueError:
+                                utc_time = raw_time
+                        
+                        started = status_code in ["FT", "HT", "1H", "2H", "ET", "PEN"]
+                        finished = status_code == "FT"
+                        is_live = status_code in ["1H", "2H", "HT", "ET", "PEN"]
+                        
+                        try:
+                            home_score = int(h_score) if h_score and h_score.isdigit() and started else None
+                            away_score = int(a_score) if a_score and a_score.isdigit() and started else None
+                        except (ValueError, AttributeError):
+                            home_score = None
+                            away_score = None
+                        
+                        matches.append({
+                            "match_id": match_el.get("id", ""),
+                            "home_team": h_team,
+                            "home_team_id": home_id,
+                            "home_flag": f"https://images.fotmob.com/image_resources/logo/teamlogo/{home_id}_small.png" if home_id else "",
+                            "home_score": home_score,
+                            "away_team": a_team,
+                            "away_team_id": away_id,
+                            "away_flag": f"https://images.fotmob.com/image_resources/logo/teamlogo/{away_id}_small.png" if away_id else "",
+                            "away_score": away_score,
+                            "status": status_code,
+                            "stage": stage,
+                            "started": started,
+                            "finished": finished,
+                            "live": is_live,
+                            "kickoff": utc_time,
+                            "minute": match_el.get("liveTime", ""),
+                            "source": "fotmob",
+                        })
+                    
+                    if matches:
+                        all_leagues.append({
+                            "league_id": league_id,
+                            "league_name": league_name,
+                            "country": country,
+                            "source": "fotmob",
+                            "matches": matches,
+                        })
+    except Exception as e:
+        print(f"FotMob error: {e}")
+    
+    return {
+        "date": date_str,
+        "total_matches": sum(len(l["matches"]) for l in all_leagues),
+        "leagues": all_leagues,
+        "sources": list(set(l["source"] for l in all_leagues)),
+    }
+
 @app.get("/api/football/match/{match_id}")
 async def get_match_details(match_id: str):
     """Get match details. Try both JSON and XML formats."""

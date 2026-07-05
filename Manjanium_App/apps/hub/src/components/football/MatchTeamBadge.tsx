@@ -10,7 +10,7 @@ export interface MatchTeamBadgeProps {
 export function MatchTeamBadge({ team, children, className = '' }: MatchTeamBadgeProps) {
   const colors = {
     home: 'bg-[#0EA5E9]/20 text-[#0EA5E9] border-[#0EA5E9]/50',
-    away: 'bg-[#EF4444]/20 text-[#EF4444] border-[#EF4444]/50'
+    away: 'bg-alert/20 text-alert border-alert/50'
   };
 
   return (

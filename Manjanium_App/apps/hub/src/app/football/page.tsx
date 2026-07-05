@@ -236,7 +236,7 @@ function FootballHubContent() {
             <TabsTrigger value="live" className="gap-2 px-6 rounded-lg data-[state=active]:bg-[#0EA5E9] data-[state=active]:text-white text-[#6B7280] font-bold text-xs uppercase tracking-wider transition-all">
               <Activity className="w-4 h-4" /> Live
             </TabsTrigger>
-            <TabsTrigger value="matches" className="gap-2 px-6 rounded-lg data-[state=active]:bg-[#10B981] data-[state=active]:text-white font-bold text-xs uppercase tracking-wider transition-all">
+            <TabsTrigger value="matches" className="gap-2 px-6 rounded-lg data-[state=active]:bg-success data-[state=active]:text-white font-bold text-xs uppercase tracking-wider transition-all">
               ⚽ Matches
             </TabsTrigger>
             <TabsTrigger value="standings" className="gap-2 px-6 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-background font-bold text-xs uppercase tracking-wider transition-all">

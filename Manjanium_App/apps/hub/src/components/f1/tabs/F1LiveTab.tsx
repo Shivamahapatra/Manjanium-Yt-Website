@@ -135,8 +135,14 @@ export function F1LiveTab() {
 
   const applyPayload = (payload: any) => {
     if (payload.session) {
-      setSession(payload.session);
-      setSessionKey(String(payload.session.session_key || 'latest'));
+      // Only set session if it has a real session_key
+      if (payload.session.session_key && 
+          payload.session.session_name !== "No Active Session") {
+        setSession(payload.session)
+        setSessionKey(String(payload.session.session_key || 'latest'))
+      } else {
+        setSession(null) // Treat as no session
+      }
     }
     if (payload.drivers) setDrivers(payload.drivers);
     if (payload.weatherData) setWeatherData(payload.weatherData);
@@ -218,8 +224,8 @@ export function F1LiveTab() {
             const data = await res.json();
             if (data.error && !data.error.includes("Initializing")) throw new Error(data.error);
             
-            if (data.stale || !data.session || data.drivers?.length === 0) {
-              setSession(data.session || null)
+            if (data.stale || !data.session?.session_key || data.drivers?.length === 0) {
+              setSession(null)  // Set to NULL so !session check works
               setDrivers([])
               setError(null) // Not an error, just no active session
               setLoading(false)
@@ -317,7 +323,12 @@ export function F1LiveTab() {
       </div>
     );
 
-  if (!session && !loading && !error) {
+  const isNoActiveSession = !session || 
+    !session.session_key || 
+    session.session_name === "No Active Session" ||
+    (drivers.length === 0 && !loading)
+
+  if (isNoActiveSession && !loading && !error) {
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <div className="text-6xl">🏎️</div>
@@ -326,7 +337,7 @@ export function F1LiveTab() {
           The next session will appear here automatically when it goes live.
         </div>
         <div className="text-xs text-[#FBBF24] font-bold">
-          NEXT: Check F1 Hub Calendar for upcoming events
+          NEXT: British Grand Prix — Check Calendar tab
         </div>
       </div>
     )

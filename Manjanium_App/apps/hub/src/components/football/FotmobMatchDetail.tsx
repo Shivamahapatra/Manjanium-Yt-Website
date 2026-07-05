@@ -40,7 +40,7 @@ export default function FotmobMatchDetail({ data }: MatchDetailProps) {
             onClick={() => setActiveTab(tab)}
             className={`px-3 py-1 rounded text-xs font-bold capitalize transition-colors ${
               activeTab === tab
-                ? 'bg-[#10B981] text-black'
+                ? 'bg-success text-black'
                 : 'bg-[#1F2937] text-[#6B7280] hover:text-white'
             }`}
           >
@@ -62,14 +62,14 @@ export default function FotmobMatchDetail({ data }: MatchDetailProps) {
 
                 return (
                   <div key={i} className="space-y-1">
-                    <div className="flex justify-between text-xs text-[#9CA3AF]">
+                    <div className="flex justify-between text-xs text-muted-light">
                       <span className="font-bold text-white">{stat?.stats?.[0]}</span>
                       <span className="text-[#6B7280]">{stat?.title}</span>
                       <span className="font-bold text-white">{stat?.stats?.[1]}</span>
                     </div>
                     <div className="flex h-1.5 rounded overflow-hidden bg-[#1F2937]">
                       <div
-                        className="bg-[#10B981] transition-all"
+                        className="bg-success transition-all"
                         style={{ width: `${homePercent}%` }}
                       />
                       <div
@@ -107,10 +107,10 @@ export default function FotmobMatchDetail({ data }: MatchDetailProps) {
                       {player?.rating?.num && (
                         <span className={`font-bold px-1.5 py-0.5 rounded text-xs ${
                           parseFloat(player.rating.num) >= 7.5
-                            ? 'bg-[#10B981]/20 text-[#10B981]'
+                            ? 'bg-success/20 text-success'
                             : parseFloat(player.rating.num) >= 6.5
                             ? 'bg-[#FBBF24]/20 text-[#FBBF24]'
-                            : 'bg-[#EF4444]/20 text-[#EF4444]'
+                            : 'bg-alert/20 text-alert'
                         }`}>
                           {player.rating.num}
                         </span>
@@ -185,7 +185,7 @@ export default function FotmobMatchDetail({ data }: MatchDetailProps) {
                 <span className="text-white">{shot.player}</span>
                 <span className="text-[#6B7280] capitalize">{shot.type}</span>
                 <span className={`font-bold ${
-                  shot.result === 'Goal' ? 'text-[#10B981]' : 'text-[#6B7280]'
+                  shot.result === 'Goal' ? 'text-success' : 'text-[#6B7280]'
                 }`}>
                   {shot.result === 'Goal' ? '⚽ GOAL' : shot.result}
                 </span>
@@ -218,7 +218,7 @@ export default function FotmobMatchDetail({ data }: MatchDetailProps) {
                       className="flex-1 flex flex-col justify-center"
                     >
                       <div
-                        className={`w-full ${isHome ? 'bg-[#10B981]/70' : 'bg-[#0EA5E9]/70'}`}
+                        className={`w-full ${isHome ? 'bg-success/70' : 'bg-[#0EA5E9]/70'}`}
                         style={{ height: `${Math.min(height, 100)}%` }}
                       />
                     </div>
@@ -259,7 +259,7 @@ export default function FotmobMatchDetail({ data }: MatchDetailProps) {
       {activeTab === 'raw' && (data as any).raw && (
         <div className="space-y-2">
           <div className="text-xs text-[#6B7280]">Raw XML Data Structure</div>
-          <pre className="text-xs text-[#10B981] bg-[#1F2937] p-2 rounded overflow-auto max-h-96">
+          <pre className="text-xs text-success bg-[#1F2937] p-2 rounded overflow-auto max-h-96">
             {JSON.stringify((data as any).raw, null, 2)}
           </pre>
         </div>

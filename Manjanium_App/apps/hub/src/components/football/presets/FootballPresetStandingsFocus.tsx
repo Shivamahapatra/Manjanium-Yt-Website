@@ -10,12 +10,12 @@ export default function FootballPresetStandingsFocus() {
         <h2 className="text-3xl font-bold text-white font-heading">
           📊 League Standings
         </h2>
-        <div className="text-xs text-[#10B981] font-bold">
+        <div className="text-xs text-success font-bold">
           Powered by FotMob • Includes xG
         </div>
       </div>
 
-      <div className="bg-[#0a0a0a]/80 backdrop-blur-md border border-[#10B981]/20 rounded-lg p-6">
+      <div className="bg-[#0a0a0a]/80 backdrop-blur-md border border-success/20 rounded-lg p-6">
         <FotmobStandings leagueId="47" showXG={true} />
       </div>
     </div>

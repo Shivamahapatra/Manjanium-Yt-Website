@@ -69,11 +69,11 @@ export default function FotmobLiveMatches({
 
   if (error) {
     return (
-      <div className="text-center py-8 text-[#EF4444]">
+      <div className="text-center py-8 text-alert">
         ⚠️ {error}
         <button
           onClick={fetchMatches}
-          className="block mx-auto mt-2 text-sm text-[#10B981]"
+          className="block mx-auto mt-2 text-sm text-success"
         >
           Retry
         </button>
@@ -94,8 +94,8 @@ export default function FotmobLiveMatches({
       {/* Live indicator */}
       {filterLive && (
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-          <span className="text-xs text-[#10B981] font-bold uppercase tracking-wider">
+          <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+          <span className="text-xs text-success font-bold uppercase tracking-wider">
             Live Now
           </span>
           {lastUpdated && (
@@ -115,7 +115,7 @@ export default function FotmobLiveMatches({
             </span>
             <span className="text-xs text-[#6B7280] ml-auto">
               {league.matches.filter((m: any) => m.live).length > 0 && (
-                <span className="text-[#10B981]">
+                <span className="text-success">
                   {league.matches.filter((m: any) => m.live).length} live
                 </span>
               )}

@@ -274,3 +274,13 @@ Context:
 - The telemetry backend now correctly handles FotMob's undocumented API changes (XML format).
 - F1 frontend presets correctly receive data mappings without undefined errors.
 - Build passes with 0 errors.
+
+--- Update: Data Quality Fixes v2 (2026-07-05T11:55:00+05:30) ---
+Changes made:
+- Updated `apps/hub/src/app/api/football/fotmob/matches/route.ts`: Changed proxy URL from `/api/football/matches` to `/api/football/combined-matches` to use the dual-source endpoint.
+- Updated `ping.txt` with changelog entry for this session.
+Context:
+- FIX 1 (F1 "No Active Session" UI): Already applied in prior session — `applyPayload` guards, `isNoActiveSession` logic, and REST fallback `session_key` check all present in F1LiveTab.tsx.
+- FIX 2 (Football combined-matches endpoint): Already present in `main.py` from prior session — worldcup26.ir as primary WC source, FotMob for club leagues only, placeholder filtering, debug logging.
+- The only remaining change was the Next.js proxy route which still pointed to `/api/football/matches` instead of `/api/football/combined-matches`.
+- Build pending verification.

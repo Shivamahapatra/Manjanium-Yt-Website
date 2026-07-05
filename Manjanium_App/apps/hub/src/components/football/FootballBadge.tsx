@@ -9,11 +9,11 @@ export interface FootballBadgeProps {
 
 export function FootballBadge({ variant, children, className = '' }: FootballBadgeProps) {
   const variants = {
-    live: 'bg-[#EF4444]/20 text-[#EF4444] border-[#EF4444]/50 animate-pulse',
+    live: 'bg-alert/20 text-alert border-alert/50 animate-pulse',
     finished: 'bg-[#6B7280]/20 text-[#6B7280] border-[#6B7280]/50',
-    upcoming: 'bg-[#10B981]/20 text-[#10B981] border-[#10B981]/50',
+    upcoming: 'bg-success/20 text-success border-success/50',
     goal: 'bg-[#FBBF24]/20 text-[#FBBF24] border-[#FBBF24]/50',
-    card: 'bg-[#EF4444]/20 text-[#EF4444] border-[#EF4444]/50',
+    card: 'bg-alert/20 text-alert border-alert/50',
     sub: 'bg-[#0EA5E9]/20 text-[#0EA5E9] border-[#0EA5E9]/50',
     info: 'bg-[#0EA5E9]/20 text-[#0EA5E9] border-[#0EA5E9]/50'
   };

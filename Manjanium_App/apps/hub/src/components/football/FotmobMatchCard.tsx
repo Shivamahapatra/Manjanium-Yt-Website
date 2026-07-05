@@ -52,7 +52,7 @@ export default function FotmobMatchCard({ match }: MatchCardProps) {
 
   return (
     <motion.div
-      className="bg-[#0a0a0a]/80 backdrop-blur-md border border-[#1F2937] rounded-lg overflow-hidden hover:border-[#10B981]/30 transition-colors"
+      className="bg-[#0a0a0a]/80 backdrop-blur-md border border-[#1F2937] rounded-lg overflow-hidden hover:border-success/30 transition-colors"
       whileHover={{ y: -1 }}
     >
       {/* Match Header */}
@@ -74,7 +74,7 @@ export default function FotmobMatchCard({ match }: MatchCardProps) {
             <span className={`font-bold text-sm ${
               match.finished && (match.home_score ?? 0) > (match.away_score ?? 0)
                 ? 'text-white'
-                : 'text-[#9CA3AF]'
+                : 'text-muted-light'
             }`}>
               {match.home_team}
             </span>
@@ -119,8 +119,8 @@ export default function FotmobMatchCard({ match }: MatchCardProps) {
             {/* Live indicator */}
             {match.live && (
               <div className="flex items-center justify-center gap-1 mt-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
-                <span className="text-xs text-[#10B981] font-bold">
+                <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                <span className="text-xs text-success font-bold">
                   {match.minute || 'LIVE'}
                 </span>
               </div>
@@ -135,7 +135,7 @@ export default function FotmobMatchCard({ match }: MatchCardProps) {
             <span className={`font-bold text-sm ${
               match.finished && (match.away_score ?? 0) > (match.home_score ?? 0)
                 ? 'text-white'
-                : 'text-[#9CA3AF]'
+                : 'text-muted-light'
             }`}>
               {match.away_team}
             </span>
@@ -170,7 +170,7 @@ export default function FotmobMatchCard({ match }: MatchCardProps) {
           >
             {loadingDetail ? (
               <div className="p-4 flex items-center justify-center gap-2 text-[#6B7280] text-sm">
-                <div className="w-4 h-4 border-2 border-[#10B981]/30 border-t-[#10B981] rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-success/30 border-t-success rounded-full animate-spin" />
                 Loading match details...
               </div>
             ) : matchDetail ? (

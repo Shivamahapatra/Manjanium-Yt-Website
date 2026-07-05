@@ -49,7 +49,7 @@ export default function FotmobStandings({
             onClick={() => setSelectedLeague(String(league.id))}
             className={`px-3 py-1 rounded text-xs font-bold transition-colors ${
               selectedLeague === String(league.id)
-                ? 'bg-[#10B981] text-black'
+                ? 'bg-success text-black'
                 : 'bg-[#1F2937] text-[#6B7280] hover:text-white'
             }`}
           >
@@ -75,7 +75,7 @@ export default function FotmobStandings({
       )}
 
       {error && (
-        <div className="text-[#EF4444] text-sm text-center py-4">{error}</div>
+        <div className="text-alert text-sm text-center py-4">{error}</div>
       )}
 
       {!loading && standings.length === 0 && (
@@ -104,7 +104,7 @@ export default function FotmobStandings({
                 {showXG && (
                   <>
                     <th className="text-center py-2 w-12 text-[#FBBF24]">xG</th>
-                    <th className="text-center py-2 w-12 text-[#EF4444]">xGA</th>
+                    <th className="text-center py-2 w-12 text-alert">xGA</th>
                   </>
                 )}
               </tr>
@@ -122,11 +122,11 @@ export default function FotmobStandings({
                   <td className="py-2">
                     <span className="font-bold text-white">{team.team}</span>
                   </td>
-                  <td className="py-2 text-center text-[#9CA3AF]">{team.played}</td>
-                  <td className="py-2 text-center text-[#10B981]">{team.wins}</td>
+                  <td className="py-2 text-center text-muted-light">{team.played}</td>
+                  <td className="py-2 text-center text-success">{team.wins}</td>
                   <td className="py-2 text-center text-[#FBBF24]">{team.draws}</td>
-                  <td className="py-2 text-center text-[#EF4444]">{team.losses}</td>
-                  <td className="py-2 text-center text-[#9CA3AF]">
+                  <td className="py-2 text-center text-alert">{team.losses}</td>
+                  <td className="py-2 text-center text-muted-light">
                     {(team.goal_diff || 0) > 0 ? `+${team.goal_diff}` : team.goal_diff}
                   </td>
                   <td className="py-2 text-center font-bold text-white">{team.points}</td>
@@ -135,7 +135,7 @@ export default function FotmobStandings({
                       <td className="py-2 text-center text-[#FBBF24] font-mono text-xs">
                         {team.xg_for ? Number(team.xg_for).toFixed(1) : '-'}
                       </td>
-                      <td className="py-2 text-center text-[#EF4444] font-mono text-xs">
+                      <td className="py-2 text-center text-alert font-mono text-xs">
                         {team.xg_against ? Number(team.xg_against).toFixed(1) : '-'}
                       </td>
                     </>

@@ -8,7 +8,7 @@ export default function FootballPresetCompactStats() {
     <div className="w-full h-full grid grid-cols-3 gap-4 p-4 overflow-hidden">
       {/* Col 1: Live Only */}
       <div className="overflow-y-auto space-y-3">
-        <h3 className="text-sm font-bold text-[#10B981] uppercase tracking-wider">
+        <h3 className="text-sm font-bold text-success uppercase tracking-wider">
           🔴 Live
         </h3>
         <FotmobLiveMatches filterLive={true} maxLeagues={5} />
