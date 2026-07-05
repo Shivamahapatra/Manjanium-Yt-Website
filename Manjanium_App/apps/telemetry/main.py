@@ -60,6 +60,10 @@ async def get_worldcup_teams() -> dict:
     except Exception as e:
         print(f"Could not load worldcup teams: {e}")
     
+    # Set a loaded flag so we don't retry endlessly if the API is down
+    if not _team_name_cache:
+        _team_name_cache["_loaded"] = True
+        
     return _team_name_cache
 
 # Configure FastF1 cache
@@ -359,6 +363,7 @@ async def get_matches_by_date(date_str: str = Query(default=None)):
             league_name = league_el.get("name", "")
             country = league_el.get("ccode", "")
 
+            teams_cache = await get_worldcup_teams()
             matches = []
             for match_el in league_el.findall("match"):
                 match_id = match_el.get("id", "")
@@ -374,7 +379,6 @@ async def get_matches_by_date(date_str: str = Query(default=None)):
                 utc_time = ""
                 if raw_time:
                     try:
-                        from datetime import datetime
                         dt = datetime.strptime(raw_time, "%d.%m.%Y %H:%M")
                         utc_time = dt.isoformat() + "Z"
                     except ValueError:
@@ -398,9 +402,13 @@ async def get_matches_by_date(date_str: str = Query(default=None)):
                 away_id = match_el.get("aId", "")
 
                 # Resolve names
-                teams_cache = await get_worldcup_teams()
-                home_info = teams_cache.get(home_id, {"name": h_team or "TBD", "flag": ""})
-                away_info = teams_cache.get(away_id, {"name": a_team or "TBD", "flag": ""})
+                home_info = teams_cache.get(home_id)
+                if not home_info:
+                    home_info = await resolve_team_name(h_team, None)
+                    
+                away_info = teams_cache.get(away_id)
+                if not away_info:
+                    away_info = await resolve_team_name(a_team, None)
 
                 matches.append({
                     "match_id": match_id,
