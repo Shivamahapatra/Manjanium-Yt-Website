@@ -48,3 +48,4 @@ Manjanium_App/apps/*/.next/
 Manjanium_App/packages/*/node_modules/
 /LLMWiki/.obsidian/
 .turbo/
+.gemini/
