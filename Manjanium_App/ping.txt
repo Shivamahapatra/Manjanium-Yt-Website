@@ -49,3 +49,18 @@ Context:
 - Response format is XML (old API format) not JSON
 - Basic match data works (IDs, scores, leagues)
 - Match details format TBD (need to inspect XML structure)
+
+--- Update: Data Quality Fixes v2 (2026-07-10) ---
+Changes:
+- F1LiveTab: Fixed !session check (now checks session_key not object truthy)
+- F1LiveTab: applyPayload now sets session=null when session_key is missing
+- Football: Added /api/football/combined-matches endpoint
+  → worldcup26.ir as primary source for World Cup 2026
+  → FotMob for club leagues only
+  → Placeholder codes ("1E/3ABCDF") filtered out from FotMob
+- Updated Next.js proxy to use combined-matches endpoint
+Context:
+- F1 "No Active Session" now correctly shows between race weekends
+- World Cup matches show real team names from worldcup26.ir
+- Club league matches (PL, La Liga etc) from FotMob
+- FotMob team logos used for club matches
