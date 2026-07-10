@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Navbar } from '@/components/layout/Navbar'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { HeroSection } from '@/components/home/HeroSection'
+import BlackHole from '@/components/ui/blackhole'
 import { SectionTitle } from '@/components/home/SectionTitle'
 import { DashboardGrid } from '@/components/home/DashboardGrid'
 import { TimingTowerCard } from '@/components/home/TimingTowerCard'
@@ -30,6 +31,11 @@ export default function HomePage() {
         <main className="flex-1 lg:ml-20">
           {/* Hero Section */}
           <HeroSection />
+
+          {/* Black Hole Animation */}
+          <div className="w-full h-[600px] mb-20">
+            <BlackHole />
+          </div>
 
           {/* F1 Dashboard Section */}
           <motion.section
