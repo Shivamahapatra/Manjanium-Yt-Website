@@ -330,3 +330,22 @@ Changes made:
 Context:
 - `origin/main` is up to date with commit `04944f2`.
 - Next Vercel deployment or manual redeploy will succeed.
+
+--- Update: Interactive SVG Half-Pitch Shotmap Integration (2026-09-19T16:18:00+05:30) ---
+Changes made:
+- Created `apps/hub/src/components/football/ShotmapPitch.tsx`:
+  - Implemented exact 105m × 68m attacking half-pitch SVG with `viewBox="0 0 68 52.5"` preserving metric proportions (penalty box, D-arc, six-yard box, goal frame, penalty spot).
+  - Configured spring-animated `<motion.circle>` nodes with radius proportional to xG and outcome colors mapped to Stitch Design System tokens.
+  - Built glassmorphic telemetry HUD overlay displaying live xG telemetry, player, minute, outcome, and assist on hover.
+  - Included defensive normalization handling both 0.0-1.0 and 0-100 coordinate systems.
+- Updated `apps/hub/src/app/football/page.tsx`:
+  - Integrated `ShotmapPitch` into the right-hand column match details inspector.
+  - Normalized fallback `SAMPLE_UNDERSTAT_SHOTS` to standard 0-1 float coordinates.
+  - Cleaned up redundant local type interfaces and unused state.
+- Updated `apps/telemetry/main.py`:
+  - Preserved raw 0.0-1.0 float normalized coordinates in `get_understat_match_shots` endpoint.
+- Created `LLMWiki/raw/session-2026-09-19-interactive-svg-shotmap.md`.
+Context:
+- `apps/hub` Next.js production build (`pnpm --filter hub build`) passed cleanly with 0 errors (all 25 static pages generated).
+- Pushed to GitHub `origin/main`.
+

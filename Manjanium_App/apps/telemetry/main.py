@@ -835,8 +835,8 @@ async def get_understat_match_shots(match_id: str = FastPath(...)):
     processed_shots = []
     for s in (home_shots_raw + away_shots_raw):
         try:
-            x_norm = float(s.get("X", 0)) * 100.0  # 0 to 100 percentage
-            y_norm = float(s.get("Y", 0)) * 100.0
+            x_norm = float(s.get("X", 0))  # 0.0 to 1.0 float normalized coordinate
+            y_norm = float(s.get("Y", 0))  # 0.0 to 1.0 float normalized coordinate
             xg_val = round(float(s.get("xG", 0)), 3)
             minute_val = int(s.get("minute", 0))
         except (ValueError, TypeError):
@@ -847,8 +847,8 @@ async def get_understat_match_shots(match_id: str = FastPath(...)):
             "id": s.get("id"),
             "minute": minute_val,
             "result": s.get("result"),  # Goal, SavedShot, MissedShots, BlockedShot, ShotOnPost
-            "x": round(x_norm, 2),
-            "y": round(y_norm, 2),
+            "x": round(x_norm, 4),
+            "y": round(y_norm, 4),
             "xG": xg_val,
             "player": s.get("player"),
             "team": "home" if is_home else "away",

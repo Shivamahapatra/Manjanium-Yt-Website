@@ -23,6 +23,7 @@ import {
   Layers,
   Sparkles,
 } from 'lucide-react'
+import ShotmapPitch, { UnderstatShot } from '@/components/football/ShotmapPitch'
 
 // ==============================================================================
 // TYPE DEFINITIONS
@@ -54,21 +55,6 @@ interface LeagueGroup {
   country?: string
   logo?: string
   matches: Match[]
-}
-
-interface UnderstatShot {
-  id: string
-  minute: number
-  result: string // Goal, SavedShot, MissedShots, BlockedShot, ShotOnPost
-  x: number // 0-100
-  y: number // 0-100
-  xG: number
-  player: string
-  team: 'home' | 'away'
-  team_name?: string
-  shot_type?: string
-  situation?: string
-  player_assisted?: string
 }
 
 interface UnderstatData {
@@ -133,14 +119,14 @@ const INITIAL_LA_LIGA_STANDINGS: StandingRow[] = [
 
 // Fallback Understat Shotmap Data
 const SAMPLE_UNDERSTAT_SHOTS: UnderstatShot[] = [
-  { id: 's1', minute: 14, result: 'SavedShot', x: 88.5, y: 48.2, xG: 0.14, player: 'Robert Lewandowski', team: 'home', shot_type: 'RightFoot', situation: 'OpenPlay' },
-  { id: 's2', minute: 23, result: 'Goal', x: 92.1, y: 51.4, xG: 0.48, player: 'Lamine Yamal', team: 'home', shot_type: 'LeftFoot', situation: 'OpenPlay', player_assisted: 'Raphinha' },
-  { id: 's3', minute: 31, result: 'MissedShots', x: 79.4, y: 64.0, xG: 0.04, player: 'Pedri', team: 'home', shot_type: 'RightFoot', situation: 'OpenPlay' },
-  { id: 's4', minute: 42, result: 'SavedShot', x: 86.0, y: 52.0, xG: 0.11, player: 'Vinícius Júnior', team: 'away', shot_type: 'RightFoot', situation: 'OpenPlay' },
-  { id: 's5', minute: 58, result: 'Goal', x: 94.0, y: 49.5, xG: 0.62, player: 'Robert Lewandowski', team: 'home', shot_type: 'Head', situation: 'FromCorner', player_assisted: 'Raphinha' },
-  { id: 's6', minute: 67, result: 'BlockedShot', x: 82.3, y: 43.1, xG: 0.07, player: 'Kylian Mbappé', team: 'away', shot_type: 'RightFoot', situation: 'OpenPlay' },
-  { id: 's7', minute: 75, result: 'Goal', x: 89.2, y: 53.8, xG: 0.28, player: 'Kylian Mbappé', team: 'away', shot_type: 'RightFoot', situation: 'OpenPlay', player_assisted: 'Jude Bellingham' },
-  { id: 's8', minute: 86, result: 'ShotOnPost', x: 87.0, y: 47.0, xG: 0.21, player: 'Dani Olmo', team: 'home', shot_type: 'RightFoot', situation: 'OpenPlay' },
+  { id: 's1', minute: 14, result: 'SavedShot', x: 0.885, y: 0.482, xG: 0.14, player: 'Robert Lewandowski', team: 'home', shot_type: 'RightFoot', situation: 'OpenPlay' },
+  { id: 's2', minute: 23, result: 'Goal', x: 0.921, y: 0.514, xG: 0.48, player: 'Lamine Yamal', team: 'home', shot_type: 'LeftFoot', situation: 'OpenPlay', player_assisted: 'Raphinha' },
+  { id: 's3', minute: 31, result: 'MissedShots', x: 0.794, y: 0.640, xG: 0.04, player: 'Pedri', team: 'home', shot_type: 'RightFoot', situation: 'OpenPlay' },
+  { id: 's4', minute: 42, result: 'SavedShot', x: 0.860, y: 0.520, xG: 0.11, player: 'Vinícius Júnior', team: 'away', shot_type: 'RightFoot', situation: 'OpenPlay' },
+  { id: 's5', minute: 58, result: 'Goal', x: 0.940, y: 0.495, xG: 0.62, player: 'Robert Lewandowski', team: 'home', shot_type: 'Head', situation: 'FromCorner', player_assisted: 'Raphinha' },
+  { id: 's6', minute: 67, result: 'BlockedShot', x: 0.823, y: 0.431, xG: 0.07, player: 'Kylian Mbappé', team: 'away', shot_type: 'RightFoot', situation: 'OpenPlay' },
+  { id: 's7', minute: 75, result: 'Goal', x: 0.892, y: 0.538, xG: 0.28, player: 'Kylian Mbappé', team: 'away', shot_type: 'RightFoot', situation: 'OpenPlay', player_assisted: 'Jude Bellingham' },
+  { id: 's8', minute: 86, result: 'ShotOnPost', x: 0.870, y: 0.470, xG: 0.21, player: 'Dani Olmo', team: 'home', shot_type: 'RightFoot', situation: 'OpenPlay' },
 ]
 
 export default function FootballHubPage() {
@@ -171,7 +157,6 @@ export default function FootballHubPage() {
 
   // Understat & Event state
   const [understatData, setUnderstatData] = useState<UnderstatData | null>(null)
-  const [hoveredShot, setHoveredShot] = useState<UnderstatShot | null>(null)
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([])
 
   // ============================================================================
@@ -1032,126 +1017,12 @@ export default function FootballHubPage() {
                   </div>
                 </div>
 
-                {/* SVG FOOTBALL PITCH SHOTMAP VISUALIZATION */}
-                <div className="relative rounded-xl bg-[#0d1f14] border border-emerald-950 p-2 shadow-inner overflow-hidden">
-                  <div className="text-[9px] font-mono text-emerald-500/80 mb-1 flex items-center justify-between">
-                    <span>ATTACKING DIRECTION ➔</span>
-                    <span>105m × 68m</span>
-                  </div>
-
-                  <svg
-                    viewBox="0 0 100 68"
-                    className="w-full h-auto aspect-[100/68] stroke-emerald-600/40 fill-none"
-                    style={{ strokeWidth: 0.8 }}
-                  >
-                    {/* Pitch Boundary */}
-                    <rect x="0" y="0" width="100" height="68" fill="#0b1a11" />
-                    <rect x="2" y="2" width="96" height="64" />
-
-                    {/* Halfway Line & Center Circle */}
-                    <line x1="50" y1="2" x2="50" y2="66" />
-                    <circle cx="50" cy="34" r="9.15" />
-                    <circle cx="50" cy="34" r="0.8" fill="currentColor" />
-
-                    {/* Left Penalty Area (Home Defense / Away Attack) */}
-                    <rect x="2" y="14" width="16.5" height="40" />
-                    <rect x="2" y="24.5" width="5.5" height="19" />
-                    <path d="M 18.5 27.5 A 9.15 9.15 0 0 1 18.5 40.5" />
-
-                    {/* Right Penalty Area (Home Attack / Away Defense) */}
-                    <rect x="81.5" y="14" width="16.5" height="40" />
-                    <rect x="92.5" y="24.5" width="5.5" height="19" />
-                    <path d="M 81.5 27.5 A 9.15 9.15 0 0 0 81.5 40.5" />
-
-                    {/* Render Interactive Shots from Understat */}
-                    {(understatData?.shots || SAMPLE_UNDERSTAT_SHOTS).map((shot) => {
-                      // Map coordinates to SVG pitch
-                      const cx = shot.x
-                      const cy = (shot.y / 100) * 68
-                      const radius = Math.max(1.5, Math.min(4.5, shot.xG * 6 + 1.2))
-
-                      const isGoal = shot.result === 'Goal'
-                      const isSaved = shot.result === 'SavedShot'
-                      const isMissed = shot.result === 'MissedShots' || shot.result === 'ShotOnPost'
-
-                      const fillColor = isGoal
-                        ? '#10b981' // emerald
-                        : isSaved
-                        ? '#38bdf8' // sky
-                        : isMissed
-                        ? '#f43f5e' // rose
-                        : '#94a3b8' // slate for blocked
-
-                      return (
-                        <g
-                          key={shot.id}
-                          className="cursor-pointer transition-transform hover:scale-125"
-                          onMouseEnter={() => setHoveredShot(shot)}
-                          onMouseLeave={() => setHoveredShot(null)}
-                        >
-                          <circle
-                            cx={cx}
-                            cy={cy}
-                            r={radius}
-                            fill={fillColor}
-                            stroke="#000"
-                            strokeWidth="0.5"
-                            className="opacity-90 hover:opacity-100"
-                          />
-                          {isGoal && (
-                            <circle
-                              cx={cx}
-                              cy={cy}
-                              r={radius + 1.2}
-                              stroke="#10b981"
-                              strokeWidth="0.6"
-                              strokeDasharray="1,1"
-                              className="animate-pulse"
-                            />
-                          )}
-                        </g>
-                      )
-                    })}
-                  </svg>
-
-                  {/* Tooltip on Hover */}
-                  {hoveredShot && (
-                    <div className="mt-2 p-2 rounded-lg bg-zinc-950/90 border border-zinc-800 text-[11px] font-mono">
-                      <div className="font-bold text-zinc-100 flex items-center justify-between">
-                        <span>{hoveredShot.player}</span>
-                        <span
-                          className={
-                            hoveredShot.result === 'Goal'
-                              ? 'text-emerald-400'
-                              : 'text-zinc-400'
-                          }
-                        >
-                          {hoveredShot.result}
-                        </span>
-                      </div>
-                      <div className="text-zinc-400 text-[10px] mt-0.5">
-                        Minute: {hoveredShot.minute}&apos; • xG: {hoveredShot.xG} •{' '}
-                        {hoveredShot.shot_type || 'Shot'}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Shot Legend */}
-                  <div className="flex items-center justify-between pt-2 text-[9px] font-mono text-zinc-400">
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500" /> Goal
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-sky-400" /> Saved
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-rose-500" /> Missed
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-slate-400" /> Blocked
-                    </span>
-                  </div>
-                </div>
+                {/* INTERACTIVE SVG ATTACKING HALF-PITCH SHOTMAP (105m x 68m, 1:1 METRIC PROPORTIONS) */}
+                <ShotmapPitch
+                  shots={understatData?.shots || SAMPLE_UNDERSTAT_SHOTS}
+                  homeTeam={selectedMatch?.home_team}
+                  awayTeam={selectedMatch?.away_team}
+                />
 
                 {/* xG Momentum Summary Timeline */}
                 <div className="p-3 rounded-xl bg-zinc-950/50 border border-zinc-800/70">
