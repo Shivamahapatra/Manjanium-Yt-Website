@@ -886,7 +886,19 @@ export default function FootballHubPage() {
             ) : filteredLeagueGroups.length === 0 ? (
               <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800 p-8 text-center text-zinc-500">
                 <p className="text-sm font-medium text-zinc-400">No matches found</p>
-                <p className="text-xs text-zinc-500 mt-1">Try changing the date or clearing filters</p>
+                <p className="text-xs text-zinc-500 mt-1">
+                  No fixtures match your current filter ({statusFilter.toUpperCase()})
+                </p>
+                <button
+                  onClick={() => {
+                    setStatusFilter('all')
+                    setActiveLeagueFilter(null)
+                    setSearchQuery('')
+                  }}
+                  className="mt-3 px-3 py-1.5 text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/20 transition-colors inline-block"
+                >
+                  Reset Filters & View All
+                </button>
               </div>
             ) : (
               filteredLeagueGroups.map((group) => {

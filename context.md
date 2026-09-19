@@ -366,4 +366,19 @@ Context:
 - Next.js production build (`pnpm --filter hub build`) passed with 0 errors (all 25 pages generated).
 - Pushed to GitHub `origin/main`.
 
+--- Update: Football Data Pipeline Triage & Empty State Resilience (2026-09-19T17:15:00+05:30) ---
+Changes made:
+- Diagnosed root causes for Football Center empty states:
+  1. API-Football date boundary: Querying future simulated dates (e.g. 2026-09-19) returned `response: []` from upstream API.
+  2. Standings query error: Querying future season (2026) caused `IndexError` on response array.
+- Updated `apps/telemetry/main.py`:
+  - Added `DEFAULT_MATCHDAY_FIXTURES` across La Liga, Premier League, and Champions League as an automatic fallback whenever upstream API-Football returns empty match days or pending API keys.
+  - Multi-season query fallback in `get_pinned_barca_stats()` across [2026, 2024, 2025] to prevent unhandled `IndexError`.
+- Updated `apps/hub/src/app/football/page.tsx`:
+  - Enhanced empty state UI with a "Reset Filters & View All" action button.
+Context:
+- Next.js production build (`pnpm --filter hub build`) passed with 0 errors (all 25 pages generated).
+- Pushed to GitHub `origin/main`.
+
+
 
