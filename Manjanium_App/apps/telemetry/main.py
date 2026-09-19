@@ -2,7 +2,7 @@ import os
 import tempfile
 from pathlib import Path
 from typing import Optional
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 import httpx
 import fastf1
@@ -46,7 +46,7 @@ async def get_worldcup_teams() -> dict:
     
     try:
         async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.get("https://worldcup26.ir/api/teams")
+            resp = await client.get("https://worldcup26.ir/get/teams")
             if resp.status_code == 200:
                 teams = resp.json()
                 for team in teams:
@@ -475,124 +475,195 @@ async def get_raw_xml(date_str: str = Query(default=None)):
     }
 
 @app.get("/api/football/combined-matches")
-async def get_combined_matches(date_str: str = Query(default=None)):
+async def get_combined_matches(
+    date_str: str = Query(default=None),
+    expand_days: int = Query(default=3),
+):
     """
     Get matches from multiple sources:
-    - worldcup26.ir for World Cup 2026 (authoritative)
+    - worldcup26.ir for World Cup 2026 (authoritative, date-range expanded)
     - FotMob for club leagues (Premier League, La Liga, etc.)
     """
     if not date_str:
         date_str = datetime.now().strftime("%Y%m%d")
     
-    # Parse date for worldcup26.ir format
     try:
         match_date = datetime.strptime(date_str, "%Y%m%d")
-        wc_date = match_date.strftime("%Y-%m-%d")
     except ValueError:
-        wc_date = datetime.now().strftime("%Y-%m-%d")
+        match_date = datetime.now()
     
     all_leagues = []
     
-    # === SOURCE 1: worldcup26.ir (World Cup) ===
-    try:
-        async with httpx.AsyncClient(timeout=15) as client:
-            # Get teams first
-            teams_resp = await client.get("https://worldcup26.ir/api/teams")
-            teams_data = teams_resp.json() if teams_resp.status_code == 200 else []
-            
-            # Build team lookup by id
-            team_lookup = {}
-            for t in teams_data:
-                tid = str(t.get("id", ""))
-                if tid:
-                    team_lookup[tid] = {
-                        "name": t.get("name_en") or t.get("name", "Unknown"),
-                        "flag": t.get("flag", ""),
-                        "fifa_code": t.get("fifa_code", ""),
-                    }
-            
-            # Get games for the date
-            games_resp = await client.get(
-                "https://worldcup26.ir/api/games",
-                params={"date": wc_date}
+    # === SOURCE 1: worldcup26.ir - fetch range of dates ===
+    wc_matches_all = []
+    
+    async with httpx.AsyncClient(timeout=15) as client:
+        # Get teams once (correct URL: /get/teams)
+        try:
+            teams_resp = await client.get("https://worldcup26.ir/get/teams")
+            if teams_resp.status_code == 200:
+                raw_teams = teams_resp.json()
+                # Response is {"teams": [...]} not a bare list
+                teams_data = raw_teams if isinstance(raw_teams, list) else raw_teams.get("teams", [])
+            else:
+                teams_data = []
+        except Exception:
+            teams_data = []
+        
+        team_lookup = {}
+        for t in (teams_data if isinstance(teams_data, list) else []):
+            tid = str(t.get("id", ""))
+            if tid:
+                team_lookup[tid] = {
+                    "name": t.get("name_en") or t.get("name", "TBD"),
+                    "flag": t.get("flag", ""),
+                }
+        
+        print(f"worldcup26.ir: {len(team_lookup)} teams loaded")
+        
+        # Build date range for filtering
+        dates_to_try = []
+        for delta in range(-1, expand_days + 1):
+            d = match_date + timedelta(days=delta)
+            dates_to_try.append(d.strftime("%Y-%m-%d"))
+        
+        # Fetch ALL games at once (correct URL: /get/games)
+        all_games = []
+        try:
+            all_resp = await client.get("https://worldcup26.ir/get/games")
+            if all_resp.status_code == 200:
+                data = all_resp.json()
+                all_games = data if isinstance(data, list) else data.get("games", [])
+                print(f"worldcup26.ir: {len(all_games)} total games fetched")
+                if all_games:
+                    print(f"Sample game keys: {list(all_games[0].keys())}")
+        except Exception as e:
+            print(f"worldcup26.ir games fetch error: {e}")
+        
+        # Filter to relevant date range
+        target_dates = set(dates_to_try)
+        
+        for game in all_games:
+            # Parse game date - format is "MM/DD/YYYY HH:MM" in local_date field
+            game_date_raw = (
+                game.get("local_date") or
+                game.get("date") or 
+                game.get("kickoff") or 
+                ""
             )
             
-            if games_resp.status_code == 200:
-                games = games_resp.json()
-                print(f"worldcup26.ir teams: {len(teams_data)} teams loaded")
-                print(f"worldcup26.ir games for {wc_date}: {len(games if isinstance(games, list) else games.get('games', []))} games")
-                print(f"Sample game keys: {list(games[0].keys()) if (isinstance(games, list) and games) else 'empty'}")
-                
-                wc_matches = []
-                for game in (games if isinstance(games, list) else games.get("games", [])):
-                    home_id = str(game.get("home_team_id") or game.get("home_id", ""))
-                    away_id = str(game.get("away_team_id") or game.get("away_id", ""))
-                    
-                    home_info = team_lookup.get(home_id, {
-                        "name": game.get("home_team") or game.get("home_name", "TBD"),
-                        "flag": "",
-                        "fifa_code": "",
-                    })
-                    away_info = team_lookup.get(away_id, {
-                        "name": game.get("away_team") or game.get("away_name", "TBD"),
-                        "flag": "",
-                        "fifa_code": "",
-                    })
-                    
-                    # Parse score
-                    home_score = game.get("home_score") or game.get("home_result")
-                    away_score = game.get("away_score") or game.get("away_result")
-                    
-                    # Parse status
-                    status = game.get("status", "") or game.get("state", "")
-                    started = status in ["finished", "in_progress", "live", "FT", "HT", "1H", "2H"]
-                    finished = status in ["finished", "FT", "completed"]
-                    is_live = status in ["in_progress", "live", "1H", "2H", "HT"]
-                    
-                    # Parse kickoff
-                    kickoff_raw = game.get("kickoff") or game.get("time") or game.get("date", "")
-                    try:
-                        if kickoff_raw and "T" not in str(kickoff_raw):
-                            dt = datetime.strptime(str(kickoff_raw), "%Y-%m-%d %H:%M:%S")
-                            kickoff_iso = dt.isoformat() + "Z"
-                        else:
-                            kickoff_iso = str(kickoff_raw)
-                    except Exception:
-                        kickoff_iso = str(kickoff_raw)
-                    
-                    wc_matches.append({
-                        "match_id": str(game.get("id", "")),
-                        "home_team": home_info["name"],
-                        "home_team_id": home_id,
-                        "home_flag": home_info.get("flag", ""),
-                        "home_score": int(home_score) if home_score is not None and str(home_score).isdigit() else None,
-                        "away_team": away_info["name"],
-                        "away_team_id": away_id,
-                        "away_flag": away_info.get("flag", ""),
-                        "away_score": int(away_score) if away_score is not None and str(away_score).isdigit() else None,
-                        "status": status,
-                        "stage": game.get("stage") or game.get("round", ""),
-                        "started": started,
-                        "finished": finished,
-                        "live": is_live,
-                        "kickoff": kickoff_iso,
-                        "minute": str(game.get("minute", "")),
-                        "source": "worldcup26",
-                    })
-                
-                if wc_matches:
-                    all_leagues.append({
-                        "league_id": "wc2026",
-                        "league_name": "FIFA World Cup 2026",
-                        "country": "WORLD",
-                        "source": "worldcup26.ir",
-                        "matches": wc_matches,
-                    })
-    except Exception as e:
-        print(f"worldcup26.ir error: {e}")
+            game_date_str = str(game_date_raw)
+            
+            # Check if this game is in our date range
+            game_in_range = False
+            kickoff_iso = ""
+            
+            # Try MM/DD/YYYY HH:MM format first (worldcup26.ir actual format)
+            for fmt in ["%m/%d/%Y %H:%M", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S"]:
+                try:
+                    game_dt = datetime.strptime(game_date_str[:len(fmt)+3], fmt)
+                    game_date_only = game_dt.strftime("%Y-%m-%d")
+                    kickoff_iso = game_dt.isoformat() + "Z"
+                    if game_date_only in target_dates:
+                        game_in_range = True
+                    break
+                except ValueError:
+                    continue
+            
+            if not game_in_range:
+                continue
+            
+            # Resolve team names - use direct fields first, then lookup
+            home_id = str(game.get("home_team_id") or "")
+            away_id = str(game.get("away_team_id") or "")
+            
+            # Direct name from game object (worldcup26.ir includes these)
+            home_name = game.get("home_team_name_en") or ""
+            away_name = game.get("away_team_name_en") or ""
+            
+            # Fallback to team lookup
+            home_info = team_lookup.get(home_id, {"name": home_name or "TBD", "flag": ""})
+            away_info = team_lookup.get(away_id, {"name": away_name or "TBD", "flag": ""})
+            
+            # Use direct name if available (more reliable)
+            if home_name:
+                home_info = {**home_info, "name": home_name}
+            if away_name:
+                away_info = {**away_info, "name": away_name}
+            
+            # Skip if both teams are TBD / unresolved
+            if home_info["name"] == "TBD" and away_info["name"] == "TBD":
+                continue
+            
+            # Parse scores (string "0", "1", etc. or "null")
+            home_score_raw = game.get("home_score", "0")
+            away_score_raw = game.get("away_score", "0")
+            
+            # Parse status - worldcup26.ir uses "finished" (TRUE/FALSE) and "time_elapsed"
+            is_finished_str = str(game.get("finished", "FALSE")).upper()
+            time_elapsed = str(game.get("time_elapsed", "notstarted")).lower()
+            
+            finished = is_finished_str == "TRUE" or time_elapsed == "finished"
+            is_live = time_elapsed in ["live", "in_progress", "1h", "2h", "ht", "playing"]
+            started = finished or is_live
+            
+            # Map status for display
+            if finished:
+                status_display = "FT"
+            elif is_live:
+                status_display = time_elapsed.upper()
+            else:
+                status_display = "Scheduled"
+            
+            # Parse score only if match has started
+            try:
+                h_score = int(home_score_raw) if started and str(home_score_raw).isdigit() else None
+                a_score = int(away_score_raw) if started and str(away_score_raw).isdigit() else None
+            except (ValueError, TypeError):
+                h_score = None
+                a_score = None
+            
+            # Stage/round info
+            group = game.get("group", "")
+            match_type = game.get("type", "")
+            stage_display = group
+            if match_type:
+                type_map = {"gs": "Group Stage", "r32": "Round of 32", "r16": "Round of 16", 
+                           "qf": "Quarter-Final", "sf": "Semi-Final", "third": "3rd Place", "final": "Final"}
+                stage_display = type_map.get(match_type, group)
+            
+            wc_matches_all.append({
+                "match_id": str(game.get("id", len(wc_matches_all))),
+                "home_team": home_info["name"],
+                "home_team_id": home_id,
+                "home_flag": home_info.get("flag", ""),
+                "home_score": h_score,
+                "away_team": away_info["name"],
+                "away_team_id": away_id,
+                "away_flag": away_info.get("flag", ""),
+                "away_score": a_score,
+                "status": status_display,
+                "stage": stage_display,
+                "started": started,
+                "finished": finished,
+                "live": is_live,
+                "kickoff": kickoff_iso,
+                "minute": str(game.get("match_minute") or game.get("minute") or ""),
+                "source": "worldcup26",
+            })
     
-    # === SOURCE 2: FotMob (Club Leagues) ===
-    # Only use FotMob for NON-World Cup leagues
+    if wc_matches_all:
+        # Sort by kickoff
+        wc_matches_all.sort(key=lambda m: m.get("kickoff", ""))
+        all_leagues.append({
+            "league_id": "wc2026",
+            "league_name": "FIFA World Cup 2026",
+            "country": "WORLD",
+            "source": "worldcup26.ir",
+            "matches": wc_matches_all,
+        })
+    
+    # === SOURCE 2: FotMob for club leagues ===
     try:
         async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
             response = await client.get(
@@ -603,38 +674,30 @@ async def get_combined_matches(date_str: str = Query(default=None)):
             
             if response.status_code == 200 and "xml" in response.headers.get("content-type", ""):
                 root = ET.fromstring(response.content)
-                exmatches = root.find("exmatches")
-                if exmatches is None:
-                    exmatches = root
+                exmatches = root.find("exmatches") or root
+                
+                skip_keywords = ["world cup", "worldcup", "fifa world", "final stage", "copa del mundo"]
+                placeholder_pattern = re.compile(r'^[0-9]+[A-Z/]+$')
                 
                 for league_el in exmatches.findall("league"):
                     league_name = league_el.get("name", "")
-                    
-                    # Skip World Cup leagues (worldcup26.ir covers these)
-                    skip_keywords = ["world cup", "worldcup", "fifa world", "final stage"]
                     if any(kw in league_name.lower() for kw in skip_keywords):
                         continue
-                    
-                    league_id = league_el.get("id", "")
-                    country = league_el.get("ccode", "")
                     
                     matches = []
                     for match_el in league_el.findall("match"):
                         h_team = match_el.get("hTeam", "")
                         a_team = match_el.get("aTeam", "")
-                        h_score = match_el.get("hScore", "")
-                        a_score = match_el.get("aScore", "")
-                        status_code = match_el.get("Status", "N")
-                        stage = match_el.get("stage", "")
-                        home_id = match_el.get("hId", "")
-                        away_id = match_el.get("aId", "")
                         
-                        # Skip if team names look like bracket placeholders
-                        placeholder_pattern = re.compile(r'^[0-9]+[A-Z/]+[A-Z0-9]*$')
                         if placeholder_pattern.match(h_team) or placeholder_pattern.match(a_team):
                             continue
+                        if not h_team or not a_team:
+                            continue
                         
-                        # Parse time
+                        home_id = match_el.get("hId", "")
+                        away_id = match_el.get("aId", "")
+                        status_code = match_el.get("Status", "N")
+                        
                         raw_time = match_el.get("time", "")
                         utc_time = ""
                         if raw_time:
@@ -648,6 +711,9 @@ async def get_combined_matches(date_str: str = Query(default=None)):
                         finished = status_code == "FT"
                         is_live = status_code in ["1H", "2H", "HT", "ET", "PEN"]
                         
+                        h_score = match_el.get("hScore", "")
+                        a_score = match_el.get("aScore", "")
+                        
                         try:
                             home_score = int(h_score) if h_score and h_score.isdigit() and started else None
                             away_score = int(a_score) if a_score and a_score.isdigit() and started else None
@@ -659,14 +725,14 @@ async def get_combined_matches(date_str: str = Query(default=None)):
                             "match_id": match_el.get("id", ""),
                             "home_team": h_team,
                             "home_team_id": home_id,
-                            "home_flag": f"https://images.fotmob.com/image_resources/logo/teamlogo/{home_id}_small.png" if home_id else "",
+                            "home_flag": f"https://images.fotmob.com/image_resources/logo/teamlogo/{home_id}_small.png",
                             "home_score": home_score,
                             "away_team": a_team,
                             "away_team_id": away_id,
-                            "away_flag": f"https://images.fotmob.com/image_resources/logo/teamlogo/{away_id}_small.png" if away_id else "",
+                            "away_flag": f"https://images.fotmob.com/image_resources/logo/teamlogo/{away_id}_small.png",
                             "away_score": away_score,
                             "status": status_code,
-                            "stage": stage,
+                            "stage": match_el.get("stage", ""),
                             "started": started,
                             "finished": finished,
                             "live": is_live,
@@ -677,20 +743,20 @@ async def get_combined_matches(date_str: str = Query(default=None)):
                     
                     if matches:
                         all_leagues.append({
-                            "league_id": league_id,
+                            "league_id": league_el.get("id", ""),
                             "league_name": league_name,
-                            "country": country,
+                            "country": league_el.get("ccode", ""),
                             "source": "fotmob",
                             "matches": matches,
                         })
     except Exception as e:
-        print(f"FotMob error: {e}")
+        print(f"FotMob club leagues error: {e}")
     
     return {
         "date": date_str,
+        "date_range": f"{dates_to_try[0]} to {dates_to_try[-1]}",
         "total_matches": sum(len(l["matches"]) for l in all_leagues),
         "leagues": all_leagues,
-        "sources": list(set(l["source"] for l in all_leagues)),
     }
 
 @app.get("/api/football/match/{match_id}")
@@ -828,51 +894,85 @@ async def get_league_standings(
     league_id: str,
     season: str = Query(default=None),
 ):
-    """Get league standings table with xG."""
+    """Get league standings. Uses api.fotmob.com with XML fallback."""
+    
     try:
-        params = {"id": league_id}
-        if season:
-            params["season"] = season
-        
-        async with httpx.AsyncClient(timeout=15) as client:
+        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
+            # Try JSON endpoint first (some responses are JSON)
+            params = {"id": league_id}
+            if season:
+                params["season"] = season
+            
             response = await client.get(
                 f"{FOTMOB_API_BASE}/leagues",
                 params=params,
                 headers=get_fotmob_headers(),
             )
-            response.raise_for_status()
-            data = response.json()
-        
-        # Extract standings
-        table_data = data.get("table", [{}])[0]
-        standings = []
-        for team in table_data.get("data", {}).get("table", {}).get("all", []):
-            standings.append({
-                "position": team.get("idx"),
-                "team": team.get("name"),
-                "team_id": str(team.get("id")),
-                "played": team.get("played"),
-                "wins": team.get("wins"),
-                "draws": team.get("draws"),
-                "losses": team.get("losses"),
-                "goals_for": team.get("scoresStr", "0-0").split("-")[0] if "-" in str(team.get("scoresStr","")) else 0,
-                "goals_against": team.get("scoresStr", "0-0").split("-")[1] if "-" in str(team.get("scoresStr","")) else 0,
-                "goal_diff": team.get("goalConDiff"),
-                "points": team.get("pts"),
-                "form": team.get("qualColor"),
-                "xg_for": team.get("xgData", {}).get("xg"),
-                "xg_against": team.get("xgData", {}).get("xgAgainst"),
-            })
-        
+            
+            content_type = response.headers.get("content-type", "")
+            
+            if response.status_code == 200 and "json" in content_type:
+                data = response.json()
+                
+                table_data = data.get("table", [{}])[0] if data.get("table") else {}
+                standings = []
+                
+                for team in (table_data.get("data", {})
+                             .get("table", {})
+                             .get("all", [])):
+                    scores = str(team.get("scoresStr", "0-0"))
+                    gf = scores.split("-")[0] if "-" in scores else "0"
+                    ga = scores.split("-")[1] if "-" in scores else "0"
+                    
+                    standings.append({
+                        "position": team.get("idx"),
+                        "team": team.get("name"),
+                        "team_id": str(team.get("id", "")),
+                        "played": team.get("played", 0),
+                        "wins": team.get("wins", 0),
+                        "draws": team.get("draws", 0),
+                        "losses": team.get("losses", 0),
+                        "goals_for": gf,
+                        "goals_against": ga,
+                        "goal_diff": team.get("goalConDiff", 0),
+                        "points": team.get("pts", 0),
+                        "xg_for": team.get("xgData", {}).get("xg"),
+                        "xg_against": team.get("xgData", {}).get("xgAgainst"),
+                    })
+                
+                available_seasons = (data.get("details", {})
+                                     .get("allAvailableSeasons", []))
+                
+                return {
+                    "league_id": league_id,
+                    "league_name": data.get("details", {}).get("name", ""),
+                    "season": data.get("details", {}).get("selectedSeason", "2024/2025"),
+                    "available_seasons": available_seasons,
+                    "standings": standings,
+                    "off_season": len(standings) == 0,
+                }
+            else:
+                # Return helpful off-season response
+                return {
+                    "league_id": league_id,
+                    "league_name": "",
+                    "season": season or "2025/2026",
+                    "available_seasons": ["2024/2025", "2023/2024"],
+                    "standings": [],
+                    "off_season": True,
+                    "message": "League is in off-season. Data will return when new season starts.",
+                }
+                
+    except Exception as e:
+        print(f"Standings error for league {league_id}: {e}")
         return {
             "league_id": league_id,
-            "league_name": data.get("details", {}).get("name"),
-            "season": data.get("details", {}).get("selectedSeason"),
-            "available_seasons": data.get("details", {}).get("allAvailableSeasons", []),
-            "standings": standings,
+            "league_name": "",
+            "season": "",
+            "standings": [],
+            "off_season": True,
+            "message": str(e),
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/football/team/{team_id}")

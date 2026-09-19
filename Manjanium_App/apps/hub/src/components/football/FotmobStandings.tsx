@@ -30,6 +30,11 @@ export default function FotmobStandings({
         const data = await res.json()
         setStandings(data.standings || [])
         setMeta(data)
+
+        // Handle off-season
+        if (data.off_season || data.standings?.length === 0) {
+          setError(data.message || 'League is currently in off-season (July). Season data returns in August.')
+        }
       } catch {
         setError('Failed to load standings')
       } finally {
@@ -75,10 +80,14 @@ export default function FotmobStandings({
       )}
 
       {error && (
-        <div className="text-alert text-sm text-center py-4">{error}</div>
+        <div className="text-center py-6 space-y-2">
+          <div className="text-3xl">🌴</div>
+          <div className="text-[#FBBF24] font-bold text-sm">Off-Season</div>
+          <p className="text-[#6B7280] text-xs max-w-xs mx-auto">{error}</p>
+        </div>
       )}
 
-      {!loading && standings.length === 0 && (
+      {!loading && !error && standings.length === 0 && (
         <div className="text-center py-8 space-y-2">
           <div className="text-[#6B7280]">No standings available</div>
           <div className="text-xs text-[#333333]">

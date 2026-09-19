@@ -64,3 +64,17 @@ Context:
 - World Cup matches show real team names from worldcup26.ir
 - Club league matches (PL, La Liga etc) from FotMob
 - FotMob team logos used for club matches
+
+--- Update: Football Data Fixes v3 (2026-07-11) ---
+Changes:
+- combined-matches: fetches worldcup26.ir full game list (not date-filtered)
+- World Cup matches shown across ±3 day range
+- Added expand_days parameter for flexible date range
+- Standings: handles off-season gracefully (🌴 Off-Season message)
+- FotmobLiveMatches: passes expand=3 to API for WC coverage
+- Standings empty state replaced with friendly off-season notice
+Context:
+- July = off-season for club leagues, World Cup ongoing
+- worldcup26.ir fetches all games then filters by date range
+- Debug prints in Python backend show game counts and keys
+- Frontend shows matches even if ±3 days from today

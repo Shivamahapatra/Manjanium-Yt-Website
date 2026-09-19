@@ -21,13 +21,25 @@ export default function FotmobLiveMatches({
 
   const fetchMatches = useCallback(async () => {
     try {
-      const dateStr = date ||
-        new Date().toISOString().slice(0, 10).replace(/-/g, '')
+      const localDate = new Date()
+      const dateStr = date || [
+        localDate.getFullYear(),
+        String(localDate.getMonth() + 1).padStart(2, '0'),
+        String(localDate.getDate()).padStart(2, '0'),
+      ].join('')
+
+      // Request with 3-day expansion for World Cup
       const res = await fetch(
-        `/api/football/fotmob/matches?date=${dateStr}`,
+        `/api/football/fotmob/matches?date=${dateStr}&expand=3`,
         { cache: 'no-store' }
       )
+      
       const data = await res.json()
+      
+      if (data.error) {
+        setError(data.error)
+        return
+      }
 
       let leagueData = data.leagues || []
 
@@ -35,7 +47,7 @@ export default function FotmobLiveMatches({
         leagueData = leagueData
           .map((league: any) => ({
             ...league,
-            matches: league.matches.filter((m: any) => m.live || m.started),
+            matches: league.matches.filter((m: any) => m.live),
           }))
           .filter((league: any) => league.matches.length > 0)
       }
@@ -43,7 +55,7 @@ export default function FotmobLiveMatches({
       setLeagues(leagueData.slice(0, maxLeagues))
       setLastUpdated(new Date())
       setError(null)
-    } catch {
+    } catch (err) {
       setError('Failed to fetch matches')
     } finally {
       setLoading(false)
