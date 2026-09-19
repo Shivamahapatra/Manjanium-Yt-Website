@@ -159,6 +159,16 @@ export function sortPlayersByGoals(players: Player[]): Player[] {
   return [...players].sort((a, b) => b.goals - a.goals);
 }
 
+/**
+ * Converts a JavaScript Date object into a timezone-aware YYYYMMDD string for FotMob API requests.
+ */
+export function formatFotmobDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}${month}${day}`;
+}
+
 export const FOTMOB_LEAGUES = {
   'premier-league': { id: '47', name: 'Premier League', country: 'England' },
   'la-liga': { id: '87', name: 'La Liga', country: 'Spain' },
@@ -169,3 +179,4 @@ export const FOTMOB_LEAGUES = {
   'world-cup': { id: '77', name: 'FIFA World Cup', country: 'World' },
   'world-cup-2026': { id: '107', name: 'FIFA World Cup 2026', country: 'World' },
 };
+
