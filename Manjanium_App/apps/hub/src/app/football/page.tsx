@@ -23,6 +23,7 @@ import { TerminalChat } from "@/components/chat/TerminalChat";
 import { FootballBadge } from "@/components/football/FootballBadge";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import FotmobLiveMatches from "@/components/football/FotmobLiveMatches";
+import FotmobThreeColumnFeed from "@/components/football/FotmobThreeColumnFeed";
 import "@/styles/football-design-tokens.css";
 
 function FootballHubContent() {
@@ -299,16 +300,7 @@ function FootballHubContent() {
           <TabsContent value="live" className="mt-0 outline-none">
             {activeTab === 'live' && (
               <>
-                {preset === 'live-matches' && (
-                  <FootballPresetLiveMatches />
-                )}
-                {preset === 'standings-focus' && (
-                  <FootballPresetStandingsFocus />
-                )}
-                {preset === 'compact-stats' && (
-                  <FootballPresetCompactStats />
-                )}
-
+                <FotmobThreeColumnFeed />
                 {/* Terminal Chat Widget for Football */}
                 <TerminalChat context="football" />
               </>
@@ -317,8 +309,8 @@ function FootballHubContent() {
 
           <TabsContent value="matches" className="mt-0 outline-none">
             {activeTab === 'matches' && (
-              <div className="p-6">
-                <FotmobLiveMatches filterLive={false} maxLeagues={15} />
+              <div className="w-full">
+                <FotmobThreeColumnFeed />
               </div>
             )}
           </TabsContent>

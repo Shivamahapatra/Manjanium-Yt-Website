@@ -291,5 +291,16 @@ Changes made:
 - Updated `apps/hub/src/app/football/page.tsx`: Transformed static Hero Banner into a Dynamic Featured Match Hero Banner automatically prioritizing active LIVE matches or top upcoming marquee fixtures.
 - Updated `apps/hub/src/components/football/FotmobStandings.tsx`: Expanded league selector buttons across all 6 major domestic/European leagues and added team crest badges, position rank, and xG analytics columns.
 Context:
-- Football Hub now reflects full FotMob layout and feature set with 100% reliable domestic league standings and dynamic live hero matches.
+--- Update: FotMob 3-Column Layout Refactor (2026-09-19T15:25:00+05:30) ---
+Changes made:
+- Created `apps/hub/src/components/football/FotmobThreeColumnFeed.tsx` implementing the 3-column FotMob desktop layout:
+  - Left Column (~20%): Sticky navigation with Followed/Top Leagues (Premier League, Champions League, La Liga, Serie A, etc.) and Club tracking.
+  - Center Column (~55%): Header with `< Date >` controls, filter pills (All, Live, Finished, By Time), and collapsible accordion league match cards.
+  - Right Column (~25%): Sticky sidebar with Top Stories & News article cards (thumbnail on left, headline on right).
+- Updated `apps/hub/src/app/football/page.tsx` to render `FotmobThreeColumnFeed` in the primary match and live views.
+- Added `formatFotmobDate` utility in `football-utils.ts` and dynamic cache-busting headers in Next.js routes.
+Context:
+- Next.js build passes with 0 errors (25 static pages generated cleanly).
+- Verified production build and push.
+
 
