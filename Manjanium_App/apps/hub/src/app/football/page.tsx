@@ -391,11 +391,12 @@ export default function FootballHubPage() {
 
   // Fetch Understat shots when a match is selected
   useEffect(() => {
-    if (!selectedMatch) return
+    const match = selectedMatch
+    if (!match) return
 
     async function loadShots() {
       try {
-        const matchId = selectedMatch?.understat_id || '22676'
+        const matchId = match.understat_id || '22676'
         const res = await fetch(`http://localhost:8000/api/football/understat/shots/${matchId}`)
         if (res.ok) {
           const json = await res.json()
@@ -409,9 +410,9 @@ export default function FootballHubPage() {
       }
 
       setUnderstatData({
-        match_id: selectedMatch.match_id,
-        home_team: { name: selectedMatch.home_team, total_xG: 2.15, shots: 14, goals: selectedMatch.home_score || 2 },
-        away_team: { name: selectedMatch.away_team, total_xG: 1.18, shots: 8, goals: selectedMatch.away_score || 1 },
+        match_id: match.match_id,
+        home_team: { name: match.home_team, total_xG: 2.15, shots: 14, goals: match.home_score || 2 },
+        away_team: { name: match.away_team, total_xG: 1.18, shots: 8, goals: match.away_score || 1 },
         shots: SAMPLE_UNDERSTAT_SHOTS,
         xG_momentum: [
           { minute: 0, home_xG: 0.0, away_xG: 0.0 },
@@ -427,11 +428,11 @@ export default function FootballHubPage() {
 
     // Default timeline events
     setTimelineEvents([
-      { minute: 23, team: selectedMatch.home_team, player: 'Lamine Yamal', assist: 'Raphinha', type: 'Goal', detail: 'Normal Goal' },
-      { minute: 38, team: selectedMatch.away_team, player: 'Aurélien Tchouaméni', type: 'Card', detail: 'Yellow Card' },
-      { minute: 58, team: selectedMatch.home_team, player: 'Robert Lewandowski', assist: 'Raphinha', type: 'Goal', detail: 'Header' },
-      { minute: 71, team: selectedMatch.home_team, player: 'Pedri', type: 'Card', detail: 'Yellow Card' },
-      { minute: 75, team: selectedMatch.away_team, player: 'Kylian Mbappé', assist: 'Jude Bellingham', type: 'Goal', detail: 'Right Foot Shot' },
+      { minute: 23, team: match.home_team, player: 'Lamine Yamal', assist: 'Raphinha', type: 'Goal', detail: 'Normal Goal' },
+      { minute: 38, team: match.away_team, player: 'Aurélien Tchouaméni', type: 'Card', detail: 'Yellow Card' },
+      { minute: 58, team: match.home_team, player: 'Robert Lewandowski', assist: 'Raphinha', type: 'Goal', detail: 'Header' },
+      { minute: 71, team: match.home_team, player: 'Pedri', type: 'Card', detail: 'Yellow Card' },
+      { minute: 75, team: match.away_team, player: 'Kylian Mbappé', assist: 'Jude Bellingham', type: 'Goal', detail: 'Right Foot Shot' },
     ])
 
     loadShots()
