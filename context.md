@@ -318,3 +318,15 @@ Changes made:
 Context:
 - `apps/hub` Next.js production build (`npx next build`) passed cleanly with 0 errors.
 - Python FastAPI telemetry service verified compiling and routing cleanly on port 8000.
+
+--- Update: Vercel Type Error Fix & Build Verification (2026-09-19T15:58:00+05:30) ---
+Changes made:
+- Diagnosed Vercel deployment failure (`DSZIKEBaz` at 15:50:02): `./src/app/football/page.tsx:399:25 Type error: 'match' is possibly 'null'`.
+- Verified that commit `04944f2` (`fix(football): strongly type match parameter in loadShots`) explicitly typed `loadShots(currentMatch: Match)` with `const activeMatch: Match = selectedMatch`.
+- Executed local production build `pnpm --filter hub build` (`next build`):
+  - Compiled successfully with 0 errors.
+  - Type validity and linting passed cleanly.
+  - All 25 static & dynamic routes generated without issues.
+Context:
+- `origin/main` is up to date with commit `04944f2`.
+- Next Vercel deployment or manual redeploy will succeed.
