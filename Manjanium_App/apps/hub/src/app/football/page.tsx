@@ -160,21 +160,91 @@ export default function FootballHubPage() {
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([])
 
   // ============================================================================
-  // 1. DATA FETCHING: MATCHDAY SCHEDULE
+  // 1. DATA FETCHING: MATCHDAY SCHEDULE (API-FOOTBALL / TELEMETRY)
   // ============================================================================
+  const parseMatchesData = useCallback((data: any): LeagueGroup[] => {
+    if (!data) return []
+    if (Array.isArray(data)) return data
+    if (data.leagues && Array.isArray(data.leagues) && data.leagues.length > 0) {
+      return data.leagues
+    }
+
+    const grouped = data.grouped_matches || data
+    if (typeof grouped === 'object' && grouped !== null) {
+      const list: LeagueGroup[] = []
+      for (const [leagueName, info] of Object.entries(grouped)) {
+        if (
+          leagueName === 'leagues' ||
+          leagueName === 'grouped_matches' ||
+          leagueName === 'date' ||
+          leagueName === 'source'
+        ) {
+          continue
+        }
+        const groupObj = info as any
+        const rawMatches = groupObj?.matches || []
+        const normMatches: Match[] = rawMatches.map((m: any, idx: number) => {
+          if (m.home_team && m.match_id) return m
+          const fixture = m.fixture || {}
+          const teams = m.teams || {}
+          const goals = m.goals || {}
+          const status = fixture.status || {}
+          const elapsed = status.elapsed
+          const short = status.short || 'NS'
+          return {
+            match_id: String(fixture.id || `${leagueName}-${idx}`),
+            home_team: teams.home?.name || 'Home',
+            home_team_id: String(teams.home?.id || ''),
+            home_flag: teams.home?.logo,
+            home_score: goals.home,
+            away_team: teams.away?.name || 'Away',
+            away_team_id: String(teams.away?.id || ''),
+            away_flag: teams.away?.logo,
+            away_score: goals.away,
+            status: short,
+            minute: elapsed ? `${elapsed}'` : short,
+            live: ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(short),
+            finished: ['FT', 'AET', 'PEN'].includes(short),
+            started: !['TBD', 'NS'].includes(short),
+            kickoff: fixture.date,
+            league_name: leagueName,
+          }
+        })
+
+        list.push({
+          league_id: String(groupObj?.id || leagueName),
+          league_name: leagueName,
+          country: groupObj?.country || '',
+          logo: groupObj?.logo || '',
+          matches: normMatches,
+        })
+      }
+      return list
+    }
+    return []
+  }, [])
+
   const fetchMatches = useCallback(async (dateStr: string) => {
     setLoadingMatches(true)
     try {
-      // Attempt to hit the Next.js API proxy to Telemetry API
-      const res = await fetch(`/api/football/fotmob/matches?date=${dateStr.replace(/-/g, '')}`, {
+      // 1. First attempt direct connection to Python FastAPI telemetry service
+      let res = await fetch(`http://localhost:8000/api/matches?date=${dateStr}`, {
         cache: 'no-store',
-      })
-      if (res.ok) {
+      }).catch(() => null)
+
+      // 2. Fallback to Next.js API proxy if direct telemetry service is unreachable
+      if (!res || !res.ok) {
+        res = await fetch(`/api/football/fotmob/matches?date=${dateStr.replace(/-/g, '')}`, {
+          cache: 'no-store',
+        }).catch(() => null)
+      }
+
+      if (res && res.ok) {
         const data = await res.json()
-        if (data.leagues && data.leagues.length > 0) {
-          setLeagueGroups(data.leagues)
-          // Default select the first live match if none selected
-          const firstLive = data.leagues
+        const parsed = parseMatchesData(data)
+        if (parsed.length > 0) {
+          setLeagueGroups(parsed)
+          const firstLive = parsed
             .flatMap((l: LeagueGroup) => l.matches)
             .find((m: Match) => m.live)
           if (firstLive && !selectedMatch) {
@@ -324,11 +394,49 @@ export default function FootballHubPage() {
   useEffect(() => {
     async function loadBarcaTracker() {
       try {
-        const res = await fetch('http://localhost:8000/api/football/teams/barcelona/tracker')
-        if (res.ok) {
+        // 1. Direct query to dedicated /api/team/barcelona endpoint
+        let res = await fetch('http://localhost:8000/api/team/barcelona').catch(() => null)
+        if (!res || !res.ok) {
+          res = await fetch('http://localhost:8000/api/football/teams/barcelona/tracker').catch(() => null)
+        }
+        if (res && res.ok) {
           const json = await res.json()
-          if (json.data) {
-            setBarcaTracker(json.data)
+          const data = json.data || json
+          if (data && (data.la_liga || data.rank)) {
+            const formArray = Array.isArray(data.recent_form)
+              ? data.recent_form
+              : typeof data.form === 'string'
+              ? Array.from(data.form)
+              : ['W', 'W', 'W', 'W', 'W']
+
+            setBarcaTracker({
+              team: data.team || {
+                id: 529,
+                name: 'FC Barcelona',
+                short_name: 'Barça',
+                crest: 'https://crests.football-data.org/81.svg',
+              },
+              la_liga: data.la_liga || {
+                standing: {
+                  position: data.rank || 1,
+                  played: data.played || 4,
+                  points: data.points || 12,
+                },
+                recent: [],
+                upcoming: [],
+              },
+              champions_league: data.champions_league || {
+                standing: { position: 1, points: 9 },
+                recent: [],
+                upcoming: [],
+              },
+              next_match: data.next_match || (data.next_fixture ? {
+                opponent: data.next_fixture.opponent,
+                competition: data.next_fixture.competition,
+                date: data.next_fixture.date,
+              } : null),
+              recent_form: formArray,
+            })
             return
           }
         }

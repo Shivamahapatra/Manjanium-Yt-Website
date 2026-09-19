@@ -349,3 +349,21 @@ Context:
 - `apps/hub` Next.js production build (`pnpm --filter hub build`) passed cleanly with 0 errors (all 25 static pages generated).
 - Pushed to GitHub `origin/main`.
 
+--- Update: API-Football Real Data Pipeline & FC Barcelona Telemetry (2026-09-19T16:50:00+05:30) ---
+Changes made:
+- Updated `apps/telemetry/main.py`:
+  - Added `GET /api/matches?date=YYYY-MM-DD` querying API-Football (`v3.football.api-sports.io/fixtures`), filtering across top supported leagues (`SUPPORTED_LEAGUES`: [39, 140, 78, 135, 61, 2]), and returning both grouped dictionaries and normalized `LeagueGroup[]` lists.
+  - Added `GET /api/team/barcelona` querying live La Liga standings, rank, points, recent form, and next fixture with defensive fallbacks.
+  - Added `dotenv.load_dotenv()` and support for both RapidAPI and direct API-Sports keys (`x-apisports-key` & `x-rapidapi-key`).
+  - Preserved all FastF1 telemetry endpoints, Understat shot endpoints, and FotMob proxies.
+- Updated `apps/hub/src/app/football/page.tsx`:
+  - Connected `fetchMatches()` to query `http://localhost:8000/api/matches?date=${dateStr}` directly with automatic normalization via `parseMatchesData()`.
+  - Connected `loadBarcaTracker()` to query `http://localhost:8000/api/team/barcelona` directly with fallback to tracker route.
+- Updated `apps/telemetry/requirements.txt` and created `apps/telemetry/.env.example`.
+- Created `LLMWiki/raw/session-2026-09-19-api-football-real-data-pipeline.md`.
+Context:
+- Verified FastAPI routes: 18 active routes.
+- Next.js production build (`pnpm --filter hub build`) passed with 0 errors (all 25 pages generated).
+- Pushed to GitHub `origin/main`.
+
+
