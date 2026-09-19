@@ -147,6 +147,32 @@ function FootballHubContent() {
     return () => clearInterval(interval);
   }, []);
 
+  const [fotmobMatches, setFotmobMatches] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchFotmobHero = async () => {
+      try {
+        const todayStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+        const res = await fetch(`/api/football/fotmob/matches?date=${todayStr}&expand=3`);
+        const data = await res.json();
+        const allMatches = (data?.leagues || []).flatMap((l: any) => l.matches || []);
+        setFotmobMatches(allMatches);
+      } catch (e) {
+        console.error("Hero match fetch error", e);
+      }
+    };
+    fetchFotmobHero();
+  }, []);
+
+  // Compute dynamic hero match: prioritize LIVE match, then upcoming match
+  const heroMatch = React.useMemo(() => {
+    if (!fotmobMatches || fotmobMatches.length === 0) return null;
+    const live = fotmobMatches.find((m: any) => m.live);
+    if (live) return live;
+    const upcoming = fotmobMatches.find((m: any) => !m.finished);
+    return upcoming || fotmobMatches[0];
+  }, [fotmobMatches]);
+
   const topScorers = standingsData?.groups ? getTopScorers(standingsData.groups, 10) : [];
 
   if (error) {
@@ -176,16 +202,20 @@ function FootballHubContent() {
   return (
     <div className="w-full flex flex-col pt-4 px-4 sm:px-8 max-w-[1600px] mx-auto lg:pr-100 z-10 relative pb-24 animate-fade-in-up">
       
-      {/* Featured Match Hero from Stitch */}
-      {fixtures?.length > 0 && activeTab === 'live' && fixtures[0]?.fixture && (
+      {/* Dynamic Featured Match Hero */}
+      {heroMatch && activeTab === 'live' && (
         <section className="relative h-64 md:h-96 overflow-hidden bg-(--football-surface) border border-(--football-border) rounded-(--football-radius) mb-8 group shadow-lg">
-          <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-30" style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuB3NY6o5XP0w9-K1jzK9q8qk1ygTDR7oBeZFvi_wcyqG18uGl4NMnPiQeuVtzG6wEedRO_IfBdO1fQGUkkSWt5wXAHHoJebUITGJxmhJQUMxXLqIqxgOxVARSQ8lZokABJ_8cB1xj2WV3Z-NFko8hxQYEFJEgKweB0awnrV0CzSYFSLo9XQiW83HkUJXR85DPTWMHbdi0Vtr2h-DA4vvhrCe2PE5wTcvFcevLyUi1cYiRJvzKpWkKHMGMU-cx2wgGO678L1YTxQ2os')` }}></div>
+          <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-30" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1600&q=80')` }}></div>
           <div className="absolute inset-0 bg-linear-to-t from-(--football-surface) via-(--football-surface)/60 to-transparent"></div>
           <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 space-y-4 z-20">
             <div className="flex items-center gap-3">
-              {fixtures[0]?.fixture?.status?.short === "1H" || fixtures[0]?.fixture?.status?.short === "2H" ? (
+              {heroMatch.live ? (
                 <FootballBadge variant="live">
-                  🔴 LIVE
+                  🔴 LIVE · {heroMatch.minute || 'IN PROGRESS'}
+                </FootballBadge>
+              ) : heroMatch.finished ? (
+                <FootballBadge variant="live">
+                  FULL TIME
                 </FootballBadge>
               ) : (
                 <FootballBadge variant="upcoming">
@@ -193,34 +223,44 @@ function FootballHubContent() {
                 </FootballBadge>
               )}
               <span className="font-bold text-xs text-(--football-accent) uppercase tracking-widest drop-shadow-md">
-                {fixtures[0]?.league?.name}
+                {heroMatch.stage || 'FEATURED MATCH'}
               </span>
             </div>
             
             <div className="flex items-center justify-between gap-6 max-w-4xl">
               <div className="flex-1 flex items-center gap-6">
                 <div className="text-right hidden md:block">
-                  <h2 className="text-2xl md:text-3xl font-black drop-shadow-md uppercase text-white" style={{ fontFamily: 'var(--football-font-heading)' }}>{fixtures[0]?.teams?.home?.name}</h2>
+                  <h2 className="text-2xl md:text-3xl font-black drop-shadow-md uppercase text-white" style={{ fontFamily: 'var(--football-font-heading)' }}>{heroMatch.home_team}</h2>
                   <p className="text-xs font-bold text-[#6B7280] uppercase">HOME</p>
                 </div>
                 <div className="w-16 h-16 md:w-24 md:h-24 bg-black/50 border border-[#333333] rounded-2xl p-3 flex items-center justify-center backdrop-blur-sm">
-                  <Image src={fixtures[0]?.teams?.home?.logo || ''} alt="Home" width={96} height={96} className="w-full h-full object-contain" unoptimized />
+                  {heroMatch.home_flag ? (
+                    <img src={heroMatch.home_flag} alt={heroMatch.home_team} className="w-full h-full object-contain" />
+                  ) : (
+                    <div className="text-2xl font-bold text-white">{heroMatch.home_team.substring(0, 3).toUpperCase()}</div>
+                  )}
                 </div>
               </div>
               
               <div className="flex flex-col items-center">
                 <span className="text-4xl md:text-6xl text-white font-bold tracking-tighter" style={{ fontFamily: 'var(--football-font-heading)' }}>
-                  {fixtures[0]?.goals?.home ?? 0} - {fixtures[0]?.goals?.away ?? 0}
+                  {heroMatch.started ? `${heroMatch.home_score ?? 0} - ${heroMatch.away_score ?? 0}` : 'VS'}
                 </span>
-                <span className="text-sm font-bold text-alert">{fixtures[0]?.fixture?.status?.elapsed ? `${fixtures[0].fixture.status.elapsed}'` : 'TBD'}</span>
+                <span className="text-sm font-bold text-alert">
+                  {heroMatch.live ? heroMatch.minute || 'LIVE' : heroMatch.kickoff ? new Date(heroMatch.kickoff).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'TODAY'}
+                </span>
               </div>
               
               <div className="flex-1 flex items-center justify-end gap-6">
                 <div className="w-16 h-16 md:w-24 md:h-24 bg-black/50 border border-[#333333] rounded-2xl p-3 flex items-center justify-center backdrop-blur-sm">
-                  <Image src={fixtures[0]?.teams?.away?.logo || ''} alt="Away" width={96} height={96} className="w-full h-full object-contain" unoptimized />
+                  {heroMatch.away_flag ? (
+                    <img src={heroMatch.away_flag} alt={heroMatch.away_team} className="w-full h-full object-contain" />
+                  ) : (
+                    <div className="text-2xl font-bold text-white">{heroMatch.away_team.substring(0, 3).toUpperCase()}</div>
+                  )}
                 </div>
                 <div className="text-left hidden md:block">
-                  <h2 className="text-2xl md:text-3xl font-black drop-shadow-md uppercase text-white" style={{ fontFamily: 'var(--football-font-heading)' }}>{fixtures[0]?.teams?.away?.name}</h2>
+                  <h2 className="text-2xl md:text-3xl font-black drop-shadow-md uppercase text-white" style={{ fontFamily: 'var(--football-font-heading)' }}>{heroMatch.away_team}</h2>
                   <p className="text-xs font-bold text-[#6B7280] uppercase">AWAY</p>
                 </div>
               </div>
