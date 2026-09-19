@@ -303,4 +303,18 @@ Context:
 - Next.js build passes with 0 errors (25 static pages generated cleanly).
 - Verified production build and push.
 
-
+--- Update: Unified Multi-API Football Rebuild (2026-09-19T15:45:00+05:30) ---
+Changes made:
+- Rebuilt `apps/telemetry/main.py`: Installed and integrated `understat`, `aiohttp`, `cachetools`, and `beautifulsoup4`. Built unified multi-API architecture:
+  - API-Football (REST): Live match scores (`/api/football/api-football/live`), match events timeline (`/api/football/api-football/timeline/{fixture_id}`), and tactical starting XI lineups (`/api/football/api-football/lineups/{fixture_id}`).
+  - Football-Data.org (REST): League standings (`/api/football/football-data/standings/{competition_code}`) and explicit FC Barcelona pinned tracker across La Liga & Champions League (`/api/football/teams/barcelona/tracker`).
+  - Understat (Async): Raw X,Y shot coordinates and minute-by-minute cumulative xG momentum curves (`/api/football/understat/shots/{match_id}`).
+  - Tiered TTL Caching: In-memory rate-limit budgets (30s live, 60s timelines, 300s lineups, 900s standings, 1800s Barça tracker, 3600s Understat shots).
+- Rebuilt `apps/hub/src/app/football/page.tsx`: Implemented pristine 3-column FotMob layout using Tailwind CSS grid and Framer Motion `<motion.div>` layout accordions:
+  - Left Column (lg:col-span-3): Pinned FC Barcelona tracker (standings, form pills, next fixture, La Liga vs UCL switcher) and Top Leagues navigation.
+  - Center Column (lg:col-span-6): Live match day feed with `< Date >` controls, status pills (All, Live, Finished, Scheduled), search input, and collapsible league match groups with smooth Framer Motion layout animations.
+  - Right Column (lg:col-span-3): Deep-dive match inspector with interactive SVG pitch shotmap (Understat x, y, xG circles), match timeline events (API-Football), and league standings (Football-Data.org).
+- Created session capture note in `LLMWiki/raw/session-2026-09-19-football-multi-api-rebuild.md` with Obsidian bidirectional links (`[[...]]`).
+Context:
+- `apps/hub` Next.js production build (`npx next build`) passed cleanly with 0 errors.
+- Python FastAPI telemetry service verified compiling and routing cleanly on port 8000.
