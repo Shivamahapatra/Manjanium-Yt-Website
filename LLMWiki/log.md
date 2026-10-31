@@ -42,3 +42,7 @@ Processed quick captures. Created pages: `[[ClerkAuthVersionCompatibility]]`, `[
 
 - [2026-07-04 02:14:00] Ingested: session-2026-07-04-fotmob-frontend.md -> Created: [[FotMobAPI]], [[FotMobReactComponents]], [[ReactSVGShotmap]]
 - [2026-07-04 14:44:29] Ingested: session-2026-07-04-fotmob-frontend.md -> Created: [[XMLParsingFastAPI]], [[ReactServerComponentPropSpreading]], Updated: [[FotMobAPI]]
+
+## [2026-10-31] ingest | session-2026-10-31-phase2-dead-code-cleanup.md
+
+- [2026-10-31 21:05:00] Ingested: session-2026-10-31-phase2-dead-code-cleanup.md → Created: [[FastF1TelemetryBackend]], [[DeadCodeAndDependencyHygiene]], Updated: [[PaddockSimulator]], [[GhostRacingSystem]], [[MonorepoArchitecture]]
