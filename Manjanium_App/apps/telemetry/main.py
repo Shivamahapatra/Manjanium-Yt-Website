@@ -1,8 +1,8 @@
 import os
 import tempfile
 from pathlib import Path
-from typing import Optional, List, Dict, Any
-from datetime import datetime, date, timedelta
+from typing import Optional, Dict, Any
+from datetime import datetime
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -20,57 +20,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from live import live_timing_loop, get_live_timing
 import asyncio
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import ParseError
-import re
-
-# Cache for resolved team names
-_team_name_cache = {}
-
-async def resolve_team_name(team_code: str, client: httpx.AsyncClient) -> dict:
-    """
-    Resolve World Cup placeholder codes to real team names.
-    """
-    if not team_code:
-        return {"name": "TBD", "flag": ""}
-    
-    if team_code in _team_name_cache:
-        return _team_name_cache[team_code]
-    
-    if re.match(r'^[0-9]+[A-Z]+$', team_code):
-        result = {"name": f"Group {team_code[-1]} ({team_code[:-1]}{'st' if team_code[0]=='1' else 'nd'})", "flag": ""}
-        _team_name_cache[team_code] = result
-        return result
-    
-    return {"name": team_code, "flag": ""}
-
-async def get_worldcup_teams() -> dict:
-    """Fetch real team data from worldcup26.ir."""
-    global _team_name_cache
-    if _team_name_cache:
-        return _team_name_cache
-    
-    try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.get("https://worldcup26.ir/get/teams")
-            if resp.status_code == 200:
-                teams = resp.json()
-                for team in teams:
-                    name = team.get("name") or team.get("name_en", "")
-                    team_id = str(team.get("id", ""))
-                    fifa_code = team.get("fifa_code", "")
-                    if name and (team_id or fifa_code):
-                        _team_name_cache[team_id] = {"name": name, "flag": team.get("flag", "")}
-                        if fifa_code:
-                            _team_name_cache[fifa_code] = {"name": name, "flag": team.get("flag", "")}
-    except Exception as e:
-        print(f"Could not load worldcup teams: {e}")
-    
-    # Set a loaded flag so we don't retry endlessly if the API is down
-    if not _team_name_cache:
-        _team_name_cache["_loaded"] = True
-        
-    return _team_name_cache
 
 # Configure FastF1 cache
 # Use /tmp for ephemeral caching (acceptable cold start penalty)
@@ -330,7 +279,6 @@ cache_fixture_lineups = TTLCache(maxsize=128, ttl=300)   # 5m for tactical lineu
 # Football-Data.org: 10 requests/minute limit
 cache_standings = TTLCache(maxsize=32, ttl=900)          # 15m for league standings
 cache_barcelona_tracker = TTLCache(maxsize=8, ttl=1800)  # 30m for FC Barcelona tracker
-cache_team_fixtures = TTLCache(maxsize=32, ttl=1800)     # 30m for team schedules
 
 # Understat: Async web extraction
 cache_understat_shots = TTLCache(maxsize=256, ttl=3600)  # 1 hour for shot coordinates
@@ -360,9 +308,6 @@ def get_api_football_headers() -> dict:
 def get_football_data_headers() -> dict:
     key = os.getenv("FOOTBALL_DATA_ORG_KEY", os.getenv("FOOTBALL_DATA_KEY", ""))
     return {"X-Auth-Token": key} if key else {}
-
-# Standard browser headers for fallback endpoints
-DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 
 # ------------------------------------------------------------------------------
 # 1. API-FOOTBALL (REST): Live Scores, Timelines, Lineups, Center Feed & Barca
@@ -1076,7 +1021,6 @@ async def get_barcelona_pinned_tracker():
         # Filter recent and upcoming matches across PD and CL
         recent_matches = []
         upcoming_matches = []
-        now_iso = datetime.utcnow().isoformat()
 
         for m in matches_data:
             comp_code = m.get("competition", {}).get("code")
@@ -1260,7 +1204,7 @@ async def get_understat_match_shots(match_id: str = FastPath(...)):
 
 # ------------------------------------------------------------------------------
 # 4. UNIFIED MATCHDAY SCHEDULE FEED (Aggregated & Backward-Compatible)
-# ----------------------------------------------------------------------------@app.get("/api/football/matches")
+# ------------------------------------------------------------------------------
 @app.get("/api/football/combined-matches")
 async def get_matchday_feed(date_str: str = Query(default=None)):
     """
