@@ -82,3 +82,5 @@ export class GhostPlayer {
     return this.ghost?.lapTime || null
   }
 }
+
+export const ghostPlayer = new GhostPlayer()

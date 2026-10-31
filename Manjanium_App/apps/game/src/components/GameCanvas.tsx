@@ -5,7 +5,7 @@ import { Physics } from '@react-three/rapier'
 import { Environment } from '@react-three/drei'
 
 import { DynamicRaycastVehicleController } from './physics/DynamicRaycastVehicleController'
-import { ghostPlayer } from './physics/VehicleController'
+import { ghostPlayer } from '../lib/ghostPlayer'
 import { MultiplayerCars } from './physics/MultiplayerCars'
 import { initMultiplayer, leaveMultiplayer } from '../lib/multiplayer'
 import GhostCar from './physics/GhostCar'

@@ -5,8 +5,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { RigidBody, useRapier, RapierRigidBody } from '@react-three/rapier';
 import * as THREE from 'three';
 import { useGamePhysics, calculateTireFriction, WEATHER_FRICTION_MULTIPLIER, DEGRADATION_RATE } from '@/store/telemetry'
-import { ghostPlayer, ghostRecorder } from './VehicleController'
-import { saveBestGhost, loadBestGhost } from '../../lib/ghostRecorder'
+import { ghostPlayer } from '../../lib/ghostPlayer'
+import { ghostRecorder, saveBestGhost, loadBestGhost } from '../../lib/ghostRecorder'
 import { getSimulatorInputs, useSimulatorInputs } from '../../hooks/useSimulatorInputs';
 import { TRACK_CONFIG } from './GameTrack';
 
