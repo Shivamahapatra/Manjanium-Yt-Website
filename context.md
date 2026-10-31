@@ -380,5 +380,21 @@ Context:
 - Next.js production build (`pnpm --filter hub build`) passed with 0 errors (all 25 pages generated).
 - Pushed to GitHub `origin/main`.
 
+--- Update: Phase 2 Dead Code & Dependency Cleanup (2026-10-31T20:32:00+05:30) ---
+Changes made:
+- Created branch `chore/phase2-dead-code-cleanup` and executed 8 verified cleanup commits:
+  1. `b7610a5` (F-10): Removed unused imports, locals, and unreferenced parameters across 46 files in `apps/hub` and 7 files in `apps/game` (`tsc --noEmit --noUnusedLocals --noUnusedParameters` passes with 0 errors).
+  2. `455a84f` (F-03): Removed 13 root/scratch files (`temp_vc.tsx`, `git_log_clerk.txt`, `ping.txt`, `fix_links.py`, `test-espn.js`, `test_football.py`, 0-byte JSONs, `mock.json`, `newFallbackData.json`) and `Manjanium_App/scratch/worldcup2026/**` while preserving `Manjanium_App/*.md` and `supabase_migration.sql`.
+  3. `03685c5` (F-01): Removed 14 orphaned 3D simulator files from `apps/hub` (`src/components/simulator/*`, `useCarControls.ts`, `useGamePhysics.ts`, `useSimulatorGame.ts`, `gamePhysicsConfig.ts`, `tracks.ts`, `types/simulator*.ts`).
+  4. `f5e7b81` (F-02): Removed 53 dead components, hooks, libs, and CSS files in `apps/hub` and cleaned up unused exports in `LoadingSkeleton.tsx`, `shadcn-tabs.tsx`, `f1-helpers.ts`, and `useDashboardPreset.ts`.
+  5. `0a1b3d4` (F-04): Removed 13 uncalled Next.js API routes in `apps/hub/src/app/api/**` and `fallbackData.ts` (preserving `/api/auth/webhook`, `/api/f1/ping`, and active routes).
+  6. `2d61bf9` (F-05): Relocated `ghostPlayer` and `ghostRecorder` singletons to `apps/game/src/lib/ghostPlayer.ts` and `ghostRecorder.ts`, and removed dead `VehicleController.tsx`, `Track.tsx`, `useKeyboardControls.ts`, and `types/simulator.ts` in `apps/game`.
+  7. `52adb50` (F-09): Removed 11 unused npm packages from `apps/hub/package.json` and `lucide-react` from `apps/game/package.json`, and updated `pnpm-lock.yaml`.
+  8. `68f4074` (F-06): Removed dead imports, unused `_team_name_cache` / `resolve_team_name` / `get_worldcup_teams`, `cache_team_fixtures`, `DEFAULT_USER_AGENT`, `now_iso`, mangled comment text on `main.py:1263`, and scratch files (`Untitled-1.js`, `test_api.py`, `test_live.py`) in `apps/telemetry` while preserving all 18 FastAPI routes.
+Context:
+- Verified `tsc --noEmit`, `pnpm build` (`hub` and `game`), and `apps/telemetry` FastAPI route loading after every commit.
+- Preserved `proxy.ts`, SQL migrations, database tables, and deferred duplicate merges/bug fixes (`F-07`, `F-11`, `F-12`, `F-13`) per user instructions.
+
+
 
 
