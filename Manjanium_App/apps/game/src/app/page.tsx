@@ -12,7 +12,7 @@ const GameCanvas = dynamic(() => import('@/components/GameCanvas').then(mod => m
 
 export default function SimulatorPage() {
   const [inGame, setInGame] = useState(false);
-  const { userId, isLoaded } = useAuth();
+  const { userId } = useAuth();
   const { currentLap, totalLaps } = useGamePhysics();
   const isRaceFinished = currentLap > totalLaps;
 

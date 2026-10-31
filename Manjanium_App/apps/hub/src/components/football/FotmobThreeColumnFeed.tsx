@@ -10,7 +10,6 @@ import {
   Trophy, 
   Star, 
   Flame, 
-  Clock, 
   ExternalLink,
   Shield
 } from 'lucide-react'

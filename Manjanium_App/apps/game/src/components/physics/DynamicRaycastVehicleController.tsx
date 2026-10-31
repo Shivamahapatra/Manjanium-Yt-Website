@@ -25,12 +25,6 @@ const SUSPENSION_POINTS = [
   new THREE.Vector3(0.8, -0.3, -1.5),  // Rear Right
 ];
 
-const SECTOR_ZONES = {
-  sector1: { center: [80, 0, 0] as [number, number, number], radius: 15 },
-  sector2: { center: [-80, 0, 0] as [number, number, number], radius: 15 },
-  startFinish: { center: [0, 0, -50] as [number, number, number], radius: 10 },
-}
-
 export function DynamicRaycastVehicleController({ trackId = 'monza', trackLoaded = false }: VehicleControllerProps) {
   const chassisRef = useRef<RapierRigidBody>(null);
   const { rapier, world } = useRapier();
@@ -56,7 +50,6 @@ export function DynamicRaycastVehicleController({ trackId = 'monza', trackLoaded
   const [carState, setCarState] = useState<'OK' | 'DNF'>('OK');
   const engineTorqueMultiplier = useRef(1.0);
   const maxTorque = 2500;
-  const optimalRpmVelocity = 80; // Example optimal shifting velocity
 
   const {
     setSpeed, setGear, setRPM,
@@ -64,7 +57,7 @@ export function DynamicRaycastVehicleController({ trackId = 'monza', trackLoaded
     tireWear, setTireWear, tireFriction, setTireFriction, weather,
     sector1Cleared, sector2Cleared, crossedStartFinish,
     currentLap, drsAvailable, setDRSActive, battery, setBattery,
-    setSector1, setSector2, clearSectors, setCrossedStartFinish,
+    clearSectors, setCrossedStartFinish,
     setThrottle, setBrake, setSteering, totalLaps
   } = useGamePhysics();
 

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 
 interface MatchDetailProps {
   data: {
@@ -25,11 +24,6 @@ export default function FotmobMatchDetail({ data }: MatchDetailProps) {
     : ['stats', 'lineup', 'shotmap', 'timeline'] as const
 
   // Extract xG from stats
-  const xgStats = data.stats?.expected_goals_xg_?.[0] ||
-    Object.values(data.stats || {}).find((group: any) =>
-      group?.some?.((s: any) => s?.title?.toLowerCase().includes('xg'))
-    )
-
   return (
     <div className="p-4 space-y-4">
       {/* Tab Selector */}

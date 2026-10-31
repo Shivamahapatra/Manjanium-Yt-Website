@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { IconHome, IconCarCrash, IconBallFootball } from "@tabler/icons-react";
-import Link from "next/link";
+
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";

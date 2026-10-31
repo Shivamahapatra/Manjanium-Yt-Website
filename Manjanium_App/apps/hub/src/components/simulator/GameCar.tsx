@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { RigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
@@ -11,7 +11,7 @@ import { PHYSICS_CONFIG } from '@/lib/gamePhysicsConfig'
 export default function GameCar() {
   const rigidBodyRef = useRef<any>(null)
   const meshRef = useRef<THREE.Group>(null)
-  const { carState, setCarState, throttle, brake, steering } = useGamePhysics()
+  const { setCarState, throttle, brake, steering } = useGamePhysics()
 
   useFrame(() => {
     if (!rigidBodyRef.current) return

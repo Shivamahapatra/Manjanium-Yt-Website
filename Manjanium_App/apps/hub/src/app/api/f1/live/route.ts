@@ -7,11 +7,8 @@ export const revalidate = 0;
 const CACHE_KEY = 'f1_live_data';
 const CACHE_TTL = 10; // seconds
 
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const sessionKey = searchParams.get('session_key') || 'latest';
-    
     // Check KV cache first
     let cached = null;
     try {

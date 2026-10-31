@@ -38,7 +38,7 @@ export function SuggestionPage() {
     }
   });
 
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
+  const onSubmit: SubmitHandler<IFormInput> = (_data) => {
     setIsSubmitting(true);
     // Simulate API call
     setTimeout(() => {

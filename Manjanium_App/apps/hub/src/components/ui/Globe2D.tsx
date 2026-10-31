@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import { ArcData, PointData, GeoJsonData, GlobeConfig } from "@/types/globe";
+import { ArcData, PointData, GlobeConfig } from "@/types/globe";
 import localWorldData from "../../../public/globe.json";
-import { findVenueByCoords } from "@/lib/globe-interactions";
+
 import { getThemeArcColor } from "@/lib/globe-themes";
 
 // Convert degrees to radians

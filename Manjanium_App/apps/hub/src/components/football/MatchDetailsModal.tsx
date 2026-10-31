@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Clock, MapPin, AlertCircle, Shield, RefreshCw, X } from 'lucide-react';
-import { LiveTimeline } from '@/components/football/LiveTimeline';
+
 import { TeamLineup } from '@/components/football/TeamLineup';
 import { MatchStatistics } from '@/components/football/MatchStatistics';
-import DecryptedText from "@/components/ui/DecryptedText";
+
 import { FootballBadge } from './FootballBadge';
 import { useLiveTicker } from '@/hooks/useLiveTicker';
 
@@ -27,7 +27,7 @@ const getCategoryColor = (category: string) => {
 export function MatchDetailsModal({ matchId, isLive, onClose }: MatchDetailsModalProps) {
   const [activeTab, setActiveTab] = useState<'lineups' | 'timeline' | 'stats'>('timeline');
   const [details, setDetails] = useState<any>(null);
-  const [commentary, setCommentary] = useState<any>(null);
+  const [, setCommentary] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const { events } = useLiveTicker(matchId);
   

@@ -1,6 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
+
 import { F1Card } from '@/components/f1/F1Card';
 import { LiveTimingTower } from '@/components/f1/LiveTimingTower';
 

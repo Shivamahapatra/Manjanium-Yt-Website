@@ -10,18 +10,10 @@ import {
   ChevronUp,
   Star,
   Trophy,
-  Activity,
-  Flame,
-  Shield,
-  Crosshair,
   RefreshCw,
   Search,
-  Users,
   TrendingUp,
-  BarChart3,
   Clock,
-  Layers,
-  Sparkles,
 } from 'lucide-react'
 import ShotmapPitch, { UnderstatShot } from '@/components/football/ShotmapPitch'
 
@@ -152,7 +144,7 @@ export default function FootballHubPage() {
   const [loadingMatches, setLoadingMatches] = useState(true)
   const [barcaTracker, setBarcaTracker] = useState<BarcelonaTracker | null>(null)
   const [barcaComp, setBarcaComp] = useState<'PD' | 'CL'>('PD')
-  const [standings, setStandings] = useState<StandingRow[]>(INITIAL_LA_LIGA_STANDINGS)
+  const [standings] = useState<StandingRow[]>(INITIAL_LA_LIGA_STANDINGS)
   const [selectedCompetition, setSelectedCompetition] = useState<string>('PD')
 
   // Understat & Event state

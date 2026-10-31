@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Clock, MapPin, ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { Tag, Spin } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getCountryFlag, F1_CANCELED_2026, F1_VENUES_2026 } from '@/lib/f1-helpers';
+import { getCountryFlag, F1_VENUES_2026 } from '@/lib/f1-helpers';
 import { useSettings } from "@/lib/settings-context";
 import { GlobeCalendar } from "@/components/f1/GlobeCalendar";
 
@@ -110,13 +110,7 @@ export function F1CalendarTab() {
     );
   }
 
-  // Calculate completed rounds
-  const completedRounds = races
-    .filter((race: any) => {
-      const raceDate = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
-      return raceDate < new Date();
-    })
-    .map((race: any) => Number(race.round));
+
 
   return (
     <div className="p-4 md:p-8 min-h-full bg-[#0a0a0a]">

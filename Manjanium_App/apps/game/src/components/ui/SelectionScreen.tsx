@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@manjanium/ui';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const MOCK_ROOMS = [
   { id: '1', name: 'Monza Time Attack', players: 4, max: 10, ping: '24ms' },

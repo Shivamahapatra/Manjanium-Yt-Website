@@ -361,7 +361,7 @@ export function F1StandingsTab() {
                       animate="show"
                       className="space-y-1.5"
                     >
-                      {activeStandings.map((item: any, idx: number) => {
+                      {activeStandings.map((item: any, _idx: number) => {
                         const isP1 = item.position === 1;
                         const isP2 = item.position === 2;
                         const isP3 = item.position === 3;

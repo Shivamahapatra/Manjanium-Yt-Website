@@ -88,7 +88,7 @@ export const Tabs = ({
 export const FadeInDiv = ({
   className,
   tabs,
-  active,
+  active: _active,
   hovering,
 }: {
   className?: string;

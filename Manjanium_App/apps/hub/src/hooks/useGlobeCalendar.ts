@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { F1_VENUES_2026, getCountryFlag } from "@/lib/f1-helpers";
 import { findVenueByCoords } from "@/lib/globe-interactions";
 
@@ -87,7 +87,7 @@ export function useGlobeCalendar() {
       "#14b8a6", // Teal
     ];
 
-    return F1_VENUES_2026.map((venue, i) => {
+    return F1_VENUES_2026.map((venue, _i) => {
       // Find matching race in API calendar
       const apiRace = calendarRaces.find((r) => Number(r.round) === venue.round);
       const circuitDetails = findVenueByCoords(venue.lat, venue.lng);

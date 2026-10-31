@@ -1,7 +1,6 @@
 'use client'
 
 import FotmobStandings from '@/components/football/FotmobStandings'
-import { FOTMOB_LEAGUES } from '@/lib/football-utils'
 
 export default function FootballPresetStandingsFocus() {
   return (

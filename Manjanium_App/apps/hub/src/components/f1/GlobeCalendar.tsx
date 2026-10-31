@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Filter, Clock, MapPin, Compass, Keyboard, RefreshCw } from "lucide-react";
+
+import { Keyboard, RefreshCw } from "lucide-react";
 import { useGlobeCalendar, RaceVenue } from "@/hooks/useGlobeCalendar";
 import { RaceDetailsModal } from "@/components/globe/RaceDetailsModal";
 import { findVenueByCoords } from "@/lib/globe-interactions";
@@ -42,7 +42,7 @@ export function GlobeCalendar({
     nextRace,
     filter,
     setFilter,
-    filteredVenues,
+
   } = useGlobeCalendar();
 
   const [selectedRace, setSelectedRace] = useState<RaceVenue | null>(null);

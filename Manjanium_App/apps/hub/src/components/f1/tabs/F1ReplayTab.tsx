@@ -1,22 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Table, Tag, Spin, Slider, Button, Select } from 'antd';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Play,
-  Pause,
-  Square,
-  Activity,
-  Clock,
-  RotateCcw,
-  Trophy,
-  FastForward,
-  Loader2,
-  SkipBack,
-  Settings,
-  AlertCircle
-} from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Table, Slider, Button } from 'antd';
+import { motion } from 'framer-motion';
+import { Play, Pause, Square, Activity, RotateCcw, Loader2 } from 'lucide-react';
 import { getTeamColor, formatGap } from '@/lib/f1-helpers';
 import DecryptedText from '@/components/ui/DecryptedText';
 

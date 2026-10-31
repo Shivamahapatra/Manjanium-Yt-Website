@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useThree } from '@react-three/fiber';
-import * as THREE from 'three';
 import { getLeaderboard, LeaderboardEntry } from '../../lib/leaderboard';
 import { useGamePhysics } from '../../store/telemetry';
 

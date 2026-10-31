@@ -3,21 +3,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Spin } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Zap,
-  RotateCcw,
-  BarChart2,
-  Trophy,
-  Calendar as CalendarIcon,
-  Flag,
-  Rss,
-  Gauge,
-  Activity,
-  AlertTriangle,
-  Clock,
-  Sparkles
-} from 'lucide-react';
-import { getTeamColor, formatGap } from '@/lib/f1-helpers';
+import { Activity } from 'lucide-react';
+
 import { F1Card } from '@/components/f1/F1Card';
 
 // Helper to format lap time in seconds (e.g. 82.105) to m:ss.xxx
@@ -663,7 +650,7 @@ export function LiveTimingTower({ drivers = [], sessionInfo = null, loading = fa
             ) : (
               /* GRID VIEW */
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 max-w-5xl mx-auto py-8">
-                {drivers.map((drv: any, idx: number) => {
+                {drivers.map((drv: any, _idx: number) => {
                   const gridPos = drv.position;
                   const isLeftCol = gridPos % 2 !== 0; // Odd Grid Position on Left
 

@@ -27,7 +27,7 @@ export function LiveTrackMap({ circuit, data, currentLap }: LiveTrackMapProps) {
         <circle cx="200" cy="200" r="120" fill="none" stroke="#333333" strokeWidth="1" strokeDasharray="4 4" />
 
         {/* Driver positions as dots */}
-        {data?.positions?.slice(0, 3).map((pos, idx) => (
+        {data?.positions?.slice(0, 3).map((_pos, idx) => (
           <g key={idx}>
             <motion.circle
               cx={200 + Math.cos((idx / 3) * Math.PI * 2) * 135}

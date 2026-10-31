@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { AppSettings } from "@/lib/settings-context";
 

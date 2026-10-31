@@ -89,7 +89,7 @@ export async function GET(request: Request) {
     ]);
 
     const resultsData = includeCharts ? await responses[2].json().catch(() => ({})) : null;
-    const sprintData = includeCharts ? await responses[3].json().catch(() => ({})) : null;
+    if (includeCharts) await responses[3].json().catch(() => ({}));
 
     // Parse driver standings
     const driverStandingsLists = driversData.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings || [];

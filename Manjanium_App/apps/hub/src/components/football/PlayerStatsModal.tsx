@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { X, ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { Team, Player } from '@/types/football';
 
 export interface PlayerStatsModalProps {

@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { RigidBody, useRapier } from '@react-three/rapier'
+import { RigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
 import { useGamePhysics, calculateTireFriction, WEATHER_FRICTION_MULTIPLIER, DEGRADATION_RATE } from '@/store/telemetry'
 
@@ -53,7 +53,6 @@ export default function VehicleController({ trackId = 'monza' }) {
   const chassisRef = useRef<any>(null)
   const meshRef = useRef<THREE.Group>(null)
   const { camera } = useThree()
-  const { rapier, world } = useRapier()
   const cameraOffset = new THREE.Vector3(0, 6, 14)
   const lapStartTime = useRef(Date.now())
 
@@ -67,7 +66,7 @@ export default function VehicleController({ trackId = 'monza' }) {
     setSpeed, setGear, setRPM,
     setBattery, battery, drsAvailable,
     completeLap,
-    tireWear, setTireWear, setTireFriction, weather, tireFriction,
+    tireWear, setTireWear, setTireFriction, weather,
     sector1Cleared, sector2Cleared,
     setSector1, setSector2, clearSectors,
     setThrottle, setBrake, setSteering, setERSActive, setDRSActive
@@ -263,11 +262,6 @@ export default function VehicleController({ trackId = 'monza' }) {
     camera.position.lerp(targetPos, 0.06)
     camera.lookAt(pos.x, pos.y + 1, pos.z)
   })
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _rapier = rapier
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _world = world
 
   return (
     <RigidBody

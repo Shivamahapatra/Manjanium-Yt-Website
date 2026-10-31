@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Clock, MapPin, AlertCircle, Shield, RefreshCw, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { LiveTimeline } from '@/components/football/LiveTimeline';
 import { TeamLineup } from '@/components/football/TeamLineup';
