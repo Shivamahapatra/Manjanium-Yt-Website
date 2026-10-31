@@ -36,17 +36,6 @@ export function getTeamColor(teamName: string, fallback?: string): string {
   return '#3b82f6';
 }
 
-export function formatCountdown(targetDate: Date): string {
-  const now = new Date();
-  const diff = targetDate.getTime() - now.getTime();
-  if (diff <= 0) return 'LIVE NOW';
-  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  const s = Math.floor((diff % (1000 * 60)) / 1000);
-  return `${String(d).padStart(2, '0')}:${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
-
 export function classifyNewsTags(title: string, snippet: string): string[] {
   const text = `${title} ${snippet}`.toLowerCase();
   const tags: string[] = [];
