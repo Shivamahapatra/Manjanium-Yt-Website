@@ -1,0 +1,3208 @@
+{
+  "path": "/api/football/api-football/live",
+  "status": 200,
+  "shape": {
+    "cached": "bool",
+    "data": [
+      {
+        "away_team": {
+          "id": "int",
+          "logo": "str",
+          "name": "str",
+          "score": "int"
+        },
+        "elapsed": "int",
+        "fixture_id": "int",
+        "home_team": {
+          "id": "int",
+          "logo": "str",
+          "name": "str",
+          "score": "int"
+        },
+        "league": {
+          "country": "str",
+          "id": "int",
+          "logo": "str",
+          "name": "str"
+        },
+        "status": "str",
+        "timestamp": "int"
+      }
+    ],
+    "source": "str"
+  },
+  "body": {
+    "data": [
+      {
+        "fixture_id": 1490587,
+        "league": {
+          "id": 253,
+          "name": "Major League Soccer",
+          "country": "USA",
+          "logo": "https://media.api-sports.io/football/leagues/253.png"
+        },
+        "home_team": {
+          "id": 18310,
+          "name": "Charlotte",
+          "logo": "https://media.api-sports.io/football/teams/18310.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 1598,
+          "name": "Orlando City SC",
+          "logo": "https://media.api-sports.io/football/teams/1598.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 19,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1494788,
+        "league": {
+          "id": 103,
+          "name": "Eliteserien",
+          "country": "Norway",
+          "logo": "https://media.api-sports.io/football/leagues/103.png"
+        },
+        "home_team": {
+          "id": 757,
+          "name": "Aalesund",
+          "logo": "https://media.api-sports.io/football/teams/757.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 332,
+          "name": "Sandefjord",
+          "logo": "https://media.api-sports.io/football/teams/332.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1499709,
+        "league": {
+          "id": 131,
+          "name": "Primera B Metropolitana",
+          "country": "Argentina",
+          "logo": "https://media.api-sports.io/football/leagues/131.png"
+        },
+        "home_team": {
+          "id": 3943,
+          "name": "Deportivo Camioneros",
+          "logo": "https://media.api-sports.io/football/teams/3943.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 8385,
+          "name": "Excursionistas",
+          "logo": "https://media.api-sports.io/football/teams/8385.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 21,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1499714,
+        "league": {
+          "id": 131,
+          "name": "Primera B Metropolitana",
+          "country": "Argentina",
+          "logo": "https://media.api-sports.io/football/leagues/131.png"
+        },
+        "home_team": {
+          "id": 8388,
+          "name": "Sportivo Italiano",
+          "logo": "https://media.api-sports.io/football/teams/8388.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 481,
+          "name": "Villa Dalmine",
+          "logo": "https://media.api-sports.io/football/teams/481.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 25,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1519674,
+        "league": {
+          "id": 328,
+          "name": "Esiliiga A",
+          "country": "Estonia",
+          "logo": "https://media.api-sports.io/football/leagues/328.png"
+        },
+        "home_team": {
+          "id": 3518,
+          "name": "Flora II",
+          "logo": "https://media.api-sports.io/football/teams/3518.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 3524,
+          "name": "Tartu Welco",
+          "logo": "https://media.api-sports.io/football/teams/3524.png",
+          "score": 2
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1548555,
+        "league": {
+          "id": 210,
+          "name": "HNL",
+          "country": "Croatia",
+          "logo": "https://media.api-sports.io/football/leagues/210.png"
+        },
+        "home_team": {
+          "id": 1019,
+          "name": "Rudes",
+          "logo": "https://media.api-sports.io/football/teams/1019.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 620,
+          "name": "Dinamo Zagreb",
+          "logo": "https://media.api-sports.io/football/teams/620.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1550186,
+        "league": {
+          "id": 135,
+          "name": "Serie A",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/135.png"
+        },
+        "home_team": {
+          "id": 494,
+          "name": "Udinese",
+          "logo": "https://media.api-sports.io/football/teams/494.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 497,
+          "name": "AS Roma",
+          "logo": "https://media.api-sports.io/football/teams/497.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1551588,
+        "league": {
+          "id": 332,
+          "name": "Super Liga",
+          "country": "Slovakia",
+          "logo": "https://media.api-sports.io/football/leagues/332.png"
+        },
+        "home_team": {
+          "id": 3548,
+          "name": "Podbrezová",
+          "logo": "https://media.api-sports.io/football/teams/3548.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 656,
+          "name": "Slovan Bratislava",
+          "logo": "https://media.api-sports.io/football/teams/656.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1555413,
+        "league": {
+          "id": 207,
+          "name": "Super League",
+          "country": "Switzerland",
+          "logo": "https://media.api-sports.io/football/leagues/207.png"
+        },
+        "home_team": {
+          "id": 1013,
+          "name": "Grasshoppers",
+          "logo": "https://media.api-sports.io/football/teams/1013.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 660,
+          "name": "FC Vaduz",
+          "logo": "https://media.api-sports.io/football/teams/660.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1555417,
+        "league": {
+          "id": 207,
+          "name": "Super League",
+          "country": "Switzerland",
+          "logo": "https://media.api-sports.io/football/leagues/207.png"
+        },
+        "home_team": {
+          "id": 1011,
+          "name": "FC ST. Gallen",
+          "logo": "https://media.api-sports.io/football/teams/1011.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 2184,
+          "name": "Servette FC",
+          "logo": "https://media.api-sports.io/football/teams/2184.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1558034,
+        "league": {
+          "id": 373,
+          "name": "1. SNL",
+          "country": "Slovenia",
+          "logo": "https://media.api-sports.io/football/leagues/373.png"
+        },
+        "home_team": {
+          "id": 4358,
+          "name": "Aluminij",
+          "logo": "https://media.api-sports.io/football/teams/4358.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 4378,
+          "name": "Radomlje",
+          "logo": "https://media.api-sports.io/football/teams/4378.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 27,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1558668,
+        "league": {
+          "id": 144,
+          "name": "Jupiler Pro League",
+          "country": "Belgium",
+          "logo": "https://media.api-sports.io/football/leagues/144.png"
+        },
+        "home_team": {
+          "id": 733,
+          "name": "Standard Liege",
+          "logo": "https://media.api-sports.io/football/teams/733.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 734,
+          "name": "Kortrijk",
+          "logo": "https://media.api-sports.io/football/teams/734.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 11,
+        "timestamp": 1793466900
+      },
+      {
+        "fixture_id": 1559822,
+        "league": {
+          "id": 346,
+          "name": "FNL",
+          "country": "Czech-Republic",
+          "logo": "https://media.api-sports.io/football/leagues/346.png"
+        },
+        "home_team": {
+          "id": 3727,
+          "name": "Třinec",
+          "logo": "https://media.api-sports.io/football/teams/3727.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 7270,
+          "name": "Arsenal Česká Lípa",
+          "logo": "https://media.api-sports.io/football/teams/7270.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1560063,
+        "league": {
+          "id": 345,
+          "name": "Czech Liga",
+          "country": "Czech-Republic",
+          "logo": "https://media.api-sports.io/football/leagues/345.png"
+        },
+        "home_team": {
+          "id": 2250,
+          "name": "Sigma Olomouc",
+          "logo": "https://media.api-sports.io/football/teams/2250.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 3733,
+          "name": "Zbrojovka Brno",
+          "logo": "https://media.api-sports.io/football/teams/3733.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1560272,
+        "league": {
+          "id": 271,
+          "name": "NB I",
+          "country": "Hungary",
+          "logo": "https://media.api-sports.io/football/leagues/271.png"
+        },
+        "home_team": {
+          "id": 2414,
+          "name": "Zalaegerszegi TE",
+          "logo": "https://media.api-sports.io/football/teams/2414.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 2396,
+          "name": "MTK Budapest",
+          "logo": "https://media.api-sports.io/football/teams/2396.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 44,
+        "timestamp": 1793465100
+      },
+      {
+        "fixture_id": 1561187,
+        "league": {
+          "id": 506,
+          "name": "2. liga",
+          "country": "Slovakia",
+          "logo": "https://media.api-sports.io/football/leagues/506.png"
+        },
+        "home_team": {
+          "id": 10550,
+          "name": "Tatran Prešov",
+          "logo": "https://media.api-sports.io/football/teams/10550.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 14054,
+          "name": "Galanta",
+          "logo": "https://media.api-sports.io/football/teams/14054.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1561433,
+        "league": {
+          "id": 235,
+          "name": "Premier League",
+          "country": "Russia",
+          "logo": "https://media.api-sports.io/football/leagues/235.png"
+        },
+        "home_team": {
+          "id": 6822,
+          "name": "Rodina Moskva",
+          "logo": "https://media.api-sports.io/football/teams/6822.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 621,
+          "name": "FC Krasnodar",
+          "logo": "https://media.api-sports.io/football/teams/621.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 38,
+        "timestamp": 1793465100
+      },
+      {
+        "fixture_id": 1565292,
+        "league": {
+          "id": 283,
+          "name": "Liga I",
+          "country": "Romania",
+          "logo": "https://media.api-sports.io/football/leagues/283.png"
+        },
+        "home_team": {
+          "id": 2598,
+          "name": "Petrolul Ploiesti",
+          "logo": "https://media.api-sports.io/football/teams/2598.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 2246,
+          "name": "CFR 1907 Cluj",
+          "logo": "https://media.api-sports.io/football/teams/2246.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 27,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1572107,
+        "league": {
+          "id": 875,
+          "name": "Segunda División RFEF - Group 1",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/875.png"
+        },
+        "home_team": {
+          "id": 5263,
+          "name": "Gernika",
+          "logo": "https://media.api-sports.io/football/teams/5263.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 9401,
+          "name": "Marino de Luanco",
+          "logo": "https://media.api-sports.io/football/teams/9401.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 27,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1572409,
+        "league": {
+          "id": 876,
+          "name": "Segunda División RFEF - Group 2",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/876.png"
+        },
+        "home_team": {
+          "id": 712,
+          "name": "Barcelona B",
+          "logo": "https://media.api-sports.io/football/teams/712.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 9862,
+          "name": "Arnedo",
+          "logo": "https://media.api-sports.io/football/teams/9862.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1573629,
+        "league": {
+          "id": 142,
+          "name": "Primera División Femenina",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/142.png"
+        },
+        "home_team": {
+          "id": 1921,
+          "name": "Madrid CFF W",
+          "logo": "https://media.api-sports.io/football/teams/1921.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 6376,
+          "name": "Deportivo de La Coruña W",
+          "logo": "https://media.api-sports.io/football/teams/6376.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1575831,
+        "league": {
+          "id": 122,
+          "name": "2. Division",
+          "country": "Denmark",
+          "logo": "https://media.api-sports.io/football/leagues/122.png"
+        },
+        "home_team": {
+          "id": 2066,
+          "name": "Naestved",
+          "logo": "https://media.api-sports.io/football/teams/2066.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 2067,
+          "name": "Roskilde",
+          "logo": "https://media.api-sports.io/football/teams/2067.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1576003,
+        "league": {
+          "id": 110,
+          "name": "Premier League",
+          "country": "Wales",
+          "logo": "https://media.api-sports.io/football/leagues/110.png"
+        },
+        "home_team": {
+          "id": 354,
+          "name": "The New Saints",
+          "logo": "https://media.api-sports.io/football/teams/354.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 357,
+          "name": "GAP Connah S Quay FC",
+          "logo": "https://media.api-sports.io/football/teams/357.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 12,
+        "timestamp": 1793466900
+      },
+      {
+        "fixture_id": 1580947,
+        "league": {
+          "id": 64,
+          "name": "Feminine Division 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/64.png"
+        },
+        "home_team": {
+          "id": 1675,
+          "name": "Montpellier W",
+          "logo": "https://media.api-sports.io/football/teams/1675.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 1674,
+          "name": "Lyon W",
+          "logo": "https://media.api-sports.io/football/teams/1674.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1580949,
+        "league": {
+          "id": 64,
+          "name": "Feminine Division 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/64.png"
+        },
+        "home_team": {
+          "id": 24514,
+          "name": "Strasbourg W",
+          "logo": "https://media.api-sports.io/football/teams/24514.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 14006,
+          "name": "Le Havre W",
+          "logo": "https://media.api-sports.io/football/teams/14006.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1581010,
+        "league": {
+          "id": 64,
+          "name": "Feminine Division 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/64.png"
+        },
+        "home_team": {
+          "id": 27933,
+          "name": "Toulouse W",
+          "logo": "https://media.api-sports.io/football/teams/27933.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 27932,
+          "name": "Saint-Malo W",
+          "logo": "https://media.api-sports.io/football/teams/27932.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 32,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1585115,
+        "league": {
+          "id": 64,
+          "name": "Feminine Division 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/64.png"
+        },
+        "home_team": {
+          "id": 26234,
+          "name": "Lens W",
+          "logo": "https://media.api-sports.io/football/teams/26234.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 1677,
+          "name": "FC Fleury 91 W",
+          "logo": "https://media.api-sports.io/football/teams/1677.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 27,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1586622,
+        "league": {
+          "id": 84,
+          "name": "Regionalliga - Nord",
+          "country": "Germany",
+          "logo": "https://media.api-sports.io/football/leagues/84.png"
+        },
+        "home_team": {
+          "id": 19475,
+          "name": "Schöningen",
+          "logo": "https://media.api-sports.io/football/teams/19475.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 12831,
+          "name": "Phönix Lübeck",
+          "logo": "https://media.api-sports.io/football/teams/12831.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 27,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1589527,
+        "league": {
+          "id": 261,
+          "name": "National Division",
+          "country": "Luxembourg",
+          "logo": "https://media.api-sports.io/football/leagues/261.png"
+        },
+        "home_team": {
+          "id": 15847,
+          "name": "Atert Bissen",
+          "logo": "https://media.api-sports.io/football/teams/15847.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 2042,
+          "name": "Etzella Ettelbruck",
+          "logo": "https://media.api-sports.io/football/teams/2042.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1589530,
+        "league": {
+          "id": 261,
+          "name": "National Division",
+          "country": "Luxembourg",
+          "logo": "https://media.api-sports.io/football/leagues/261.png"
+        },
+        "home_team": {
+          "id": 2037,
+          "name": "US Mondorf-les-bains",
+          "logo": "https://media.api-sports.io/football/teams/2037.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 2040,
+          "name": "US Hostert",
+          "logo": "https://media.api-sports.io/football/teams/2040.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 22,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1589531,
+        "league": {
+          "id": 261,
+          "name": "National Division",
+          "country": "Luxembourg",
+          "logo": "https://media.api-sports.io/football/leagues/261.png"
+        },
+        "home_team": {
+          "id": 658,
+          "name": "Progres Niederkorn",
+          "logo": "https://media.api-sports.io/football/teams/658.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 11907,
+          "name": "Swift Hesperange",
+          "logo": "https://media.api-sports.io/football/teams/11907.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1589533,
+        "league": {
+          "id": 261,
+          "name": "National Division",
+          "country": "Luxembourg",
+          "logo": "https://media.api-sports.io/football/leagues/261.png"
+        },
+        "home_team": {
+          "id": 2036,
+          "name": "UNA Strassen",
+          "logo": "https://media.api-sports.io/football/teams/2036.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 2035,
+          "name": "UN Kaerjeng 97",
+          "logo": "https://media.api-sports.io/football/teams/2035.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1589534,
+        "league": {
+          "id": 261,
+          "name": "National Division",
+          "country": "Luxembourg",
+          "logo": "https://media.api-sports.io/football/leagues/261.png"
+        },
+        "home_team": {
+          "id": 15900,
+          "name": "Résidence Walferdange",
+          "logo": "https://media.api-sports.io/football/teams/15900.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 11906,
+          "name": "Wiltz",
+          "logo": "https://media.api-sports.io/football/teams/11906.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1593347,
+        "league": {
+          "id": 197,
+          "name": "Super League 1",
+          "country": "Greece",
+          "logo": "https://media.api-sports.io/football/leagues/197.png"
+        },
+        "home_team": {
+          "id": 5050,
+          "name": "Kifisia",
+          "logo": "https://media.api-sports.io/football/teams/5050.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 553,
+          "name": "Olympiakos Piraeus",
+          "logo": "https://media.api-sports.io/football/teams/553.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 27,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1599517,
+        "league": {
+          "id": 67,
+          "name": "National 2 - Group A",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/67.png"
+        },
+        "home_team": {
+          "id": 1307,
+          "name": "Creteil",
+          "logo": "https://media.api-sports.io/football/teams/1307.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 3058,
+          "name": "Haguenau",
+          "logo": "https://media.api-sports.io/football/teams/3058.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1599762,
+        "league": {
+          "id": 68,
+          "name": "National 2 - Group B",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/68.png"
+        },
+        "home_team": {
+          "id": 3235,
+          "name": "Tarbes",
+          "logo": "https://media.api-sports.io/football/teams/3235.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 3037,
+          "name": "Chauray",
+          "logo": "https://media.api-sports.io/football/teams/3037.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 30,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1599982,
+        "league": {
+          "id": 69,
+          "name": "National 2 - Group C",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/69.png"
+        },
+        "home_team": {
+          "id": 9973,
+          "name": "Rumilly Vallières",
+          "logo": "https://media.api-sports.io/football/teams/9973.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 3267,
+          "name": "Istres",
+          "logo": "https://media.api-sports.io/football/teams/3267.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1599996,
+        "league": {
+          "id": 69,
+          "name": "National 2 - Group C",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/69.png"
+        },
+        "home_team": {
+          "id": 17360,
+          "name": "Bourges Foot 18",
+          "logo": "https://media.api-sports.io/football/teams/17360.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 9945,
+          "name": "Troyes II",
+          "logo": "https://media.api-sports.io/football/teams/9945.png",
+          "score": 2
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1599999,
+        "league": {
+          "id": 69,
+          "name": "National 2 - Group C",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/69.png"
+        },
+        "home_team": {
+          "id": 9254,
+          "name": "Chasselay MDA",
+          "logo": "https://media.api-sports.io/football/teams/9254.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 3187,
+          "name": "Hauts Lyonnais",
+          "logo": "https://media.api-sports.io/football/teams/3187.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 22,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1603596,
+        "league": {
+          "id": 318,
+          "name": "1. Division",
+          "country": "Cyprus",
+          "logo": "https://media.api-sports.io/football/leagues/318.png"
+        },
+        "home_team": {
+          "id": 3402,
+          "name": "Omonia Nicosia",
+          "logo": "https://media.api-sports.io/football/teams/3402.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 3396,
+          "name": "AEL",
+          "logo": "https://media.api-sports.io/football/teams/3396.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 26,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1611441,
+        "league": {
+          "id": 186,
+          "name": "Ligue 1",
+          "country": "Algeria",
+          "logo": "https://media.api-sports.io/football/leagues/186.png"
+        },
+        "home_team": {
+          "id": 10777,
+          "name": "MB Rouisset",
+          "logo": "https://media.api-sports.io/football/teams/10777.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 10792,
+          "name": "Ben Aknoun",
+          "logo": "https://media.api-sports.io/football/teams/10792.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 43,
+        "timestamp": 1793465100
+      },
+      {
+        "fixture_id": 1612782,
+        "league": {
+          "id": 439,
+          "name": "Tercera División RFEF - Group 1",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/439.png"
+        },
+        "home_team": {
+          "id": 9615,
+          "name": "Silva",
+          "logo": "https://media.api-sports.io/football/teams/9615.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 15307,
+          "name": "Viveiro",
+          "logo": "https://media.api-sports.io/football/teams/15307.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 25,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1613086,
+        "league": {
+          "id": 440,
+          "name": "Tercera División RFEF - Group 2",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/440.png"
+        },
+        "home_team": {
+          "id": 9625,
+          "name": "L'Entregu",
+          "logo": "https://media.api-sports.io/football/teams/9625.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 9624,
+          "name": "Gijón Industrial",
+          "logo": "https://media.api-sports.io/football/teams/9624.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 13,
+        "timestamp": 1793466900
+      },
+      {
+        "fixture_id": 1613387,
+        "league": {
+          "id": 441,
+          "name": "Tercera División RFEF - Group 3",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/441.png"
+        },
+        "home_team": {
+          "id": 9637,
+          "name": "Atlético Albericia",
+          "logo": "https://media.api-sports.io/football/teams/9637.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 9386,
+          "name": "Escobedo",
+          "logo": "https://media.api-sports.io/football/teams/9386.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1613390,
+        "league": {
+          "id": 441,
+          "name": "Tercera División RFEF - Group 3",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/441.png"
+        },
+        "home_team": {
+          "id": 15336,
+          "name": "Castro",
+          "logo": "https://media.api-sports.io/football/teams/15336.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 8152,
+          "name": "Barquereño",
+          "logo": "https://media.api-sports.io/football/teams/8152.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1613694,
+        "league": {
+          "id": 442,
+          "name": "Tercera División RFEF - Group 4",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/442.png"
+        },
+        "home_team": {
+          "id": 17315,
+          "name": "Amurrio Club",
+          "logo": "https://media.api-sports.io/football/teams/17315.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 24571,
+          "name": "Aretxabaleta",
+          "logo": "https://media.api-sports.io/football/teams/24571.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 21,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1613700,
+        "league": {
+          "id": 442,
+          "name": "Tercera División RFEF - Group 4",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/442.png"
+        },
+        "home_team": {
+          "id": 9666,
+          "name": "Sodupe",
+          "logo": "https://media.api-sports.io/football/teams/9666.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 9662,
+          "name": "Real Sociedad III",
+          "logo": "https://media.api-sports.io/football/teams/9662.png",
+          "score": 3
+        },
+        "status": "1H",
+        "elapsed": 45,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1614310,
+        "league": {
+          "id": 444,
+          "name": "Tercera División RFEF - Group 6",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/444.png"
+        },
+        "home_team": {
+          "id": 9684,
+          "name": "Roda",
+          "logo": "https://media.api-sports.io/football/teams/9684.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 28103,
+          "name": "Eldense B",
+          "logo": "https://media.api-sports.io/football/teams/28103.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 27,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1614613,
+        "league": {
+          "id": 445,
+          "name": "Tercera División RFEF - Group 7",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/445.png"
+        },
+        "home_team": {
+          "id": 17589,
+          "name": "Colonia Moscardó",
+          "logo": "https://media.api-sports.io/football/teams/17589.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 24709,
+          "name": "Cala Pozuelo",
+          "logo": "https://media.api-sports.io/football/teams/24709.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 28,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1614923,
+        "league": {
+          "id": 446,
+          "name": "Tercera División RFEF - Group 8",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/446.png"
+        },
+        "home_team": {
+          "id": 9728,
+          "name": "Cristo Atlético",
+          "logo": "https://media.api-sports.io/football/teams/9728.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 17538,
+          "name": "Palencia CF",
+          "logo": "https://media.api-sports.io/football/teams/17538.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 27,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1615226,
+        "league": {
+          "id": 447,
+          "name": "Tercera División RFEF - Group 9",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/447.png"
+        },
+        "home_team": {
+          "id": 28108,
+          "name": "Cantoria",
+          "logo": "https://media.api-sports.io/football/teams/28108.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 24960,
+          "name": "Marbelli",
+          "logo": "https://media.api-sports.io/football/teams/24960.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1616143,
+        "league": {
+          "id": 450,
+          "name": "Tercera División RFEF - Group 12",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/450.png"
+        },
+        "home_team": {
+          "id": 9798,
+          "name": "Las Palmas III",
+          "logo": "https://media.api-sports.io/football/teams/9798.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 28113,
+          "name": "Anaza",
+          "logo": "https://media.api-sports.io/football/teams/28113.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 19,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1616144,
+        "league": {
+          "id": 450,
+          "name": "Tercera División RFEF - Group 12",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/450.png"
+        },
+        "home_team": {
+          "id": 24611,
+          "name": "Los Llanos",
+          "logo": "https://media.api-sports.io/football/teams/24611.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 5269,
+          "name": "Mensajero",
+          "logo": "https://media.api-sports.io/football/teams/5269.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 19,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1616451,
+        "league": {
+          "id": 451,
+          "name": "Tercera División RFEF - Group 13",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/451.png"
+        },
+        "home_team": {
+          "id": 9816,
+          "name": "Mazarrón FC",
+          "logo": "https://media.api-sports.io/football/teams/9816.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 28115,
+          "name": "Bullas Deportivo",
+          "logo": "https://media.api-sports.io/football/teams/28115.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 27,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1617978,
+        "league": {
+          "id": 456,
+          "name": "Tercera División RFEF - Group 18",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/456.png"
+        },
+        "home_team": {
+          "id": 9905,
+          "name": "Manchego",
+          "logo": "https://media.api-sports.io/football/teams/9905.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 9901,
+          "name": "Illescas",
+          "logo": "https://media.api-sports.io/football/teams/9901.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1634791,
+        "league": {
+          "id": 330,
+          "name": "Premier League",
+          "country": "Kuwait",
+          "logo": "https://media.api-sports.io/football/leagues/330.png"
+        },
+        "home_team": {
+          "id": 3543,
+          "name": "Al Sulaibikhat",
+          "logo": "https://media.api-sports.io/football/teams/3543.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 3538,
+          "name": "Al Salmiyah",
+          "logo": "https://media.api-sports.io/football/teams/3538.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 44,
+        "timestamp": 1793465100
+      },
+      {
+        "fixture_id": 1635312,
+        "league": {
+          "id": 585,
+          "name": "Premier League",
+          "country": "Uganda",
+          "logo": "https://media.api-sports.io/football/leagues/585.png"
+        },
+        "home_team": {
+          "id": 12459,
+          "name": "URA",
+          "logo": "https://media.api-sports.io/football/teams/12459.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 8114,
+          "name": "Vipers",
+          "logo": "https://media.api-sports.io/football/teams/8114.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 29,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1639830,
+        "league": {
+          "id": 242,
+          "name": "Liga Pro",
+          "country": "Ecuador",
+          "logo": "https://media.api-sports.io/football/leagues/242.png"
+        },
+        "home_team": {
+          "id": 1149,
+          "name": "Delfin SC",
+          "logo": "https://media.api-sports.io/football/teams/1149.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 1154,
+          "name": "Deportivo Cuenca",
+          "logo": "https://media.api-sports.io/football/teams/1154.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1641202,
+        "league": {
+          "id": 201,
+          "name": "Botola 2",
+          "country": "Morocco",
+          "logo": "https://media.api-sports.io/football/leagues/201.png"
+        },
+        "home_team": {
+          "id": 25058,
+          "name": "Yacoub El Mansour",
+          "logo": "https://media.api-sports.io/football/teams/25058.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 3451,
+          "name": "El Massira",
+          "logo": "https://media.api-sports.io/football/teams/3451.png",
+          "score": 1
+        },
+        "status": "1H",
+        "elapsed": 27,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1648018,
+        "league": {
+          "id": 762,
+          "name": "Premier League",
+          "country": "Mauritania",
+          "logo": "https://media.api-sports.io/football/leagues/762.png"
+        },
+        "home_team": {
+          "id": 16164,
+          "name": "Armée",
+          "logo": "https://media.api-sports.io/football/teams/16164.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 24798,
+          "name": "N'Zidane",
+          "logo": "https://media.api-sports.io/football/teams/24798.png",
+          "score": 0
+        },
+        "status": "1H",
+        "elapsed": 22,
+        "timestamp": 1793466000
+      },
+      {
+        "fixture_id": 1497737,
+        "league": {
+          "id": 114,
+          "name": "Superettan",
+          "country": "Sweden",
+          "logo": "https://media.api-sports.io/football/leagues/114.png"
+        },
+        "home_team": {
+          "id": 812,
+          "name": "Falkenbergs FF",
+          "logo": "https://media.api-sports.io/football/teams/812.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 6697,
+          "name": "Sandviken",
+          "logo": "https://media.api-sports.io/football/teams/6697.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 72,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1499715,
+        "league": {
+          "id": 131,
+          "name": "Primera B Metropolitana",
+          "country": "Argentina",
+          "logo": "https://media.api-sports.io/football/leagues/131.png"
+        },
+        "home_team": {
+          "id": 8380,
+          "name": "Villa San Carlos",
+          "logo": "https://media.api-sports.io/football/teams/8380.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 2422,
+          "name": "Real Pilar",
+          "logo": "https://media.api-sports.io/football/teams/2422.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 70,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1530028,
+        "league": {
+          "id": 649,
+          "name": "Supreme Division Women",
+          "country": "Russia",
+          "logo": "https://media.api-sports.io/football/leagues/649.png"
+        },
+        "home_team": {
+          "id": 10885,
+          "name": "Chertanovo W",
+          "logo": "https://media.api-sports.io/football/teams/10885.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 16490,
+          "name": "Rostov W",
+          "logo": "https://media.api-sports.io/football/teams/16490.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 71,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1547650,
+        "league": {
+          "id": 362,
+          "name": "A Lyga",
+          "country": "Lithuania",
+          "logo": "https://media.api-sports.io/football/leagues/362.png"
+        },
+        "home_team": {
+          "id": 3870,
+          "name": "Šiauliai",
+          "logo": "https://media.api-sports.io/football/teams/3870.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 3860,
+          "name": "Džiugas Telšiai",
+          "logo": "https://media.api-sports.io/football/teams/3860.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 90,
+        "timestamp": 1793460600
+      },
+      {
+        "fixture_id": 1551863,
+        "league": {
+          "id": 89,
+          "name": "Eerste Divisie",
+          "country": "Netherlands",
+          "logo": "https://media.api-sports.io/football/leagues/89.png"
+        },
+        "home_team": {
+          "id": 412,
+          "name": "MVV",
+          "logo": "https://media.api-sports.io/football/teams/412.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 204,
+          "name": "VVV Venlo",
+          "logo": "https://media.api-sports.io/football/teams/204.png",
+          "score": 2
+        },
+        "status": "2H",
+        "elapsed": 90,
+        "timestamp": 1793460600
+      },
+      {
+        "fixture_id": 1553900,
+        "league": {
+          "id": 286,
+          "name": "Super Liga",
+          "country": "Serbia",
+          "logo": "https://media.api-sports.io/football/leagues/286.png"
+        },
+        "home_team": {
+          "id": 2637,
+          "name": "Macva",
+          "logo": "https://media.api-sports.io/football/teams/2637.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 598,
+          "name": "FK Crvena Zvezda",
+          "logo": "https://media.api-sports.io/football/teams/598.png",
+          "score": 2
+        },
+        "status": "2H",
+        "elapsed": 72,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1555541,
+        "league": {
+          "id": 383,
+          "name": "Ligat Ha'al",
+          "country": "Israel",
+          "logo": "https://media.api-sports.io/football/leagues/383.png"
+        },
+        "home_team": {
+          "id": 4481,
+          "name": "Bnei Sakhnin",
+          "logo": "https://media.api-sports.io/football/teams/4481.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 6181,
+          "name": "Ironi Tiberias",
+          "logo": "https://media.api-sports.io/football/teams/6181.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 72,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1558985,
+        "league": {
+          "id": 374,
+          "name": "2. SNL",
+          "country": "Slovenia",
+          "logo": "https://media.api-sports.io/football/leagues/374.png"
+        },
+        "home_team": {
+          "id": 16302,
+          "name": "Dravinja",
+          "logo": "https://media.api-sports.io/football/teams/16302.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 4370,
+          "name": "Dekani",
+          "logo": "https://media.api-sports.io/football/teams/4370.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 73,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1559819,
+        "league": {
+          "id": 346,
+          "name": "FNL",
+          "country": "Czech-Republic",
+          "logo": "https://media.api-sports.io/football/leagues/346.png"
+        },
+        "home_team": {
+          "id": 3718,
+          "name": "Příbram",
+          "logo": "https://media.api-sports.io/football/teams/3718.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 3726,
+          "name": "Táborsko",
+          "logo": "https://media.api-sports.io/football/teams/3726.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 69,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1561954,
+        "league": {
+          "id": 218,
+          "name": "Bundesliga",
+          "country": "Austria",
+          "logo": "https://media.api-sports.io/football/leagues/218.png"
+        },
+        "home_team": {
+          "id": 618,
+          "name": "SCR Altach",
+          "logo": "https://media.api-sports.io/football/teams/618.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 1028,
+          "name": "Ried",
+          "logo": "https://media.api-sports.io/football/teams/1028.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 72,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1567942,
+        "league": {
+          "id": 219,
+          "name": "2. Liga",
+          "country": "Austria",
+          "logo": "https://media.api-sports.io/football/leagues/219.png"
+        },
+        "home_team": {
+          "id": 4990,
+          "name": "First Vienna",
+          "logo": "https://media.api-sports.io/football/teams/4990.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 1394,
+          "name": "FC BW Linz",
+          "logo": "https://media.api-sports.io/football/teams/1394.png",
+          "score": 3
+        },
+        "status": "2H",
+        "elapsed": 68,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1568546,
+        "league": {
+          "id": 782,
+          "name": "III Liga - Group 3",
+          "country": "Poland",
+          "logo": "https://media.api-sports.io/football/leagues/782.png"
+        },
+        "home_team": {
+          "id": 14145,
+          "name": "Polonia Nysa",
+          "logo": "https://media.api-sports.io/football/teams/14145.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 17401,
+          "name": "Carina Gubin",
+          "logo": "https://media.api-sports.io/football/teams/17401.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 72,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1569996,
+        "league": {
+          "id": 141,
+          "name": "Segunda División",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/141.png"
+        },
+        "home_team": {
+          "id": 545,
+          "name": "Eibar",
+          "logo": "https://media.api-sports.io/football/teams/545.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 723,
+          "name": "Almeria",
+          "logo": "https://media.api-sports.io/football/teams/723.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 90,
+        "timestamp": 1793459700
+      },
+      {
+        "fixture_id": 1570813,
+        "league": {
+          "id": 435,
+          "name": "Primera División RFEF - Group 1",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/435.png"
+        },
+        "home_team": {
+          "id": 5280,
+          "name": "UD Logroñés",
+          "logo": "https://media.api-sports.io/football/teams/5280.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 799,
+          "name": "Mirandes",
+          "logo": "https://media.api-sports.io/football/teams/799.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 90,
+        "timestamp": 1793460600
+      },
+      {
+        "fixture_id": 1572411,
+        "league": {
+          "id": 876,
+          "name": "Segunda División RFEF - Group 2",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/876.png"
+        },
+        "home_team": {
+          "id": 9868,
+          "name": "Náxara",
+          "logo": "https://media.api-sports.io/football/teams/9868.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 9891,
+          "name": "Utebo",
+          "logo": "https://media.api-sports.io/football/teams/9891.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 69,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1572716,
+        "league": {
+          "id": 877,
+          "name": "Segunda División RFEF - Group 3",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/877.png"
+        },
+        "home_team": {
+          "id": 9691,
+          "name": "Elche II",
+          "logo": "https://media.api-sports.io/football/teams/9691.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 17588,
+          "name": "Castellón II",
+          "logo": "https://media.api-sports.io/football/teams/17588.png",
+          "score": 4
+        },
+        "status": "2H",
+        "elapsed": 73,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1574152,
+        "league": {
+          "id": 221,
+          "name": "Regionalliga - Ost",
+          "country": "Austria",
+          "logo": "https://media.api-sports.io/football/leagues/221.png"
+        },
+        "home_team": {
+          "id": 4966,
+          "name": "Wiener Viktoria",
+          "logo": "https://media.api-sports.io/football/teams/4966.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 1397,
+          "name": "SV Horn",
+          "logo": "https://media.api-sports.io/football/teams/1397.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 70,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1574153,
+        "league": {
+          "id": 221,
+          "name": "Regionalliga - Ost",
+          "country": "Austria",
+          "logo": "https://media.api-sports.io/football/leagues/221.png"
+        },
+        "home_team": {
+          "id": 27886,
+          "name": "Mattersburg SV 2020",
+          "logo": "https://media.api-sports.io/football/teams/27886.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 11200,
+          "name": "Oberwart",
+          "logo": "https://media.api-sports.io/football/teams/11200.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 74,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1575535,
+        "league": {
+          "id": 94,
+          "name": "Primeira Liga",
+          "country": "Portugal",
+          "logo": "https://media.api-sports.io/football/leagues/94.png"
+        },
+        "home_team": {
+          "id": 215,
+          "name": "Moreirense",
+          "logo": "https://media.api-sports.io/football/teams/215.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 15130,
+          "name": "Estrela",
+          "logo": "https://media.api-sports.io/football/teams/15130.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 90,
+        "timestamp": 1793460600
+      },
+      {
+        "fixture_id": 1576515,
+        "league": {
+          "id": 95,
+          "name": "Segunda Liga",
+          "country": "Portugal",
+          "logo": "https://media.api-sports.io/football/leagues/95.png"
+        },
+        "home_team": {
+          "id": 244,
+          "name": "Leixoes",
+          "logo": "https://media.api-sports.io/football/teams/244.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 761,
+          "name": "Sporting CP B",
+          "logo": "https://media.api-sports.io/football/teams/761.png",
+          "score": 2
+        },
+        "status": "2H",
+        "elapsed": 90,
+        "timestamp": 1793460600
+      },
+      {
+        "fixture_id": 1581552,
+        "league": {
+          "id": 342,
+          "name": "Premier League",
+          "country": "Armenia",
+          "logo": "https://media.api-sports.io/football/leagues/342.png"
+        },
+        "home_team": {
+          "id": 3682,
+          "name": "Ararat",
+          "logo": "https://media.api-sports.io/football/teams/3682.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 582,
+          "name": "Alashkert",
+          "logo": "https://media.api-sports.io/football/teams/582.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 69,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1582306,
+        "league": {
+          "id": 393,
+          "name": "Premier League",
+          "country": "Malta",
+          "logo": "https://media.api-sports.io/football/leagues/393.png"
+        },
+        "home_team": {
+          "id": 2277,
+          "name": "Birkirkara",
+          "logo": "https://media.api-sports.io/football/teams/2277.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 16533,
+          "name": "Birzebbuga",
+          "logo": "https://media.api-sports.io/football/teams/16533.png",
+          "score": 2
+        },
+        "status": "2H",
+        "elapsed": 88,
+        "timestamp": 1793460600
+      },
+      {
+        "fixture_id": 1584451,
+        "league": {
+          "id": 203,
+          "name": "Süper Lig",
+          "country": "Turkey",
+          "logo": "https://media.api-sports.io/football/leagues/203.png"
+        },
+        "home_team": {
+          "id": 611,
+          "name": "Fenerbahçe",
+          "logo": "https://media.api-sports.io/football/teams/611.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 994,
+          "name": "Göztepe",
+          "logo": "https://media.api-sports.io/football/teams/994.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 67,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1585816,
+        "league": {
+          "id": 204,
+          "name": "1. Lig",
+          "country": "Turkey",
+          "logo": "https://media.api-sports.io/football/leagues/204.png"
+        },
+        "home_team": {
+          "id": 3597,
+          "name": "Manisa F.K.",
+          "logo": "https://media.api-sports.io/football/teams/3597.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 7395,
+          "name": "Batman Petrolspor",
+          "logo": "https://media.api-sports.io/football/teams/7395.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 69,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1587878,
+        "league": {
+          "id": 50,
+          "name": "National League - North",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/50.png"
+        },
+        "home_team": {
+          "id": 1375,
+          "name": "Morecambe",
+          "logo": "https://media.api-sports.io/football/teams/1375.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 7745,
+          "name": "Scarborough Athletic",
+          "logo": "https://media.api-sports.io/football/teams/7745.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 84,
+        "timestamp": 1793458800
+      },
+      {
+        "fixture_id": 1591365,
+        "league": {
+          "id": 205,
+          "name": "2. Lig",
+          "country": "Turkey",
+          "logo": "https://media.api-sports.io/football/leagues/205.png"
+        },
+        "home_team": {
+          "id": 6536,
+          "name": "Muş Sport Klübü",
+          "logo": "https://media.api-sports.io/football/teams/6536.png",
+          "score": 4
+        },
+        "away_team": {
+          "id": 3563,
+          "name": "Adana Demirspor",
+          "logo": "https://media.api-sports.io/football/teams/3563.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 66,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1594181,
+        "league": {
+          "id": 635,
+          "name": "NB III - Northwest",
+          "country": "Hungary",
+          "logo": "https://media.api-sports.io/football/leagues/635.png"
+        },
+        "home_team": {
+          "id": 2401,
+          "name": "Dorogi FC",
+          "logo": "https://media.api-sports.io/football/teams/2401.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 7557,
+          "name": "SC Sopron",
+          "logo": "https://media.api-sports.io/football/teams/7557.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 75,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1594185,
+        "league": {
+          "id": 635,
+          "name": "NB III - Northwest",
+          "country": "Hungary",
+          "logo": "https://media.api-sports.io/football/leagues/635.png"
+        },
+        "home_team": {
+          "id": 17285,
+          "name": "Haladás VSE",
+          "logo": "https://media.api-sports.io/football/teams/17285.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 7536,
+          "name": "Bicskei",
+          "logo": "https://media.api-sports.io/football/teams/7536.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 70,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1594663,
+        "league": {
+          "id": 634,
+          "name": "NB III - Southwest",
+          "country": "Hungary",
+          "logo": "https://media.api-sports.io/football/leagues/634.png"
+        },
+        "home_team": {
+          "id": 17064,
+          "name": "MTK Budapest II",
+          "logo": "https://media.api-sports.io/football/teams/17064.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 7562,
+          "name": "Sárbogárd",
+          "logo": "https://media.api-sports.io/football/teams/7562.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 73,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1600362,
+        "league": {
+          "id": 288,
+          "name": "Premier Soccer League",
+          "country": "South-Africa",
+          "logo": "https://media.api-sports.io/football/leagues/288.png"
+        },
+        "home_team": {
+          "id": 4905,
+          "name": "Stellenbosch",
+          "logo": "https://media.api-sports.io/football/teams/4905.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 2698,
+          "name": "Chippa United",
+          "logo": "https://media.api-sports.io/football/teams/2698.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 73,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1600364,
+        "league": {
+          "id": 288,
+          "name": "Premier Soccer League",
+          "country": "South-Africa",
+          "logo": "https://media.api-sports.io/football/leagues/288.png"
+        },
+        "home_team": {
+          "id": 2669,
+          "name": "Amazulu",
+          "logo": "https://media.api-sports.io/football/teams/2669.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 2690,
+          "name": "Golden Arrows",
+          "logo": "https://media.api-sports.io/football/teams/2690.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 67,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1600365,
+        "league": {
+          "id": 288,
+          "name": "Premier Soccer League",
+          "country": "South-Africa",
+          "logo": "https://media.api-sports.io/football/leagues/288.png"
+        },
+        "home_team": {
+          "id": 2693,
+          "name": "Polokwane City",
+          "logo": "https://media.api-sports.io/football/teams/2693.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 8074,
+          "name": "TS Galaxy",
+          "logo": "https://media.api-sports.io/football/teams/8074.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 68,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1601276,
+        "league": {
+          "id": 139,
+          "name": "Serie A Women",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/139.png"
+        },
+        "home_team": {
+          "id": 1889,
+          "name": "Sassuolo W",
+          "logo": "https://media.api-sports.io/football/teams/1889.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 19748,
+          "name": "Parma W",
+          "logo": "https://media.api-sports.io/football/teams/19748.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 87,
+        "timestamp": 1793461500
+      },
+      {
+        "fixture_id": 1601585,
+        "league": {
+          "id": 136,
+          "name": "Serie B",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/136.png"
+        },
+        "home_team": {
+          "id": 1687,
+          "name": "Catanzaro",
+          "logo": "https://media.api-sports.io/football/teams/1687.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 870,
+          "name": "Padova",
+          "logo": "https://media.api-sports.io/football/teams/870.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 55,
+        "timestamp": 1793463300
+      },
+      {
+        "fixture_id": 1611436,
+        "league": {
+          "id": 186,
+          "name": "Ligue 1",
+          "country": "Algeria",
+          "logo": "https://media.api-sports.io/football/leagues/186.png"
+        },
+        "home_team": {
+          "id": 911,
+          "name": "CS Constantine",
+          "logo": "https://media.api-sports.io/football/teams/911.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 910,
+          "name": "USM Alger",
+          "logo": "https://media.api-sports.io/football/teams/910.png",
+          "score": 2
+        },
+        "status": "2H",
+        "elapsed": 66,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1613388,
+        "league": {
+          "id": 441,
+          "name": "Tercera División RFEF - Group 3",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/441.png"
+        },
+        "home_team": {
+          "id": 22132,
+          "name": "Atlético Mineros",
+          "logo": "https://media.api-sports.io/football/teams/22132.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 9650,
+          "name": "Torina",
+          "logo": "https://media.api-sports.io/football/teams/9650.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 54,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1613389,
+        "league": {
+          "id": 441,
+          "name": "Tercera División RFEF - Group 3",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/441.png"
+        },
+        "home_team": {
+          "id": 9639,
+          "name": "Bezana",
+          "logo": "https://media.api-sports.io/football/teams/9639.png",
+          "score": 4
+        },
+        "away_team": {
+          "id": 20451,
+          "name": "Velarde",
+          "logo": "https://media.api-sports.io/football/teams/20451.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 72,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1613697,
+        "league": {
+          "id": 442,
+          "name": "Tercera División RFEF - Group 4",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/442.png"
+        },
+        "home_team": {
+          "id": 28099,
+          "name": "Erandio",
+          "logo": "https://media.api-sports.io/football/teams/28099.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 9397,
+          "name": "Leioa",
+          "logo": "https://media.api-sports.io/football/teams/9397.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 67,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1613999,
+        "league": {
+          "id": 443,
+          "name": "Tercera División RFEF - Group 5",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/443.png"
+        },
+        "home_team": {
+          "id": 24574,
+          "name": "Atlètic Lleida",
+          "logo": "https://media.api-sports.io/football/teams/24574.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 24575,
+          "name": "Europa II",
+          "logo": "https://media.api-sports.io/football/teams/24575.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 71,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1614615,
+        "league": {
+          "id": 445,
+          "name": "Tercera División RFEF - Group 7",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/445.png"
+        },
+        "home_team": {
+          "id": 9705,
+          "name": "Alcobendas Sport",
+          "logo": "https://media.api-sports.io/football/teams/9705.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 9715,
+          "name": "Rayo Vallecano II",
+          "logo": "https://media.api-sports.io/football/teams/9715.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 69,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1614918,
+        "league": {
+          "id": 446,
+          "name": "Tercera División RFEF - Group 8",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/446.png"
+        },
+        "home_team": {
+          "id": 28106,
+          "name": "Calasanz de Soria",
+          "logo": "https://media.api-sports.io/football/teams/28106.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 9727,
+          "name": "Burgos Promesas",
+          "logo": "https://media.api-sports.io/football/teams/9727.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 65,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1614924,
+        "league": {
+          "id": 446,
+          "name": "Tercera División RFEF - Group 8",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/446.png"
+        },
+        "home_team": {
+          "id": 9737,
+          "name": "Salamanca II",
+          "logo": "https://media.api-sports.io/football/teams/9737.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 9738,
+          "name": "UD Santa Marta",
+          "logo": "https://media.api-sports.io/football/teams/9738.png",
+          "score": 2
+        },
+        "status": "2H",
+        "elapsed": 67,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1615841,
+        "league": {
+          "id": 449,
+          "name": "Tercera División RFEF - Group 11",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/449.png"
+        },
+        "home_team": {
+          "id": 9785,
+          "name": "Platges Calvià",
+          "logo": "https://media.api-sports.io/football/teams/9785.png",
+          "score": 3
+        },
+        "away_team": {
+          "id": 17598,
+          "name": "Inter Ibiza",
+          "logo": "https://media.api-sports.io/football/teams/17598.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 64,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1615843,
+        "league": {
+          "id": 449,
+          "name": "Tercera División RFEF - Group 11",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/449.png"
+        },
+        "home_team": {
+          "id": 28112,
+          "name": "Sineu",
+          "logo": "https://media.api-sports.io/football/teams/28112.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 8151,
+          "name": "Andratx",
+          "logo": "https://media.api-sports.io/football/teams/8151.png",
+          "score": 2
+        },
+        "status": "2H",
+        "elapsed": 74,
+        "timestamp": 1793461500
+      },
+      {
+        "fixture_id": 1616453,
+        "league": {
+          "id": 451,
+          "name": "Tercera División RFEF - Group 13",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/451.png"
+        },
+        "home_team": {
+          "id": 9808,
+          "name": "Atlético Pulpileño",
+          "logo": "https://media.api-sports.io/football/teams/9808.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 17715,
+          "name": "Cartagena LU II",
+          "logo": "https://media.api-sports.io/football/teams/17715.png",
+          "score": 2
+        },
+        "status": "2H",
+        "elapsed": 64,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1617067,
+        "league": {
+          "id": 453,
+          "name": "Tercera División RFEF - Group 15",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/453.png"
+        },
+        "home_team": {
+          "id": 9583,
+          "name": "Izarra",
+          "logo": "https://media.api-sports.io/football/teams/9583.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 9856,
+          "name": "Subiza",
+          "logo": "https://media.api-sports.io/football/teams/9856.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 90,
+        "timestamp": 1793460600
+      },
+      {
+        "fixture_id": 1617674,
+        "league": {
+          "id": 455,
+          "name": "Tercera División RFEF - Group 17",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/455.png"
+        },
+        "home_team": {
+          "id": 8158,
+          "name": "Fraga",
+          "logo": "https://media.api-sports.io/football/teams/8158.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 9883,
+          "name": "Brea",
+          "logo": "https://media.api-sports.io/football/teams/9883.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 90,
+        "timestamp": 1793460600
+      },
+      {
+        "fixture_id": 1617981,
+        "league": {
+          "id": 456,
+          "name": "Tercera División RFEF - Group 18",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/456.png"
+        },
+        "home_team": {
+          "id": 15332,
+          "name": "Marchamalo",
+          "logo": "https://media.api-sports.io/football/teams/15332.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 9906,
+          "name": "Quintanar del Rey",
+          "logo": "https://media.api-sports.io/football/teams/9906.png",
+          "score": 2
+        },
+        "status": "2H",
+        "elapsed": 52,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1617983,
+        "league": {
+          "id": 456,
+          "name": "Tercera División RFEF - Group 18",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/456.png"
+        },
+        "home_team": {
+          "id": 17619,
+          "name": "San Clemente",
+          "logo": "https://media.api-sports.io/football/teams/17619.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 9908,
+          "name": "Toledo",
+          "logo": "https://media.api-sports.io/football/teams/9908.png",
+          "score": 2
+        },
+        "status": "2H",
+        "elapsed": 61,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1617984,
+        "league": {
+          "id": 456,
+          "name": "Tercera División RFEF - Group 18",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/456.png"
+        },
+        "home_team": {
+          "id": 9910,
+          "name": "Villacañas",
+          "logo": "https://media.api-sports.io/football/teams/9910.png",
+          "score": 3
+        },
+        "away_team": {
+          "id": 28123,
+          "name": "CD Villa",
+          "logo": "https://media.api-sports.io/football/teams/28123.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 88,
+        "timestamp": 1793460600
+      },
+      {
+        "fixture_id": 1628019,
+        "league": {
+          "id": 542,
+          "name": "Iraqi League",
+          "country": "Iraq",
+          "logo": "https://media.api-sports.io/football/leagues/542.png"
+        },
+        "home_team": {
+          "id": 15544,
+          "name": "Al Karkh",
+          "logo": "https://media.api-sports.io/football/teams/15544.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 26600,
+          "name": "Gharraf",
+          "logo": "https://media.api-sports.io/football/teams/26600.png",
+          "score": 2
+        },
+        "status": "2H",
+        "elapsed": 73,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1630119,
+        "league": {
+          "id": 1241,
+          "name": "U19 league",
+          "country": "Serbia",
+          "logo": "https://media.api-sports.io/football/leagues/1241.png"
+        },
+        "home_team": {
+          "id": 28267,
+          "name": "Jedinstvo U. U19",
+          "logo": "https://media.api-sports.io/football/teams/28267.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 28273,
+          "name": "Sp. Subotica U19",
+          "logo": "https://media.api-sports.io/football/teams/28273.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 72,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1645831,
+        "league": {
+          "id": 282,
+          "name": "Segunda División",
+          "country": "Peru",
+          "logo": "https://media.api-sports.io/football/leagues/282.png"
+        },
+        "home_team": {
+          "id": 2543,
+          "name": "Academia Cantolao",
+          "logo": "https://media.api-sports.io/football/teams/2543.png",
+          "score": 7
+        },
+        "away_team": {
+          "id": 2550,
+          "name": "Deportivo Binacional",
+          "logo": "https://media.api-sports.io/football/teams/2550.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 89,
+        "timestamp": 1793461500
+      },
+      {
+        "fixture_id": 1646861,
+        "league": {
+          "id": 200,
+          "name": "Botola Pro",
+          "country": "Morocco",
+          "logo": "https://media.api-sports.io/football/leagues/200.png"
+        },
+        "home_team": {
+          "id": 18753,
+          "name": "Amal Tiznit",
+          "logo": "https://media.api-sports.io/football/teams/18753.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 971,
+          "name": "Kawkab Marrakech",
+          "logo": "https://media.api-sports.io/football/teams/971.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 69,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1646898,
+        "league": {
+          "id": 268,
+          "name": "Primera División",
+          "country": "Uruguay",
+          "logo": "https://media.api-sports.io/football/leagues/268.png"
+        },
+        "home_team": {
+          "id": 2362,
+          "name": "Cerro",
+          "logo": "https://media.api-sports.io/football/teams/2362.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 2368,
+          "name": "Central Espanol",
+          "logo": "https://media.api-sports.io/football/teams/2368.png",
+          "score": 1
+        },
+        "status": "2H",
+        "elapsed": 70,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1647165,
+        "league": {
+          "id": 269,
+          "name": "Segunda División",
+          "country": "Uruguay",
+          "logo": "https://media.api-sports.io/football/leagues/269.png"
+        },
+        "home_team": {
+          "id": 16740,
+          "name": "Uruguay Montevideo",
+          "logo": "https://media.api-sports.io/football/teams/16740.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 2377,
+          "name": "Sportivo Huracan",
+          "logo": "https://media.api-sports.io/football/teams/2377.png",
+          "score": 0
+        },
+        "status": "2H",
+        "elapsed": 66,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1547651,
+        "league": {
+          "id": 362,
+          "name": "A Lyga",
+          "country": "Lithuania",
+          "logo": "https://media.api-sports.io/football/leagues/362.png"
+        },
+        "home_team": {
+          "id": 3861,
+          "name": "Hegelmann Litauen",
+          "logo": "https://media.api-sports.io/football/teams/3861.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 3872,
+          "name": "Kauno Žalgiris",
+          "logo": "https://media.api-sports.io/football/teams/3872.png",
+          "score": 2
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1553212,
+        "league": {
+          "id": 106,
+          "name": "Ekstraklasa",
+          "country": "Poland",
+          "logo": "https://media.api-sports.io/football/leagues/106.png"
+        },
+        "home_team": {
+          "id": 347,
+          "name": "Lech Poznan",
+          "logo": "https://media.api-sports.io/football/teams/347.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 338,
+          "name": "Wisla Krakow",
+          "logo": "https://media.api-sports.io/football/teams/338.png",
+          "score": 0
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1597951,
+        "league": {
+          "id": 305,
+          "name": "Stars League",
+          "country": "Qatar",
+          "logo": "https://media.api-sports.io/football/leagues/305.png"
+        },
+        "home_team": {
+          "id": 2905,
+          "name": "Al-Arabi SC",
+          "logo": "https://media.api-sports.io/football/teams/2905.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 2897,
+          "name": "Al-Rayyan SC",
+          "logo": "https://media.api-sports.io/football/teams/2897.png",
+          "score": 0
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1597952,
+        "league": {
+          "id": 305,
+          "name": "Stars League",
+          "country": "Qatar",
+          "logo": "https://media.api-sports.io/football/leagues/305.png"
+        },
+        "home_team": {
+          "id": 2904,
+          "name": "Al-Duhail SC",
+          "logo": "https://media.api-sports.io/football/teams/2904.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 2900,
+          "name": "Al Wakrah",
+          "logo": "https://media.api-sports.io/football/teams/2900.png",
+          "score": 1
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1608346,
+        "league": {
+          "id": 138,
+          "name": "Serie C - Girone A",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/138.png"
+        },
+        "home_team": {
+          "id": 865,
+          "name": "Giana Erminio",
+          "logo": "https://media.api-sports.io/football/teams/865.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 17824,
+          "name": "Alcione",
+          "logo": "https://media.api-sports.io/football/teams/17824.png",
+          "score": 3
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1608723,
+        "league": {
+          "id": 942,
+          "name": "Serie C - Girone B",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/942.png"
+        },
+        "home_team": {
+          "id": 882,
+          "name": "Guidonia Montecelio 1937",
+          "logo": "https://media.api-sports.io/football/teams/882.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 524,
+          "name": "Perugia",
+          "logo": "https://media.api-sports.io/football/teams/524.png",
+          "score": 0
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1608730,
+        "league": {
+          "id": 942,
+          "name": "Serie C - Girone B",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/942.png"
+        },
+        "home_team": {
+          "id": 9442,
+          "name": "Vado",
+          "logo": "https://media.api-sports.io/football/teams/9442.png",
+          "score": 2
+        },
+        "away_team": {
+          "id": 9499,
+          "name": "Grosseto",
+          "logo": "https://media.api-sports.io/football/teams/9499.png",
+          "score": 1
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1609103,
+        "league": {
+          "id": 943,
+          "name": "Serie C - Girone C",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/943.png"
+        },
+        "home_team": {
+          "id": 19968,
+          "name": "Barletta",
+          "logo": "https://media.api-sports.io/football/teams/19968.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 10138,
+          "name": "SS Monopoli",
+          "logo": "https://media.api-sports.io/football/teams/10138.png",
+          "score": 0
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1609105,
+        "league": {
+          "id": 943,
+          "name": "Serie C - Girone C",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/943.png"
+        },
+        "home_team": {
+          "id": 1712,
+          "name": "Cavese",
+          "logo": "https://media.api-sports.io/football/teams/1712.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 1587,
+          "name": "AZ Picerno",
+          "logo": "https://media.api-sports.io/football/teams/1587.png",
+          "score": 2
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1612778,
+        "league": {
+          "id": 439,
+          "name": "Tercera División RFEF - Group 1",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/439.png"
+        },
+        "home_team": {
+          "id": 9608,
+          "name": "Barco",
+          "logo": "https://media.api-sports.io/football/teams/9608.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 26534,
+          "name": "Coruña",
+          "logo": "https://media.api-sports.io/football/teams/26534.png",
+          "score": 0
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793463300
+      },
+      {
+        "fixture_id": 1613395,
+        "league": {
+          "id": 441,
+          "name": "Tercera División RFEF - Group 3",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/441.png"
+        },
+        "home_team": {
+          "id": 9651,
+          "name": "Tropezón",
+          "logo": "https://media.api-sports.io/football/teams/9651.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 28098,
+          "name": "Naval Reinosa",
+          "logo": "https://media.api-sports.io/football/teams/28098.png",
+          "score": 0
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1614311,
+        "league": {
+          "id": 444,
+          "name": "Tercera División RFEF - Group 6",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/444.png"
+        },
+        "home_team": {
+          "id": 9699,
+          "name": "Saguntino",
+          "logo": "https://media.api-sports.io/football/teams/9699.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 9688,
+          "name": "Atzeneta",
+          "logo": "https://media.api-sports.io/football/teams/9688.png",
+          "score": 0
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1617979,
+        "league": {
+          "id": 456,
+          "name": "Tercera División RFEF - Group 18",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/456.png"
+        },
+        "home_team": {
+          "id": 15330,
+          "name": "Huracán Balazote",
+          "logo": "https://media.api-sports.io/football/teams/15330.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 9909,
+          "name": "Torrijos",
+          "logo": "https://media.api-sports.io/football/teams/9909.png",
+          "score": 0
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793462400
+      },
+      {
+        "fixture_id": 1628024,
+        "league": {
+          "id": 542,
+          "name": "Iraqi League",
+          "country": "Iraq",
+          "logo": "https://media.api-sports.io/football/leagues/542.png"
+        },
+        "home_team": {
+          "id": 28571,
+          "name": "Al Shorta",
+          "logo": "https://media.api-sports.io/football/teams/28571.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 25062,
+          "name": "Newroz",
+          "logo": "https://media.api-sports.io/football/teams/25062.png",
+          "score": 1
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1632521,
+        "league": {
+          "id": 405,
+          "name": "National Soccer League",
+          "country": "Rwanda",
+          "logo": "https://media.api-sports.io/football/leagues/405.png"
+        },
+        "home_team": {
+          "id": 5239,
+          "name": "Al Merreikh",
+          "logo": "https://media.api-sports.io/football/teams/5239.png",
+          "score": 1
+        },
+        "away_team": {
+          "id": 5320,
+          "name": "Mukura",
+          "logo": "https://media.api-sports.io/football/teams/5320.png",
+          "score": 0
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      },
+      {
+        "fixture_id": 1643375,
+        "league": {
+          "id": 387,
+          "name": "League",
+          "country": "Jordan",
+          "logo": "https://media.api-sports.io/football/leagues/387.png"
+        },
+        "home_team": {
+          "id": 4531,
+          "name": "Al Faisaly",
+          "logo": "https://media.api-sports.io/football/teams/4531.png",
+          "score": 0
+        },
+        "away_team": {
+          "id": 4532,
+          "name": "Al Hussein",
+          "logo": "https://media.api-sports.io/football/teams/4532.png",
+          "score": 0
+        },
+        "status": "HT",
+        "elapsed": 45,
+        "timestamp": 1793464200
+      }
+    ],
+    "source": "api-football",
+    "cached": false
+  }
+}

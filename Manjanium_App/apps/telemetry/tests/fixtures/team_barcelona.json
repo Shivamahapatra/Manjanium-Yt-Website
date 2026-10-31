@@ -1,0 +1,92 @@
+{
+  "path": "/api/team/barcelona",
+  "status": 200,
+  "shape": {
+    "champions_league": {
+      "recent": [],
+      "standing": {
+        "points": "int",
+        "position": "int"
+      },
+      "upcoming": []
+    },
+    "form": "str",
+    "la_liga": {
+      "recent": [],
+      "standing": {
+        "played": "int",
+        "points": "int",
+        "position": "int"
+      },
+      "upcoming": []
+    },
+    "next_fixture": {
+      "competition": "str",
+      "date": "str",
+      "opponent": "str"
+    },
+    "next_match": {
+      "competition": "str",
+      "date": "str",
+      "opponent": "str"
+    },
+    "played": "int",
+    "points": "int",
+    "rank": "int",
+    "recent_form": [
+      "str"
+    ],
+    "team": {
+      "crest": "str",
+      "id": "int",
+      "name": "str",
+      "short_name": "str"
+    }
+  },
+  "body": {
+    "rank": 1,
+    "points": 12,
+    "played": 4,
+    "form": "WWWWW",
+    "next_fixture": {
+      "opponent": "Girona FC",
+      "competition": "La Liga",
+      "date": "2026-09-22T19:00:00Z"
+    },
+    "team": {
+      "id": 529,
+      "name": "FC Barcelona",
+      "short_name": "Barça",
+      "crest": "https://crests.football-data.org/81.svg"
+    },
+    "la_liga": {
+      "standing": {
+        "position": 1,
+        "points": 12,
+        "played": 4
+      },
+      "recent": [],
+      "upcoming": []
+    },
+    "champions_league": {
+      "standing": {
+        "position": 1,
+        "points": 9
+      },
+      "recent": [],
+      "upcoming": []
+    },
+    "next_match": {
+      "opponent": "Girona FC",
+      "competition": "La Liga",
+      "date": "2026-09-22T19:00:00Z"
+    },
+    "recent_form": [
+      "W",
+      "W",
+      "W",
+      "W",
+      "W"
+    ]
+  }
+}

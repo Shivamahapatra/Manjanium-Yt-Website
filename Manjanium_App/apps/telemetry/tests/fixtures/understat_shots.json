@@ -1,0 +1,650 @@
+{
+  "path": "/api/football/understat/shots/22676",
+  "status": 200,
+  "shape": {
+    "cached": "bool",
+    "data": {
+      "away_team": {
+        "goals": "int",
+        "name": "str",
+        "shots": "int",
+        "total_xG": "float"
+      },
+      "home_team": {
+        "goals": "int",
+        "name": "str",
+        "shots": "int",
+        "total_xG": "float"
+      },
+      "match_id": "str",
+      "shots": [
+        {
+          "id": "str",
+          "last_action": "str",
+          "minute": "int",
+          "player": "str",
+          "player_assisted": "str",
+          "result": "str",
+          "shot_type": "str",
+          "situation": "str",
+          "team": "str",
+          "team_name": "str",
+          "x": "float",
+          "xG": "float",
+          "y": "float"
+        }
+      ],
+      "xG_momentum": [
+        {
+          "away_xG": "float",
+          "home_xG": "float",
+          "minute": "int"
+        }
+      ]
+    },
+    "source": "str"
+  },
+  "body": {
+    "data": {
+      "match_id": "22676",
+      "home_team": {
+        "name": "Cagliari",
+        "total_xG": 2.08,
+        "shots": 14,
+        "goals": 2
+      },
+      "away_team": {
+        "name": "Fiorentina",
+        "total_xG": 2.22,
+        "shots": 11,
+        "goals": 3
+      },
+      "shots": [
+        {
+          "id": "582971",
+          "minute": 7,
+          "result": "MissedShots",
+          "x": 0.903,
+          "y": 0.507,
+          "xG": 0.048,
+          "player": "Gianluca Lapadula",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "Head",
+          "situation": "OpenPlay",
+          "player_assisted": "Tommaso Augello",
+          "last_action": "Aerial"
+        },
+        {
+          "id": "582972",
+          "minute": 15,
+          "result": "MissedShots",
+          "x": 0.811,
+          "y": 0.493,
+          "xG": 0.063,
+          "player": "Nicolas Viola",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "LeftFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Gianluca Lapadula",
+          "last_action": "LayOff"
+        },
+        {
+          "id": "582973",
+          "minute": 19,
+          "result": "SavedShot",
+          "x": 0.899,
+          "y": 0.456,
+          "xG": 0.298,
+          "player": "Andrea Belotti",
+          "team": "away",
+          "team_name": "Fiorentina",
+          "shot_type": "Head",
+          "situation": "SetPiece",
+          "player_assisted": "Cristiano Biraghi",
+          "last_action": "Aerial"
+        },
+        {
+          "id": "582974",
+          "minute": 23,
+          "result": "BlockedShot",
+          "x": 0.92,
+          "y": 0.444,
+          "xG": 0.138,
+          "player": "Andrea Belotti",
+          "team": "away",
+          "team_name": "Fiorentina",
+          "shot_type": "RightFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Jonathan Ikone",
+          "last_action": "Pass"
+        },
+        {
+          "id": "582975",
+          "minute": 24,
+          "result": "MissedShots",
+          "x": 0.92,
+          "y": 0.445,
+          "xG": 0.053,
+          "player": "Antonin Barak",
+          "team": "away",
+          "team_name": "Fiorentina",
+          "shot_type": "OtherBodyPart",
+          "situation": "FromCorner",
+          "player_assisted": "Cristiano Biraghi",
+          "last_action": "Cross"
+        },
+        {
+          "id": "582976",
+          "minute": 25,
+          "result": "BlockedShot",
+          "x": 0.834,
+          "y": 0.237,
+          "xG": 0.018,
+          "player": "Dodô",
+          "team": "away",
+          "team_name": "Fiorentina",
+          "shot_type": "RightFoot",
+          "situation": "OpenPlay",
+          "player_assisted": null,
+          "last_action": "None"
+        },
+        {
+          "id": "582977",
+          "minute": 26,
+          "result": "MissedShots",
+          "x": 0.949,
+          "y": 0.474,
+          "xG": 0.452,
+          "player": "Alessandro Deiola",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "Head",
+          "situation": "FromCorner",
+          "player_assisted": "Nicolas Viola",
+          "last_action": "Cross"
+        },
+        {
+          "id": "582978",
+          "minute": 27,
+          "result": "SavedShot",
+          "x": 0.868,
+          "y": 0.555,
+          "xG": 0.107,
+          "player": "Zito",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "LeftFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Gianluca Lapadula",
+          "last_action": "Pass"
+        },
+        {
+          "id": "582979",
+          "minute": 28,
+          "result": "SavedShot",
+          "x": 0.921,
+          "y": 0.472,
+          "xG": 0.052,
+          "player": "Alessandro Deiola",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "Head",
+          "situation": "FromCorner",
+          "player_assisted": null,
+          "last_action": "None"
+        },
+        {
+          "id": "582980",
+          "minute": 32,
+          "result": "SavedShot",
+          "x": 0.825,
+          "y": 0.628,
+          "xG": 0.24,
+          "player": "Zito",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "LeftFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Nicolas Viola",
+          "last_action": "Pass"
+        },
+        {
+          "id": "582981",
+          "minute": 33,
+          "result": "ShotOnPost",
+          "x": 0.811,
+          "y": 0.495,
+          "xG": 0.046,
+          "player": "Matteo Prati",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "RightFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Zito",
+          "last_action": "Pass"
+        },
+        {
+          "id": "582982",
+          "minute": 38,
+          "result": "Goal",
+          "x": 0.849,
+          "y": 0.383,
+          "xG": 0.074,
+          "player": "Giacomo Bonaventura",
+          "team": "away",
+          "team_name": "Fiorentina",
+          "shot_type": "LeftFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Gaetano Castrovilli",
+          "last_action": "Pass"
+        },
+        {
+          "id": "582983",
+          "minute": 42,
+          "result": "SavedShot",
+          "x": 0.939,
+          "y": 0.66,
+          "xG": 0.099,
+          "player": "Gaetano Castrovilli",
+          "team": "away",
+          "team_name": "Fiorentina",
+          "shot_type": "LeftFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Giacomo Bonaventura",
+          "last_action": "Pass"
+        },
+        {
+          "id": "582984",
+          "minute": 48,
+          "result": "MissedShots",
+          "x": 0.866,
+          "y": 0.416,
+          "xG": 0.055,
+          "player": "Nicolas Viola",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "LeftFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Nahitan Nández",
+          "last_action": "Cross"
+        },
+        {
+          "id": "582985",
+          "minute": 57,
+          "result": "MissedShots",
+          "x": 0.923,
+          "y": 0.51,
+          "xG": 0.334,
+          "player": "Alessandro Deiola",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "Head",
+          "situation": "FromCorner",
+          "player_assisted": "Nicolas Viola",
+          "last_action": "Cross"
+        },
+        {
+          "id": "582986",
+          "minute": 59,
+          "result": "SavedShot",
+          "x": 0.887,
+          "y": 0.383,
+          "xG": 0.055,
+          "player": "Gabriele Zappa",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "RightFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Nicolas Viola",
+          "last_action": "Cross"
+        },
+        {
+          "id": "582987",
+          "minute": 61,
+          "result": "MissedShots",
+          "x": 0.921,
+          "y": 0.579,
+          "xG": 0.091,
+          "player": "Nicolas Viola",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "LeftFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Gianluca Lapadula",
+          "last_action": "Cross"
+        },
+        {
+          "id": "582988",
+          "minute": 63,
+          "result": "Goal",
+          "x": 0.914,
+          "y": 0.531,
+          "xG": 0.189,
+          "player": "Alessandro Deiola",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "Head",
+          "situation": "OpenPlay",
+          "player_assisted": "Matteo Prati",
+          "last_action": "Chipped"
+        },
+        {
+          "id": "582989",
+          "minute": 74,
+          "result": "BlockedShot",
+          "x": 0.909,
+          "y": 0.594,
+          "xG": 0.117,
+          "player": "M&#039;Bala Nzola",
+          "team": "away",
+          "team_name": "Fiorentina",
+          "shot_type": "RightFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Antonin Barak",
+          "last_action": "Pass"
+        },
+        {
+          "id": "582990",
+          "minute": 75,
+          "result": "MissedShots",
+          "x": 0.71,
+          "y": 0.599,
+          "xG": 0.014,
+          "player": "Arthur",
+          "team": "away",
+          "team_name": "Fiorentina",
+          "shot_type": "RightFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Gaetano Castrovilli",
+          "last_action": "Pass"
+        },
+        {
+          "id": "582991",
+          "minute": 78,
+          "result": "MissedShots",
+          "x": 0.917,
+          "y": 0.485,
+          "xG": 0.338,
+          "player": "Nicolas Viola",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "Head",
+          "situation": "OpenPlay",
+          "player_assisted": "Gabriele Zappa",
+          "last_action": "Cross"
+        },
+        {
+          "id": "582992",
+          "minute": 81,
+          "result": "MissedShots",
+          "x": 0.923,
+          "y": 0.433,
+          "xG": 0.026,
+          "player": "Lucas Martínez Quarta",
+          "team": "away",
+          "team_name": "Fiorentina",
+          "shot_type": "Head",
+          "situation": "FromCorner",
+          "player_assisted": "Cristiano Biraghi",
+          "last_action": "Aerial"
+        },
+        {
+          "id": "582993",
+          "minute": 84,
+          "result": "Goal",
+          "x": 0.792,
+          "y": 0.765,
+          "xG": 0.013,
+          "player": "Kingstone Mutandwa",
+          "team": "home",
+          "team_name": "Cagliari",
+          "shot_type": "RightFoot",
+          "situation": "OpenPlay",
+          "player_assisted": "Nahitan Nández",
+          "last_action": "Chipped"
+        },
+        {
+          "id": "582994",
+          "minute": 88,
+          "result": "Goal",
+          "x": 0.967,
+          "y": 0.528,
+          "xG": 0.618,
+          "player": "Nicolás González",
+          "team": "away",
+          "team_name": "Fiorentina",
+          "shot_type": "LeftFoot",
+          "situation": "SetPiece",
+          "player_assisted": "Cristiano Biraghi",
+          "last_action": "Cross"
+        },
+        {
+          "id": "582995",
+          "minute": 102,
+          "result": "Goal",
+          "x": 0.885,
+          "y": 0.5,
+          "xG": 0.761,
+          "player": "Arthur",
+          "team": "away",
+          "team_name": "Fiorentina",
+          "shot_type": "RightFoot",
+          "situation": "Penalty",
+          "player_assisted": null,
+          "last_action": "Standard"
+        }
+      ],
+      "xG_momentum": [
+        {
+          "minute": 0,
+          "home_xG": 0.0,
+          "away_xG": 0.0
+        },
+        {
+          "minute": 7,
+          "home_xG": 0.048,
+          "away_xG": 0.0,
+          "result": "MissedShots",
+          "player": "Gianluca Lapadula",
+          "team": "home"
+        },
+        {
+          "minute": 15,
+          "home_xG": 0.111,
+          "away_xG": 0.0,
+          "result": "MissedShots",
+          "player": "Nicolas Viola",
+          "team": "home"
+        },
+        {
+          "minute": 19,
+          "home_xG": 0.111,
+          "away_xG": 0.298,
+          "result": "SavedShot",
+          "player": "Andrea Belotti",
+          "team": "away"
+        },
+        {
+          "minute": 23,
+          "home_xG": 0.111,
+          "away_xG": 0.436,
+          "result": "BlockedShot",
+          "player": "Andrea Belotti",
+          "team": "away"
+        },
+        {
+          "minute": 24,
+          "home_xG": 0.111,
+          "away_xG": 0.489,
+          "result": "MissedShots",
+          "player": "Antonin Barak",
+          "team": "away"
+        },
+        {
+          "minute": 25,
+          "home_xG": 0.111,
+          "away_xG": 0.507,
+          "result": "BlockedShot",
+          "player": "Dodô",
+          "team": "away"
+        },
+        {
+          "minute": 26,
+          "home_xG": 0.563,
+          "away_xG": 0.507,
+          "result": "MissedShots",
+          "player": "Alessandro Deiola",
+          "team": "home"
+        },
+        {
+          "minute": 27,
+          "home_xG": 0.67,
+          "away_xG": 0.507,
+          "result": "SavedShot",
+          "player": "Zito",
+          "team": "home"
+        },
+        {
+          "minute": 28,
+          "home_xG": 0.722,
+          "away_xG": 0.507,
+          "result": "SavedShot",
+          "player": "Alessandro Deiola",
+          "team": "home"
+        },
+        {
+          "minute": 32,
+          "home_xG": 0.962,
+          "away_xG": 0.507,
+          "result": "SavedShot",
+          "player": "Zito",
+          "team": "home"
+        },
+        {
+          "minute": 33,
+          "home_xG": 1.008,
+          "away_xG": 0.507,
+          "result": "ShotOnPost",
+          "player": "Matteo Prati",
+          "team": "home"
+        },
+        {
+          "minute": 38,
+          "home_xG": 1.008,
+          "away_xG": 0.581,
+          "result": "Goal",
+          "player": "Giacomo Bonaventura",
+          "team": "away"
+        },
+        {
+          "minute": 42,
+          "home_xG": 1.008,
+          "away_xG": 0.68,
+          "result": "SavedShot",
+          "player": "Gaetano Castrovilli",
+          "team": "away"
+        },
+        {
+          "minute": 48,
+          "home_xG": 1.063,
+          "away_xG": 0.68,
+          "result": "MissedShots",
+          "player": "Nicolas Viola",
+          "team": "home"
+        },
+        {
+          "minute": 57,
+          "home_xG": 1.397,
+          "away_xG": 0.68,
+          "result": "MissedShots",
+          "player": "Alessandro Deiola",
+          "team": "home"
+        },
+        {
+          "minute": 59,
+          "home_xG": 1.452,
+          "away_xG": 0.68,
+          "result": "SavedShot",
+          "player": "Gabriele Zappa",
+          "team": "home"
+        },
+        {
+          "minute": 61,
+          "home_xG": 1.543,
+          "away_xG": 0.68,
+          "result": "MissedShots",
+          "player": "Nicolas Viola",
+          "team": "home"
+        },
+        {
+          "minute": 63,
+          "home_xG": 1.732,
+          "away_xG": 0.68,
+          "result": "Goal",
+          "player": "Alessandro Deiola",
+          "team": "home"
+        },
+        {
+          "minute": 74,
+          "home_xG": 1.732,
+          "away_xG": 0.797,
+          "result": "BlockedShot",
+          "player": "M&#039;Bala Nzola",
+          "team": "away"
+        },
+        {
+          "minute": 75,
+          "home_xG": 1.732,
+          "away_xG": 0.811,
+          "result": "MissedShots",
+          "player": "Arthur",
+          "team": "away"
+        },
+        {
+          "minute": 78,
+          "home_xG": 2.07,
+          "away_xG": 0.811,
+          "result": "MissedShots",
+          "player": "Nicolas Viola",
+          "team": "home"
+        },
+        {
+          "minute": 81,
+          "home_xG": 2.07,
+          "away_xG": 0.837,
+          "result": "MissedShots",
+          "player": "Lucas Martínez Quarta",
+          "team": "away"
+        },
+        {
+          "minute": 84,
+          "home_xG": 2.083,
+          "away_xG": 0.837,
+          "result": "Goal",
+          "player": "Kingstone Mutandwa",
+          "team": "home"
+        },
+        {
+          "minute": 88,
+          "home_xG": 2.083,
+          "away_xG": 1.455,
+          "result": "Goal",
+          "player": "Nicolás González",
+          "team": "away"
+        },
+        {
+          "minute": 102,
+          "home_xG": 2.083,
+          "away_xG": 2.216,
+          "result": "Goal",
+          "player": "Arthur",
+          "team": "away"
+        }
+      ]
+    },
+    "source": "understat",
+    "cached": true
+  }
+}
