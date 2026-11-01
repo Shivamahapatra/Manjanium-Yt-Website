@@ -60,3 +60,4 @@ class APIFootballAdapter:
 
 
 api_football_adapter = APIFootballAdapter()
+

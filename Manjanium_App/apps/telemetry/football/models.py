@@ -68,3 +68,4 @@ class NormalizedShot(BaseModel):
     situation: Optional[str] = None
     player_assisted: Optional[str] = None
     last_action: Optional[str] = None
+

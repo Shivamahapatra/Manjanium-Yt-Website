@@ -153,3 +153,4 @@ class FootballDataAdapter:
 
 
 football_data_adapter = FootballDataAdapter()
+

@@ -85,3 +85,4 @@ def resolve_league_code(identifier: str) -> Optional[str]:
         if info["football_data_id"] == ident or info["api_football_id"] == ident:
             return code
     return None
+
