@@ -70,6 +70,18 @@ export const HeroSection = () => {
             Football Center
             <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Button>
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="group border-amber-500/40 text-amber-400 hover:bg-amber-500/10 hover:border-amber-500"
+            onClick={() => {
+              const el = document.getElementById('engine-teardown')
+              if (el) el.scrollIntoView({ behavior: 'smooth' })
+            }}
+          >
+            Explore the V8
+            <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
         </motion.div>
       </div>
     </div>

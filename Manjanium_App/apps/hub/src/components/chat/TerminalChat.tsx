@@ -80,12 +80,30 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
   const [showCommands, setShowCommands] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [desktopOpen, setDesktopOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Wait for document to be available (portal requirement)
+  // Wait for document to be available (portal requirement) and load persisted state (default collapsed)
   useEffect(() => {
     setMounted(true);
+    try {
+      const saved = localStorage.getItem("manjanium_terminal_open");
+      if (saved !== null) {
+        setDesktopOpen(saved === "true");
+      }
+    } catch {
+      // ignore
+    }
   }, []);
+
+  const handleToggleDesktop = (open: boolean) => {
+    setDesktopOpen(open);
+    try {
+      localStorage.setItem("manjanium_terminal_open", String(open));
+    } catch {
+      // ignore
+    }
+  };
 
   const username =
     isLoaded && user
@@ -321,32 +339,67 @@ export function TerminalChat({ context, className = "" }: TerminalChatProps) {
 
   const widget = (
     <>
-      {/* ── DESKTOP: fixed sidebar (lg and above) ───────────────────────── */}
-      <div
-        className={`
-          hidden lg:flex
-          fixed top-24 right-4 z-100
-          flex-col
-          w-80 xl:w-95
-          h-[calc(100vh-110px)]
-          bg-[#0a0a0a]/95 backdrop-blur-md
-          border border-primary/20
-          rounded-xl overflow-hidden
-          font-mono text-xs shadow-[0_0_30px_rgba(0,0,0,0.8)]
-          ${className}
-        `}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-primary/20 shrink-0">
-          <div className="flex items-center gap-2 text-primary font-bold tracking-widest uppercase text-xs">
-            <Terminal className="w-3.5 h-3.5" />
-            <span>Manjanium OS Terminal</span>
+      {/* ── DESKTOP: collapsible drawer panel (lg and above) ──────────────── */}
+      {desktopOpen ? (
+        <div
+          className={`
+            hidden lg:flex
+            fixed top-24 right-4 z-100
+            flex-col
+            w-80 xl:w-95
+            h-[calc(100vh-110px)]
+            bg-[#0a0a0a]/95 backdrop-blur-md
+            border border-primary/30
+            rounded-xl overflow-hidden
+            font-mono text-xs shadow-[0_0_40px_rgba(0,0,0,0.9)]
+            transition-all duration-300 ease-in-out
+            ${className}
+          `}
+        >
+          {/* Header with Close Button */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-primary/20 shrink-0 bg-[#0f0f0f]">
+            <div className="flex items-center gap-2 text-primary font-bold tracking-widest uppercase text-xs">
+              <Terminal className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-zinc-100">Manjanium OS Terminal</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(var(--color-success),0.8)]" />
+              <button
+                aria-label="Close Terminal"
+                onClick={() => handleToggleDesktop(false)}
+                className="text-gray-400 hover:text-white hover:bg-white/10 transition-colors p-1 rounded-md ml-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-          <div className="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(var(--color-success),0.8)]" />
-        </div>
 
-        {ChatContent}
-      </div>
+          {ChatContent}
+        </div>
+      ) : (
+        /* Desktop Floating Toggle Button */
+        <button
+          aria-label="Open Manjanium OS Terminal"
+          onClick={() => handleToggleDesktop(true)}
+          className="
+            hidden lg:flex
+            fixed bottom-6 right-6 z-100
+            h-11 px-4
+            bg-[#0a0a0a]/90 backdrop-blur-md
+            text-emerald-400 border border-emerald-500/30 hover:border-emerald-500/70
+            rounded-full
+            items-center gap-2.5
+            font-mono text-xs font-semibold
+            shadow-[0_4px_20px_rgba(0,0,0,0.8)]
+            hover:scale-105 active:scale-95
+            transition-all duration-200
+          "
+        >
+          <Terminal className="w-4 h-4 text-emerald-400" />
+          <span>TERMINAL</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        </button>
+      )}
 
       {/* ── MOBILE: floating action button (below lg) ────────────────────── */}
       <button

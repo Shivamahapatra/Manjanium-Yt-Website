@@ -99,6 +99,15 @@ const TOP_LEAGUES = [
   { id: 'FL1', name: 'Ligue 1', country: 'France', flag: '🇫🇷', compCode: 'FL1', logo: 'https://crests.football-data.org/FL1.png' },
 ]
 
+const LEAGUE_ID_MAP: Record<string, string[]> = {
+  PD: ['PD', '140', 'La Liga', 'La Liga EA Sports'],
+  CL: ['CL', '2', 'Champions League', 'UEFA Champions League'],
+  PL: ['PL', '39', 'Premier League'],
+  BL1: ['BL1', '78', 'Bundesliga'],
+  SA: ['SA', '135', 'Serie A'],
+  FL1: ['FL1', '61', 'Ligue 1'],
+}
+
 // Fallback Standings for Football-Data.org when API key is pending
 const INITIAL_LA_LIGA_STANDINGS: StandingRow[] = [
   { position: 1, name: 'FC Barcelona', short_name: 'Barça', crest: 'https://crests.football-data.org/81.svg', played: 4, won: 4, draw: 0, lost: 0, points: 12, goal_difference: 10 },
@@ -219,14 +228,20 @@ export default function FootballHubPage() {
   const fetchMatches = useCallback(async (dateStr: string) => {
     setLoadingMatches(true)
     try {
-      // 1. First attempt direct connection to Python FastAPI telemetry service
-      let res = await fetch(`http://localhost:8000/api/matches?date=${dateStr}`, {
+      // 1. First attempt Next.js API route proxy (or direct FastAPI telemetry service)
+      let res = await fetch(`/api/football/matches?date=${dateStr}`, {
         cache: 'no-store',
       }).catch(() => null)
 
-      // 2. Fallback to Next.js API proxy if direct telemetry service is unreachable
       if (!res || !res.ok) {
-        res = await fetch(`/api/football/fotmob/matches?date=${dateStr.replace(/-/g, '')}`, {
+        res = await fetch(`http://localhost:8000/api/matches?date=${dateStr}`, {
+          cache: 'no-store',
+        }).catch(() => null)
+      }
+
+      // 2. Fallback to fotmob proxy route if primary matches route fails
+      if (!res || !res.ok) {
+        res = await fetch(`/api/football/fotmob/matches?date=${dateStr}`, {
           cache: 'no-store',
         }).catch(() => null)
       }
@@ -241,140 +256,20 @@ export default function FootballHubPage() {
             .find((m: Match) => m.live)
           if (firstLive && !selectedMatch) {
             setSelectedMatch(firstLive)
+          } else if (parsed[0]?.matches?.[0] && !selectedMatch) {
+            setSelectedMatch(parsed[0].matches[0])
           }
           setLoadingMatches(false)
           return
         }
       }
     } catch (err) {
-      console.warn('Backend matchday feed offline or pending, rendering fallback feed:', err)
+      console.warn('Backend matchday feed offline or pending:', err)
     }
 
-    // High quality initial match fixtures if backend is connecting
-    const fallbackGroups: LeagueGroup[] = [
-      {
-        league_id: '87',
-        league_name: 'La Liga EA Sports',
-        country: 'Spain',
-        logo: 'https://crests.football-data.org/PD.png',
-        matches: [
-          {
-            match_id: 'laliga_1',
-            home_team: 'FC Barcelona',
-            home_flag: 'https://crests.football-data.org/81.svg',
-            home_score: 2,
-            away_team: 'Real Madrid',
-            away_flag: 'https://crests.football-data.org/86.png',
-            away_score: 1,
-            status: '2H',
-            minute: "74'",
-            live: true,
-            finished: false,
-            started: true,
-            kickoff: '2026-09-19T19:00:00Z',
-            understat_id: '22676',
-          },
-          {
-            match_id: 'laliga_2',
-            home_team: 'Atlético Madrid',
-            home_flag: 'https://crests.football-data.org/78.svg',
-            home_score: 1,
-            away_team: 'Sevilla FC',
-            away_flag: 'https://crests.football-data.org/559.svg',
-            away_score: 0,
-            status: 'FT',
-            minute: 'FT',
-            live: false,
-            finished: true,
-            started: true,
-            kickoff: '2026-09-19T16:15:00Z',
-          },
-          {
-            match_id: 'laliga_3',
-            home_team: 'Athletic Club',
-            home_flag: 'https://crests.football-data.org/77.png',
-            home_score: null,
-            away_team: 'Real Sociedad',
-            away_flag: 'https://crests.football-data.org/92.svg',
-            away_score: null,
-            status: 'SCHEDULED',
-            minute: '',
-            live: false,
-            finished: false,
-            started: false,
-            kickoff: '2026-09-19T21:00:00Z',
-          },
-        ],
-      },
-      {
-        league_id: '47',
-        league_name: 'Premier League',
-        country: 'England',
-        logo: 'https://crests.football-data.org/PL.png',
-        matches: [
-          {
-            match_id: 'pl_1',
-            home_team: 'Manchester City',
-            home_flag: 'https://crests.football-data.org/65.png',
-            home_score: 3,
-            away_team: 'Arsenal',
-            away_flag: 'https://crests.football-data.org/57.png',
-            away_score: 2,
-            status: '2H',
-            minute: "88'",
-            live: true,
-            finished: false,
-            started: true,
-            kickoff: '2026-09-19T16:30:00Z',
-          },
-          {
-            match_id: 'pl_2',
-            home_team: 'Liverpool',
-            home_flag: 'https://crests.football-data.org/64.png',
-            home_score: 2,
-            away_team: 'Chelsea',
-            away_flag: 'https://crests.football-data.org/61.png',
-            away_score: 0,
-            status: 'FT',
-            minute: 'FT',
-            live: false,
-            finished: true,
-            started: true,
-            kickoff: '2026-09-19T14:00:00Z',
-          },
-        ],
-      },
-      {
-        league_id: '42',
-        league_name: 'UEFA Champions League',
-        country: 'Europe',
-        logo: 'https://crests.football-data.org/CL.png',
-        matches: [
-          {
-            match_id: 'ucl_1',
-            home_team: 'Bayern Munich',
-            home_flag: 'https://crests.football-data.org/5.svg',
-            home_score: null,
-            away_team: 'Paris Saint-Germain',
-            away_flag: 'https://crests.football-data.org/524.png',
-            away_score: null,
-            status: 'SCHEDULED',
-            minute: '',
-            live: false,
-            finished: false,
-            started: false,
-            kickoff: '2026-09-19T20:00:00Z',
-          },
-        ],
-      },
-    ]
-
-    setLeagueGroups(fallbackGroups)
-    if (!selectedMatch) {
-      setSelectedMatch(fallbackGroups[0].matches[0])
-    }
+    setLeagueGroups([])
     setLoadingMatches(false)
-  }, [selectedMatch])
+  }, [parseMatchesData, selectedMatch])
 
   useEffect(() => {
     fetchMatches(selectedDate)
@@ -403,7 +298,7 @@ export default function FootballHubPage() {
 
             setBarcaTracker({
               team: data.team || {
-                id: 529,
+                id: 81,
                 name: 'FC Barcelona',
                 short_name: 'Barça',
                 crest: 'https://crests.football-data.org/81.svg',
@@ -411,8 +306,8 @@ export default function FootballHubPage() {
               la_liga: data.la_liga || {
                 standing: {
                   position: data.rank || 1,
-                  played: data.played || 4,
-                  points: data.points || 12,
+                  played: data.played || 11,
+                  points: data.points || 30,
                 },
                 recent: [],
                 upcoming: [],
@@ -433,42 +328,8 @@ export default function FootballHubPage() {
           }
         }
       } catch (err) {
-        // Fallback Barça state
+        console.warn('Error loading Barcelona stats:', err)
       }
-
-      setBarcaTracker({
-        team: {
-          id: 81,
-          name: 'FC Barcelona',
-          short_name: 'Barça',
-          crest: 'https://crests.football-data.org/81.svg',
-        },
-        la_liga: {
-          standing: { position: 1, played: 4, points: 12 },
-          recent: [
-            { id: 101, opponent: 'Valencia CF', score: '2-1', result: 'W' },
-            { id: 102, opponent: 'Athletic Club', score: '2-1', result: 'W' },
-            { id: 103, opponent: 'Rayo Vallecano', score: '2-1', result: 'W' },
-            { id: 104, opponent: 'Real Valladolid', score: '7-0', result: 'W' },
-          ],
-          upcoming: [
-            { id: 105, opponent: 'Girona FC', date: '2026-09-22', home: false },
-            { id: 106, opponent: 'Villarreal CF', date: '2026-09-28', home: false },
-          ],
-        },
-        champions_league: {
-          standing: { position: 1, points: 3 },
-          recent: [{ id: 201, opponent: 'Monaco', score: '2-1', result: 'W' }],
-          upcoming: [{ id: 202, opponent: 'Young Boys', date: '2026-10-01', home: true }],
-        },
-        next_match: {
-          opponent: 'Girona FC',
-          competition: 'La Liga EA Sports',
-          utc_date: '2026-09-22T14:15:00Z',
-          home: false,
-        },
-        recent_form: ['W', 'W', 'W', 'W', 'W'],
-      })
     }
 
     loadBarcaTracker()
@@ -537,8 +398,13 @@ export default function FootballHubPage() {
   const filteredLeagueGroups = useMemo(() => {
     return leagueGroups
       .filter((group) => {
-        if (activeLeagueFilter && group.league_id !== activeLeagueFilter) {
-          return false
+        if (activeLeagueFilter) {
+          const validIds = LEAGUE_ID_MAP[activeLeagueFilter] || [activeLeagueFilter]
+          const matches =
+            group.league_id === activeLeagueFilter ||
+            validIds.includes(group.league_id) ||
+            validIds.some((v) => group.league_name?.toLowerCase().includes(v.toLowerCase()))
+          if (!matches) return false
         }
         return true
       })
@@ -719,10 +585,10 @@ export default function FootballHubPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-zinc-200">
-                    vs {barcaTracker?.next_match?.opponent || 'Girona FC'}
+                    {barcaTracker?.next_match ? `vs ${barcaTracker.next_match.opponent}` : 'No upcoming fixture'}
                   </span>
                   <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-mono">
-                    La Liga
+                    {barcaTracker?.next_match?.competition || 'Official'}
                   </span>
                 </div>
               </div>

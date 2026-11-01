@@ -8,11 +8,18 @@ const TELEMETRY_URL = process.env.TELEMETRY_API_URL || 'http://localhost:8000'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const date = searchParams.get('date') || ''
+    const rawDate = searchParams.get('date') || searchParams.get('date_str') || ''
+    // Ensure YYYY-MM-DD
+    const date = rawDate.length === 8 && !rawDate.includes('-')
+      ? `${rawDate.slice(0, 4)}-${rawDate.slice(4, 6)}-${rawDate.slice(6, 8)}`
+      : rawDate
     const expand = searchParams.get('expand') || '3'
     
     const params = new URLSearchParams()
-    if (date) params.set('date_str', date)
+    if (date) {
+      params.set('date_str', date)
+      params.set('date', date)
+    }
     params.set('expand_days', expand)
     
     const response = await fetch(
