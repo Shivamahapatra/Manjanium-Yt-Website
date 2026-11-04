@@ -9,17 +9,20 @@ the sports dashboard from the 3D game simulator while sharing UI components.
 ## Structure
 ```
 apps/
-├── hub/     → Sports dashboard (F1 + Football)
-└── game/    → Paddock Simulator (3D racing game)
+├── hub/       → Sports dashboard (F1 + Football)
+├── game/      → Paddock Simulator (3D racing game)
+└── telemetry/ → Python FastAPI backend (FastF1 + Football multi-API)
 packages/
-└── ui/      → Shared Stitch Design System tokens
+└── ui/        → Shared Stitch Design System tokens
 ```
 Key Decisions
 
 [[apps/hub]] runs on Next.js 14 (original version - do not upgrade)
 [[apps/game]] runs on same Next.js version as hub (avoid version conflicts)
+[[FastF1TelemetryBackend]] (`apps/telemetry`) runs as an independent Python FastAPI service on port 8000
 Shared deps go in packages/ui, not duplicated in each app
-Both apps share same Clerk + Supabase credentials via .env.local
+Both frontend apps share same Clerk + Supabase credentials via .env.local
+Orphaned simulator files and 3D dependencies were purged from `apps/hub` during [[DeadCodeAndDependencyHygiene]]
 
 Known Gotchas
 

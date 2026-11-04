@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, Clock, MapPin, Trophy, Milestone, Compass, Eye, Activity } from "lucide-react";
 import { RaceVenue } from "@/hooks/useGlobeCalendar";
-import { getCountryFlag } from "@/lib/f1-helpers";
+
 
 interface RaceDetailsModalProps {
   venue: RaceVenue | null;

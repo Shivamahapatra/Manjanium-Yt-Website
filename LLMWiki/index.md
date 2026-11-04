@@ -15,6 +15,7 @@ This is the content catalog for the wiki. It is updated automatically on every i
 - [[GhostRacingSystem]] — Ghost recording, playback, and rendering
 - [[FotMobAPI]] — Unofficial API for football data
 - [[FotMobReactComponents]] — Core React components for football data
+- [[FastF1TelemetryBackend]] — Python FastAPI service for FastF1 telemetry and multi-API football pipelines
 
 ## Concepts
 *(Thematic pages, ideas, high-level synthesis, etc.)*
@@ -35,6 +36,7 @@ This is the content catalog for the wiki. It is updated automatically on every i
 - [[ReactSVGShotmap]] — UX pattern for drawing lightweight, lazy-loaded shotmaps without Canvas/WebGL
 - [[XMLParsingFastAPI]] — Fallback parsing mechanism for external telemetry APIs
 - [[ReactServerComponentPropSpreading]] — Handling dynamic className props in Next.js Server Components
+- [[DeadCodeAndDependencyHygiene]] — Phase 2 dead code pruning, ghost singleton separation, and strict TypeScript/FastAPI verification
 
 ## 🎮 Game & Physics
 - [[RaycastVehicleController]] — Advanced suspension simulation

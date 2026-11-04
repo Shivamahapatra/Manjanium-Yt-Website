@@ -23,7 +23,7 @@ interface ShotmapPitchProps {
   awayTeam?: string
 }
 
-export default function ShotmapPitch({ shots, homeTeam, awayTeam }: ShotmapPitchProps) {
+export default function ShotmapPitch({ shots, homeTeam: _homeTeam, awayTeam: _awayTeam }: ShotmapPitchProps) {
   const [activeShot, setActiveShot] = useState<UnderstatShot | null>(null)
 
   // Mapped to the Stitch Design System telemetry accent colors

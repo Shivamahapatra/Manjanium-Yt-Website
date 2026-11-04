@@ -380,5 +380,51 @@ Context:
 - Next.js production build (`pnpm --filter hub build`) passed with 0 errors (all 25 pages generated).
 - Pushed to GitHub `origin/main`.
 
+--- Update: Phase 2 Dead Code & Dependency Cleanup (2026-10-31T20:32:00+05:30) ---
+Changes made:
+- Created branch `chore/phase2-dead-code-cleanup` and executed 8 verified cleanup commits:
+  1. `b7610a5` (F-10): Removed unused imports, locals, and unreferenced parameters across 46 files in `apps/hub` and 7 files in `apps/game` (`tsc --noEmit --noUnusedLocals --noUnusedParameters` passes with 0 errors).
+  2. `455a84f` (F-03): Removed 13 root/scratch files (`temp_vc.tsx`, `git_log_clerk.txt`, `ping.txt`, `fix_links.py`, `test-espn.js`, `test_football.py`, 0-byte JSONs, `mock.json`, `newFallbackData.json`) and `Manjanium_App/scratch/worldcup2026/**` while preserving `Manjanium_App/*.md` and `supabase_migration.sql`.
+  3. `03685c5` (F-01): Removed 14 orphaned 3D simulator files from `apps/hub` (`src/components/simulator/*`, `useCarControls.ts`, `useGamePhysics.ts`, `useSimulatorGame.ts`, `gamePhysicsConfig.ts`, `tracks.ts`, `types/simulator*.ts`).
+  4. `f5e7b81` (F-02): Removed 53 dead components, hooks, libs, and CSS files in `apps/hub` and cleaned up unused exports in `LoadingSkeleton.tsx`, `shadcn-tabs.tsx`, `f1-helpers.ts`, and `useDashboardPreset.ts`.
+  5. `0a1b3d4` (F-04): Removed 13 uncalled Next.js API routes in `apps/hub/src/app/api/**` and `fallbackData.ts` (preserving `/api/auth/webhook`, `/api/f1/ping`, and active routes).
+  6. `2d61bf9` (F-05): Relocated `ghostPlayer` and `ghostRecorder` singletons to `apps/game/src/lib/ghostPlayer.ts` and `ghostRecorder.ts`, and removed dead `VehicleController.tsx`, `Track.tsx`, `useKeyboardControls.ts`, and `types/simulator.ts` in `apps/game`.
+  7. `52adb50` (F-09): Removed 11 unused npm packages from `apps/hub/package.json` and `lucide-react` from `apps/game/package.json`, and updated `pnpm-lock.yaml`.
+  8. `68f4074` (F-06): Removed dead imports, unused `_team_name_cache` / `resolve_team_name` / `get_worldcup_teams`, `cache_team_fixtures`, `DEFAULT_USER_AGENT`, `now_iso`, mangled comment text on `main.py:1263`, and scratch files (`Untitled-1.js`, `test_api.py`, `test_live.py`) in `apps/telemetry` while preserving all 18 FastAPI routes.
+Context:
+- Verified `tsc --noEmit`, `pnpm build` (`hub` and `game`), and `apps/telemetry` FastAPI route loading after every commit.
+- Preserved `proxy.ts`, SQL migrations, database tables, and deferred duplicate merges/bug fixes (`F-07`, `F-11`, `F-12`, `F-13`) per user instructions.
 
 
+
+
+--- Update: Football Data Fallback, Terminal Drawer & V8 Engine Simulator (2026-11-01T12:45:00+05:30) ---
+Changes made:
+- Updated `apps/telemetry/main.py`:
+  - Added automatic fallback to `football-data.org` when `API-Football` returns plan errors or fails for season 2026.
+  - Added date normalization supporting both `YYYY-MM-DD` and `YYYYMMDD`.
+  - Upgraded FC Barcelona pinned stats to fetch real live standings and upcoming fixtures from football-data.org when API-Football fails.
+- Created `apps/hub/src/app/api/football/matches/route.ts`:
+  - Proxies to telemetry `/api/matches` with graceful fallback to combined-matches.
+- Updated `apps/hub/src/app/football/page.tsx`:
+  - Fixed competition ID and league mapping (`PD`, `PL`, `BL1`, `SA`, `FL1`, `CL` to IDs `140`, `39`, `78`, `135`, `61`, `2`).
+  - Rendered real live match data with honest empty state when no fixtures exist.
+- Updated `apps/hub/src/components/chat/TerminalChat.tsx`:
+  - Made the desktop overlay start collapsed by default.
+  - Added close button (`<X />`) in the terminal header and desktop floating pill launcher (`hidden lg:flex fixed bottom-6 right-6`).
+  - Added safe `localStorage` persistence with `try/catch`.
+- Copied `v8-engine-teardown.html` to `apps/hub/public/simulators/v8-engine-teardown.html`.
+- Created `apps/hub/src/components/home/EngineTeardown.tsx`:
+  - Built 16:9 responsive frame, IntersectionObserver mounting within 600px margin and unmounting off-screen.
+  - Click-to-interact overlay to prevent scroll trapping, full screen button, and narrow screen (<820px) poster with full screen tab open.
+- Updated `apps/hub/next.config.mjs`:
+  - Added `X-Frame-Options: SAMEORIGIN` and `frame-ancestors 'self'` headers for `/simulators/:path*`.
+- Updated `apps/hub/src/components/home/HeroSection.tsx`:
+  - Added "Explore the V8" CTA button scrolling to `#engine-teardown`.
+- Updated `apps/hub/src/app/page.tsx`:
+  - Removed duplicate `<Navbar />` and `<Sidebar />` components.
+  - Inserted `<EngineTeardown />` section between Hero and F1 Live.
+  - Removed duplicate World Cup cards under F1 section.
+Context:
+- Verified `npx tsc --noEmit` and `pnpm build` passed with 0 errors across `hub` and `game`.
+- FastAPI telemetry service verified running and serving real match data on port 8000.

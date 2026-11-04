@@ -2,7 +2,7 @@ import asyncio
 import fastf1
 import pandas as pd
 from typing import Optional, Tuple
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 import math
 
 GLOBAL_LIVE_TIMING = {}

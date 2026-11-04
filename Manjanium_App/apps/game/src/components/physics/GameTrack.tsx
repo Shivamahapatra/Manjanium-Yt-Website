@@ -1,11 +1,9 @@
 'use client'
 
-import { useMemo, useRef, useEffect } from 'react'
+import { useMemo, useEffect } from 'react'
 import { RigidBody, CuboidCollider } from '@react-three/rapier'
 import * as THREE from 'three'
-import { useFrame } from '@react-three/fiber'
 import { useGamePhysics } from '@/store/telemetry'
-import { getInputState } from '@/hooks/useKeyboardControls'
 import { GridAssembly } from './GridAssembly'
 
 // Define oval track shape
@@ -57,7 +55,6 @@ export default function GameTrack({ trackId = 'monza', onLoaded }: GameTrackProp
     setSector1, 
     setSector2,
     setCrossedStartFinish, 
-    completeLap,
     setDRSAvailable,
     weather 
   } = useGamePhysics()

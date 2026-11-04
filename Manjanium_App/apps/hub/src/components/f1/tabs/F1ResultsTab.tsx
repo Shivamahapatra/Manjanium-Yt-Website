@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Flag, Trophy, Clock, Zap, Timer } from 'lucide-react';
-import { Table, Tag, Spin } from 'antd';
+import { Table, Tag } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import { formatGap, formatLapTime, getTeamColor } from '@/lib/f1-helpers';
+import { getTeamColor } from '@/lib/f1-helpers';
 
 type SessionTab = 'race' | 'qualifying' | 'sprint' | 'fastest';
 

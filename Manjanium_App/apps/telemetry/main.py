@@ -1,8 +1,8 @@
 import os
 import tempfile
 from pathlib import Path
-from typing import Optional, List, Dict, Any
-from datetime import datetime, date, timedelta
+from typing import Optional, Dict, Any
+from datetime import datetime
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -20,57 +20,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from live import live_timing_loop, get_live_timing
 import asyncio
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import ParseError
-import re
-
-# Cache for resolved team names
-_team_name_cache = {}
-
-async def resolve_team_name(team_code: str, client: httpx.AsyncClient) -> dict:
-    """
-    Resolve World Cup placeholder codes to real team names.
-    """
-    if not team_code:
-        return {"name": "TBD", "flag": ""}
-    
-    if team_code in _team_name_cache:
-        return _team_name_cache[team_code]
-    
-    if re.match(r'^[0-9]+[A-Z]+$', team_code):
-        result = {"name": f"Group {team_code[-1]} ({team_code[:-1]}{'st' if team_code[0]=='1' else 'nd'})", "flag": ""}
-        _team_name_cache[team_code] = result
-        return result
-    
-    return {"name": team_code, "flag": ""}
-
-async def get_worldcup_teams() -> dict:
-    """Fetch real team data from worldcup26.ir."""
-    global _team_name_cache
-    if _team_name_cache:
-        return _team_name_cache
-    
-    try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.get("https://worldcup26.ir/get/teams")
-            if resp.status_code == 200:
-                teams = resp.json()
-                for team in teams:
-                    name = team.get("name") or team.get("name_en", "")
-                    team_id = str(team.get("id", ""))
-                    fifa_code = team.get("fifa_code", "")
-                    if name and (team_id or fifa_code):
-                        _team_name_cache[team_id] = {"name": name, "flag": team.get("flag", "")}
-                        if fifa_code:
-                            _team_name_cache[fifa_code] = {"name": name, "flag": team.get("flag", "")}
-    except Exception as e:
-        print(f"Could not load worldcup teams: {e}")
-    
-    # Set a loaded flag so we don't retry endlessly if the API is down
-    if not _team_name_cache:
-        _team_name_cache["_loaded"] = True
-        
-    return _team_name_cache
 
 # Configure FastF1 cache
 # Use /tmp for ephemeral caching (acceptable cold start penalty)
@@ -82,7 +31,18 @@ app = FastAPI(
     title="Manjanium Telemetry API",
     description="FastF1 powered F1 telemetry backend",
     version="1.0.0",
+    # Global admin security headers for admin routes
+    docs_url=None,  # hide OpenAPI docs from public
+    redoc_url=None,
 )
+
+# Include admin routes (protected)
+try:
+    from admin_routes import router as admin_router
+except ImportError:
+    from .admin_routes import router as admin_router
+app.include_router(admin_router)
+
 
 background_tasks = set()
 
@@ -330,10 +290,24 @@ cache_fixture_lineups = TTLCache(maxsize=128, ttl=300)   # 5m for tactical lineu
 # Football-Data.org: 10 requests/minute limit
 cache_standings = TTLCache(maxsize=32, ttl=900)          # 15m for league standings
 cache_barcelona_tracker = TTLCache(maxsize=8, ttl=1800)  # 30m for FC Barcelona tracker
-cache_team_fixtures = TTLCache(maxsize=32, ttl=1800)     # 30m for team schedules
 
 # Understat: Async web extraction
 cache_understat_shots = TTLCache(maxsize=256, ttl=3600)  # 1 hour for shot coordinates
+
+# PitchAPI: Production post-match analytics & shotmaps
+# Cache rules:
+# 1. Never cache empty/incomplete response permanently.
+# 2. Permanent cache only when match status is played AND data non-empty.
+# 3. Otherwise, 5-minute TTL cache and retry.
+# 4. Handle 429 by honoring Retry-After and falling back to cache.
+pitchapi_perm_cache = {}  # permanent cache for played matches with non-empty shots
+pitchapi_ttl_cache = TTLCache(maxsize=256, ttl=300)  # 5 min TTL
+pitchapi_rate_limit_until = 0.0  # epoch timestamp until which rate limit is active
+PITCHAPI_BASE_URL = os.getenv("PITCHAPI_BASE_URL", "https://api.pitchapi.dev/v1")
+
+def get_pitchapi_headers() -> dict:
+    key = os.getenv("PITCHAPI_API_KEY", os.getenv("PITCHAPI_KEY", ""))
+    return {"X-API-KEY": key} if key else {}
 
 # --- Upstream Credentials & Configuration ---
 API_FOOTBALL_BASE_URL = os.getenv("API_FOOTBALL_BASE_URL", "https://v3.football.api-sports.io")
@@ -360,9 +334,6 @@ def get_api_football_headers() -> dict:
 def get_football_data_headers() -> dict:
     key = os.getenv("FOOTBALL_DATA_ORG_KEY", os.getenv("FOOTBALL_DATA_KEY", ""))
     return {"X-Auth-Token": key} if key else {}
-
-# Standard browser headers for fallback endpoints
-DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 
 # ------------------------------------------------------------------------------
 # 1. API-FOOTBALL (REST): Live Scores, Timelines, Lineups, Center Feed & Barca
@@ -510,12 +481,21 @@ DEFAULT_MATCHDAY_FIXTURES = [
 ]
 
 @app.get("/api/matches")
-async def get_real_matches(date: str = Query(..., description="Format: YYYY-MM-DD")):
+@app.get("/api/football/matches")
+async def get_real_matches(date: Optional[str] = Query(default=None, description="Format: YYYY-MM-DD or YYYYMMDD"), date_str: Optional[str] = Query(default=None)):
     """
     Feeds the Center Column: Live and scheduled matches grouped by league.
     Integrates with API-Football (v3.football.api-sports.io) with TTL cache.
+    Falls through to Football-Data.org if API-Football returns no matches or errors.
     """
-    cache_key = f"api_matches_{date}"
+    raw_date = date or date_str or datetime.utcnow().strftime("%Y-%m-%d")
+    # Normalize YYYYMMDD -> YYYY-MM-DD
+    if len(raw_date) == 8 and raw_date.isdigit():
+        target_date = f"{raw_date[:4]}-{raw_date[4:6]}-{raw_date[6:]}"
+    else:
+        target_date = raw_date
+
+    cache_key = f"api_matches_{target_date}"
     if cache_key in cache_live_fixtures:
         return cache_live_fixtures[cache_key]
 
@@ -525,11 +505,57 @@ async def get_real_matches(date: str = Query(..., description="Format: YYYY-MM-D
     if headers:
         try:
             async with httpx.AsyncClient(timeout=15) as client:
-                response = await client.get(f"{API_FOOTBALL_BASE_URL}/fixtures?date={date}", headers=headers)
+                response = await client.get(f"{API_FOOTBALL_BASE_URL}/fixtures?date={target_date}", headers=headers)
                 if response.status_code == 200:
-                    data = response.json().get("response", [])
+                    resp_json = response.json()
+                    errs = resp_json.get("errors")
+                    if errs:
+                        print(f"[API-Football] Provider returned errors for {target_date}: {errs}")
+                    data = resp_json.get("response", [])
+                else:
+                    print(f"[API-Football] HTTP {response.status_code} fetching fixtures for {target_date}: {response.text[:200]}")
         except Exception as e:
-            print(f"[API-Football] Error fetching fixtures for {date}: {e}")
+            print(f"[API-Football] Exception fetching fixtures for {target_date}: {e}")
+
+    # Fall through to Football-Data.org if API-Football produced no fixtures
+    if not data:
+        fd_headers = get_football_data_headers()
+        if fd_headers:
+            try:
+                async with httpx.AsyncClient(timeout=15) as client:
+                    fd_resp = await client.get(
+                        f"{FOOTBALL_DATA_BASE_URL}/matches?dateFrom={target_date}&dateTo={target_date}",
+                        headers=fd_headers,
+                    )
+                    if fd_resp.status_code == 200:
+                        fd_matches = fd_resp.json().get("matches", [])
+                        for m in fd_matches:
+                            comp = m.get("competition", {})
+                            st = m.get("status", "SCHEDULED")
+                            short = "FT" if st == "FINISHED" else ("LIVE" if st in ["IN_PLAY", "PAUSED"] else "NS")
+                            data.append({
+                                "fixture": {
+                                    "id": m.get("id"),
+                                    "date": m.get("utcDate"),
+                                    "status": {"short": short, "elapsed": 90 if short == "FT" else None},
+                                },
+                                "league": {
+                                    "id": comp.get("id"),
+                                    "name": comp.get("name"),
+                                    "country": comp.get("code"),
+                                    "logo": comp.get("emblem"),
+                                },
+                                "teams": {
+                                    "home": {"id": m.get("homeTeam", {}).get("id"), "name": m.get("homeTeam", {}).get("name"), "logo": m.get("homeTeam", {}).get("crest")},
+                                    "away": {"id": m.get("awayTeam", {}).get("id"), "name": m.get("awayTeam", {}).get("name"), "logo": m.get("awayTeam", {}).get("crest")},
+                                },
+                                "goals": {
+                                    "home": m.get("score", {}).get("fullTime", {}).get("home"),
+                                    "away": m.get("score", {}).get("fullTime", {}).get("away"),
+                                },
+                            })
+            except Exception as e:
+                print(f"[Football-Data.org] Fallback fetch error: {e}")
 
     # Filter top supported leagues and group for Framer Motion accordions
     grouped_matches: Dict[str, Any] = {}
@@ -538,7 +564,8 @@ async def get_real_matches(date: str = Query(..., description="Format: YYYY-MM-D
     for match in data:
         league_info = match.get("league", {})
         league_id = league_info.get("id")
-        if league_id in SUPPORTED_LEAGUES:
+        # Include if in SUPPORTED_LEAGUES or if we have top league data
+        if league_id in SUPPORTED_LEAGUES or not SUPPORTED_LEAGUES or len(data) < 50:
             league_name = league_info.get("name", "Unknown League")
             if league_name not in grouped_matches:
                 grouped_matches[league_name] = {
@@ -588,24 +615,9 @@ async def get_real_matches(date: str = Query(..., description="Format: YYYY-MM-D
             "matches": norm_matches,
         })
 
-    # If no matches were returned by API-Football (e.g. key missing, off-season, or future date),
-    # seamlessly fall back to realistic matchday fixtures
-    if not leagues_list:
-        leagues_list = DEFAULT_MATCHDAY_FIXTURES
-        grouped_matches = {
-            group["league_name"]: {
-                "id": int(group["league_id"]),
-                "name": group["league_name"],
-                "country": group["country"],
-                "logo": group["logo"],
-                "matches": group["matches"],
-            }
-            for group in DEFAULT_MATCHDAY_FIXTURES
-        }
-
     result_payload = {
-        "date": date,
-        "source": "api-football" if (headers and data) else "fallback",
+        "date": target_date,
+        "source": "api-football" if (headers and data) else "football-data",
         "grouped_matches": grouped_matches,
         "leagues": leagues_list,
         **grouped_matches,
@@ -621,6 +633,7 @@ async def get_real_matches(date: str = Query(..., description="Format: YYYY-MM-D
 async def get_pinned_barca_stats():
     """
     Feeds the Left Column: FC Barcelona's live rank, points, form, and next fixture.
+    Checks API-Football, falls through to Football-Data.org.
     """
     barca_id = 529
     current_season = 2026
@@ -642,6 +655,10 @@ async def get_pinned_barca_stats():
                     resp_data = standings_res.json().get("response", [])
                     if resp_data:
                         team_stats = resp_data[0].get("league", {}).get("standings", [[]])[0][0]
+                    else:
+                        errs = standings_res.json().get("errors")
+                        if errs:
+                            print(f"[API-Football] Barca standings error: {errs}")
 
                 # 2. Fetch Next Fixture
                 fixtures_res = await client.get(
@@ -652,25 +669,72 @@ async def get_pinned_barca_stats():
                     resp_fixtures = fixtures_res.json().get("response", [])
                     if resp_fixtures:
                         next_match = resp_fixtures[0]
+                    else:
+                        errs = fixtures_res.json().get("errors")
+                        if errs:
+                            print(f"[API-Football] Barca next fixture error: {errs}")
         except Exception as e:
             print(f"[API-Football] Error fetching Barca stats: {e}")
 
-    # Fallback or default stats if API key is not configured or in off-season
-    rank_val = team_stats.get("rank", 1) if team_stats else 1
-    points_val = team_stats.get("points", 12) if team_stats else 12
-    played_val = team_stats.get("all", {}).get("played", 4) if team_stats else 4
-    form_str = team_stats.get("form", "WWWWW") if team_stats else "WWWWW"
+    # Fall through to Football-Data.org if API-Football did not provide live standing/fixture
+    if not team_stats or not next_match:
+        fd_headers = get_football_data_headers()
+        if fd_headers:
+            try:
+                async with httpx.AsyncClient(timeout=15) as client:
+                    if not team_stats:
+                        fd_standings_res = await client.get(
+                            f"{FOOTBALL_DATA_BASE_URL}/competitions/PD/standings",
+                            headers=fd_headers,
+                        )
+                        if fd_standings_res.status_code == 200:
+                            tables = fd_standings_res.json().get("standings", [{}])[0].get("table", [])
+                            barca_row = next((t for t in tables if t.get("team", {}).get("id") == 81), None)
+                            if barca_row:
+                                team_stats = {
+                                    "rank": barca_row.get("position"),
+                                    "points": barca_row.get("points"),
+                                    "all": {"played": barca_row.get("playedGames")},
+                                    "form": barca_row.get("form") or "WWWWW",
+                                }
+                    if not next_match:
+                        fd_match_res = await client.get(
+                            f"{FOOTBALL_DATA_BASE_URL}/teams/81/matches?status=SCHEDULED&limit=1",
+                            headers=fd_headers,
+                        )
+                        if fd_match_res.status_code == 200:
+                            fd_matches = fd_match_res.json().get("matches", [])
+                            if fd_matches:
+                                m = fd_matches[0]
+                                is_home = m.get("homeTeam", {}).get("id") == 81
+                                opp_team = m.get("awayTeam") if is_home else m.get("homeTeam")
+                                next_match = {
+                                    "teams": {
+                                        "home": {"id": m.get("homeTeam", {}).get("id"), "name": m.get("homeTeam", {}).get("name")},
+                                        "away": {"id": m.get("awayTeam", {}).get("id"), "name": m.get("awayTeam", {}).get("name")},
+                                    },
+                                    "league": {"name": m.get("competition", {}).get("name")},
+                                    "fixture": {"date": m.get("utcDate")},
+                                }
+            except Exception as e:
+                print(f"[Football-Data.org] Error fetching Barca fallback: {e}")
 
-    next_opp = "Girona FC"
-    next_comp = "La Liga"
-    next_date = "2026-09-22T19:00:00Z"
+    # Fallback or default stats if API key is not configured or in off-season
+    rank_val = team_stats.get("rank") if team_stats else 1
+    points_val = team_stats.get("points") if team_stats else 30
+    played_val = team_stats.get("all", {}).get("played") if team_stats else 11
+    form_str = team_stats.get("form") or "WWWWW" if team_stats else "WWWWW"
+
+    next_opp = "Aston Villa FC"
+    next_comp = "UEFA Champions League"
+    next_date = "2026-11-03T20:00:00Z"
     if next_match:
         teams = next_match.get("teams", {})
-        next_opp = teams.get("away", {}).get("name") if teams.get("home", {}).get("id") == barca_id else teams.get("home", {}).get("name", "Opponent")
-        next_comp = next_match.get("league", {}).get("name", "La Liga")
+        next_opp = teams.get("away", {}).get("name") if teams.get("home", {}).get("id") in [barca_id, 81] else teams.get("home", {}).get("name", "Opponent")
+        next_comp = next_match.get("league", {}).get("name", "UEFA Champions League")
         next_date = next_match.get("fixture", {}).get("date", next_date)
 
-    form_list = [c for c in form_str][-5:]
+    form_list = [c for c in form_str][-5:] if form_str else ["W", "W", "W", "W", "W"]
 
     return {
         "rank": rank_val,
@@ -1076,7 +1140,6 @@ async def get_barcelona_pinned_tracker():
         # Filter recent and upcoming matches across PD and CL
         recent_matches = []
         upcoming_matches = []
-        now_iso = datetime.utcnow().isoformat()
 
         for m in matches_data:
             comp_code = m.get("competition", {}).get("code")
@@ -1260,18 +1323,22 @@ async def get_understat_match_shots(match_id: str = FastPath(...)):
 
 # ------------------------------------------------------------------------------
 # 4. UNIFIED MATCHDAY SCHEDULE FEED (Aggregated & Backward-Compatible)
-# ----------------------------------------------------------------------------@app.get("/api/football/matches")
+# ------------------------------------------------------------------------------
 @app.get("/api/football/combined-matches")
-async def get_matchday_feed(date_str: str = Query(default=None)):
+async def get_matchday_feed(date_str: str = Query(default=None), date: str = Query(default=None)):
     """
     Aggregates the central match day schedule:
     Uses API-Football for live fixtures if configured, or Football-Data.org matches.
     Rate-guarded with a 60s TTL cache.
+    Accepts date in YYYY-MM-DD or YYYYMMDD format.
     """
-    if not date_str:
-        date_str = datetime.utcnow().strftime("%Y-%m-%d")
+    raw_date = date_str or date or datetime.utcnow().strftime("%Y-%m-%d")
+    if len(raw_date) == 8 and raw_date.isdigit():
+        normalized_date = f"{raw_date[:4]}-{raw_date[4:6]}-{raw_date[6:]}"
+    else:
+        normalized_date = raw_date
 
-    cache_key = f"feed_{date_str}"
+    cache_key = f"feed_{normalized_date}"
     if cache_key in cache_date_fixtures:
         return cache_date_fixtures[cache_key]
 
@@ -1284,11 +1351,14 @@ async def get_matchday_feed(date_str: str = Query(default=None)):
             async with httpx.AsyncClient(timeout=15) as client:
                 resp = await client.get(
                     f"{API_FOOTBALL_BASE_URL}/fixtures",
-                    params={"date": date_str},
+                    params={"date": normalized_date},
                     headers=api_fb_headers,
                 )
                 if resp.status_code == 200:
                     raw_fixtures = resp.json().get("response", [])
+                    errs = resp.json().get("errors")
+                    if errs:
+                        print(f"[API-Football] Feed errors for {normalized_date}: {errs}")
                     leagues_map = {}
                     for item in raw_fixtures:
                         l = item.get("league", {})
@@ -1337,7 +1407,7 @@ async def get_matchday_feed(date_str: str = Query(default=None)):
                 async with httpx.AsyncClient(timeout=15) as client:
                     resp = await client.get(
                         f"{FOOTBALL_DATA_BASE_URL}/matches",
-                        params={"dateFrom": date_str, "dateTo": date_str},
+                        params={"dateFrom": normalized_date, "dateTo": normalized_date},
                         headers=fd_headers,
                     )
                     if resp.status_code == 200:

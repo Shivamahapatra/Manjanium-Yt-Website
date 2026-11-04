@@ -52,7 +52,7 @@ export function LiveTimeline({
     }
   }, [events, isLive]);
 
-  const getEventIcon = (type: string, cardType?: string) => {
+  const getEventIcon = (type: string, _cardType?: string) => {
     switch (type) {
       case 'goal': return <Goal className="w-4 h-4 text-white" />;
       case 'substitution': return <RefreshCw className="w-4 h-4 text-white" />;

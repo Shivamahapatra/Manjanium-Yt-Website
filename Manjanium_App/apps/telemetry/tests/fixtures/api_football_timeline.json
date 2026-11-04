@@ -1,0 +1,188 @@
+{
+  "path": "/api/football/api-football/timeline/1208021",
+  "status": 200,
+  "shape": {
+    "cached": "bool",
+    "events": [
+      {
+        "assist": "null",
+        "comments": "str",
+        "detail": "str",
+        "extra": "null",
+        "minute": "int",
+        "player": "str",
+        "team": "str",
+        "type": "str"
+      }
+    ],
+    "fixture_id": "int",
+    "source": "str"
+  },
+  "body": {
+    "fixture_id": 1208021,
+    "events": [
+      {
+        "minute": 18,
+        "extra": null,
+        "team": "Manchester United",
+        "player": "Mason Mount",
+        "assist": null,
+        "type": "Card",
+        "detail": "Yellow Card",
+        "comments": "Foul"
+      },
+      {
+        "minute": 25,
+        "extra": null,
+        "team": "Fulham",
+        "player": "Calvin Bassey",
+        "assist": null,
+        "type": "Card",
+        "detail": "Yellow Card",
+        "comments": "Foul"
+      },
+      {
+        "minute": 40,
+        "extra": null,
+        "team": "Manchester United",
+        "player": "Harry Maguire",
+        "assist": null,
+        "type": "Card",
+        "detail": "Yellow Card",
+        "comments": "Simulation"
+      },
+      {
+        "minute": 61,
+        "extra": null,
+        "team": "Manchester United",
+        "player": "A. Diallo",
+        "assist": "A. Garnacho",
+        "type": "subst",
+        "detail": "Substitution 1",
+        "comments": null
+      },
+      {
+        "minute": 61,
+        "extra": null,
+        "team": "Manchester United",
+        "player": "M. Mount",
+        "assist": "J. Zirkzee",
+        "type": "subst",
+        "detail": "Substitution 2",
+        "comments": null
+      },
+      {
+        "minute": 64,
+        "extra": null,
+        "team": "Fulham",
+        "player": "E. Smith Rowe",
+        "assist": "T. Cairney",
+        "type": "subst",
+        "detail": "Substitution 1",
+        "comments": null
+      },
+      {
+        "minute": 70,
+        "extra": null,
+        "team": "Fulham",
+        "player": "Andreas Pereira",
+        "assist": null,
+        "type": "Card",
+        "detail": "Yellow Card",
+        "comments": "Argument"
+      },
+      {
+        "minute": 73,
+        "extra": null,
+        "team": "Fulham",
+        "player": "Tom Cairney",
+        "assist": null,
+        "type": "Card",
+        "detail": "Yellow Card",
+        "comments": "Foul"
+      },
+      {
+        "minute": 78,
+        "extra": null,
+        "team": "Fulham",
+        "player": "Rodrigo Muniz",
+        "assist": "R. Jiménez",
+        "type": "subst",
+        "detail": "Substitution 2",
+        "comments": null
+      },
+      {
+        "minute": 78,
+        "extra": null,
+        "team": "Fulham",
+        "player": "Adama Traoré",
+        "assist": "H. Wilson",
+        "type": "subst",
+        "detail": "Substitution 3",
+        "comments": null
+      },
+      {
+        "minute": 81,
+        "extra": null,
+        "team": "Manchester United",
+        "player": "N. Mazraoui",
+        "assist": "M. de Ligt",
+        "type": "subst",
+        "detail": "Substitution 3",
+        "comments": null
+      },
+      {
+        "minute": 81,
+        "extra": null,
+        "team": "Manchester United",
+        "player": "H. Maguire",
+        "assist": "J. Evans",
+        "type": "subst",
+        "detail": "Substitution 4",
+        "comments": null
+      },
+      {
+        "minute": 84,
+        "extra": null,
+        "team": "Manchester United",
+        "player": "K. Mainoo",
+        "assist": "S. McTominay",
+        "type": "subst",
+        "detail": "Substitution 5",
+        "comments": null
+      },
+      {
+        "minute": 87,
+        "extra": null,
+        "team": "Manchester United",
+        "player": "J. Zirkzee",
+        "assist": "A. Garnacho",
+        "type": "Goal",
+        "detail": "Normal Goal",
+        "comments": null
+      },
+      {
+        "minute": 90,
+        "extra": 1,
+        "team": "Fulham",
+        "player": "S. Lukić",
+        "assist": "J. Stansfield",
+        "type": "subst",
+        "detail": "Substitution 4",
+        "comments": null
+      },
+      {
+        "minute": 90,
+        "extra": 1,
+        "team": "Fulham",
+        "player": "Andreas Pereira",
+        "assist": "H. Reed",
+        "type": "subst",
+        "detail": "Substitution 5",
+        "comments": null
+      }
+    ],
+    "source": "api-football",
+    "cached": false
+  }
+}

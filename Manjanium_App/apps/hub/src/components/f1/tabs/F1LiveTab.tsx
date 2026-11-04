@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import dynamic from "next/dynamic";
 import { Spin } from "antd";
 import { getTimezoneForVenue, F1_VENUES_2026 } from "@/lib/f1-helpers";
 import { F1Card } from "@/components/f1/F1Card";
@@ -12,16 +11,7 @@ import { usePresetWithHydration } from "@/hooks/usePresetWithHydration";
 import { HUDSkeleton } from "@/components/ui/LoadingSkeleton";
 import { useDashboardPreset } from "@/hooks/useDashboardPreset";
 
-// Dynamic import for the 3D Live focus Globe
-const Globe = dynamic(
-  () => import("@/components/ui/Globe").then((m) => m.Globe),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-80 h-80 rounded-2xl bg-neutral-900 animate-pulse mx-auto border border-neutral-800" />
-    ),
-  }
-);
+
 
 // F1 Racing venues coordinate arcs for Globe visualization
 const globeArcs = [

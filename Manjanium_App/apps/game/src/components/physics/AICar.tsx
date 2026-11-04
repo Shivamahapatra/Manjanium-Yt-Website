@@ -16,12 +16,12 @@ interface AICarProps {
 }
 
 export default function AICar({
-  id,
+  id: _id,
   color,
   startPosition,
   waypoints,
   difficulty = 'medium',
-  startOffset = 0,
+  startOffset: _startOffset = 0,
 }: AICarProps) {
   const rigidBodyRef = useRef<any>(null)
   const [currentWaypoint, setCurrentWaypoint] = useState(0)

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Info, Code, ShieldCheck, FileText, Bug, MessageSquare, ExternalLink } from "lucide-react";
+import { Code, ShieldCheck, FileText, Bug, MessageSquare, ExternalLink } from "lucide-react";
 
 export function AboutApp() {
   const currentYear = new Date().getFullYear();

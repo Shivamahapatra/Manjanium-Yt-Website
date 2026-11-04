@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { PresetSidebar } from './PresetSidebar';
-import { useDashboardPreset, F1NewPresetType as F1PresetType } from '@/hooks/useDashboardPreset';
+import { useDashboardPreset } from '@/hooks/useDashboardPreset';
 import { motion } from 'framer-motion';
 
 export function F1DashboardPresets() {

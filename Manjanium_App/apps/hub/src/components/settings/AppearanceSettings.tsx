@@ -3,7 +3,7 @@
 import { useUserPreferences } from '@/hooks/useUserPreferences'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Monitor, Sun, Moon, Type, Zap } from 'lucide-react'
+import { Monitor, Sun, Moon, Zap } from 'lucide-react'
 
 type Theme = 'dark' | 'light' | 'auto'
 type FontSize = 'sm' | 'md' | 'lg'

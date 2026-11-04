@@ -90,3 +90,5 @@ export function loadBestGhost(trackId: string): GhostLap | null {
     return null
   }
 }
+
+export const ghostRecorder = new GhostRecorder()

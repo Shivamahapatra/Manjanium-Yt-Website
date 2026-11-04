@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Clock, MapPin, Activity, AlertCircle, Shield, Goal, Flag, RefreshCw } from 'lucide-react';
-import { LiveTimeline, MatchEvent } from '@/components/football/LiveTimeline';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Clock, MapPin, Activity, AlertCircle, Shield, RefreshCw } from 'lucide-react';
+import { LiveTimeline } from '@/components/football/LiveTimeline';
 import { TeamLineup } from '@/components/football/TeamLineup';
 import { MatchStatistics } from '@/components/football/MatchStatistics';
 

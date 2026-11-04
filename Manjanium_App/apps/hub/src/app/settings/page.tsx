@@ -28,7 +28,7 @@ export default function SettingsPage() {
   const router = useRouter();
   
   const { isSignedIn, isLoaded } = useAuth();
-  const { preferences, loading, updatePreferences } = useUserPreferences();
+  const { loading } = useUserPreferences();
 
   const handleLoginClick = () => {
     router.push("/sign-up");

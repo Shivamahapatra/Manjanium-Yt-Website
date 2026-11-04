@@ -18,7 +18,7 @@ const STATS_MAP: Record<string, string> = {
   redCards: 'redCards',
 };
 
-function parseStatValue(key: string, value: string): number {
+function parseStatValue(_key: string, value: string): number {
   if (!value) return 0;
   
   // Clean up strings like "85.5%" or "450"
@@ -57,7 +57,7 @@ function extractTeamStats(teamData: any) {
 }
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ matchId: string }> }
 ) {
   try {

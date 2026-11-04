@@ -35,26 +35,32 @@ Accessible at `/simulator` via [[VercelMultiZones]] rewrite from [[apps/hub]].
 ```
 apps/game/src/
 ├── components/
-│   ├── GameCanvas.tsx        ← R3F Canvas wrapper
-│   ├── GameHUD.tsx           ← Live telemetry overlay
-│   ├── SelectionScreen.tsx   ← Pre-race menu
-│   ├── SettingsModal.tsx     ← Control configuration
-│   ├── PostRacePodium.tsx    ← Victory screen
-│   ├── Track.tsx             ← Track environments
+│   ├── GameCanvas.tsx              ← R3F Canvas wrapper
+│   ├── GameHUD.tsx                 ← Live telemetry overlay
+│   ├── SelectionScreen.tsx         ← Pre-race menu
+│   ├── SettingsModal.tsx           ← Control configuration
+│   ├── PostRacePodium.tsx          ← Victory screen
+│   ├── GhostCar.tsx                ← Best-lap ghost renderer
+│   ├── tracks/                     ← Track environments (Monza, Silverstone, Spa)
 │   ├── physics/
-│   │   └── VehicleController.tsx ← Rapier vehicle
+│   │   └── ProVehicleController.tsx ← Raycast Rapier vehicle
 │   └── ui/
-│       └── MultiplayerCars.tsx   ← Ghost/remote cars
+│       └── MultiplayerCars.tsx     ← Remote multiplayer cars
 ├── store/
-│   ├── telemetry.ts          ← Speed, gear, ERS, DRS
-│   └── multiplayer.ts        ← Remote player positions
+│   ├── telemetry.ts                ← Speed, gear, ERS, DRS
+│   └── multiplayer.ts              ← Remote player positions
 └── lib/
-    ├── supabase.ts           ← Realtime client
-    └── multiplayer.ts        ← Position broadcasting
+    ├── ghostPlayer.ts              ← Ghost lap playback singleton
+    ├── ghostRecorder.ts            ← Ghost lap recorder singleton
+    ├── supabase.ts                 ← Realtime client
+    └── multiplayer.ts              ← Position broadcasting
 ```
 
 ## Related
 - [[MonorepoArchitecture]]
 - [[RapierPhysics]]
+- [[RaycastVehicleController]]
+- [[GhostRacingSystem]]
 - [[WebGLContextManagement]]
 - [[VercelMultiZones]]
+- [[DeadCodeAndDependencyHygiene]]

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { FootballPresetSidebar } from './FootballPresetSidebar';
-import { useFootballDashboardPreset, FootballNewPresetType } from '@/hooks/useFootballDashboardPreset';
+import { useFootballDashboardPreset } from '@/hooks/useFootballDashboardPreset';
 import { motion } from 'framer-motion';
 
 export function FootballDashboardPresets() {

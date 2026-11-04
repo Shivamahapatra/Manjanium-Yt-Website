@@ -42,7 +42,7 @@ function processRoster(rosters: any[], teamId: string) {
   return { lineup, substitutes };
 }
 
-function extractTeam(headerTeam: any, rosters: any[], isHome: boolean) {
+function extractTeam(headerTeam: any, rosters: any[], _isHome: boolean) {
   const { lineup, substitutes } = processRoster(rosters, headerTeam.team.id);
   return {
     id: headerTeam.team.id,
@@ -56,7 +56,7 @@ function extractTeam(headerTeam: any, rosters: any[], isHome: boolean) {
 }
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ matchId: string }> }
 ) {
   try {
